@@ -2,14 +2,14 @@ name = 'plasma_web'
 target_dir = 'target/wasm32-unknown-unknown/release/'
 
 # build all
-all: wasm
+all: wasm opt
 
 # install deps
 install:
     npm install
 
 # serve
-serve: all
+serve: wasm
     npm run serve
 
 # distribute
@@ -17,7 +17,7 @@ webpack:
     NODE_ENV=production npx webpack
 
 # build and optimize wasm files
-wasm: build bindgen opt
+wasm: build bindgen
 
 # build wasm files
 build:

@@ -3,9 +3,9 @@ import { PlasmaHandle } from '../../plasma_web';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const TARGET_WIDTH = 900;
-const TARGET_HEIGHT = 900;
-const plasma = new PlasmaHandle(450, 450, 80, 200);
+const TARGET_WIDTH = 800;
+const TARGET_HEIGHT = 800;
+const plasma = new PlasmaHandle(400, 400, 80, 200);
 
 function resize() {
     var w = canvas.width = canvas.offsetWidth;

@@ -1,0 +1,55 @@
+name = 'plasma_web'
+target_dir = 'target/wasm32-unknown-unknown/release/'
+
+# build all
+all: wasm
+
+# install deps
+install:
+    npm install
+
+# serve
+serve: all
+    npm run serve
+
+# distribute
+webpack:
+    NODE_ENV=production npx webpack
+
+# build and optimize wasm files
+wasm: build bindgen opt
+
+# build wasm files
+build:
+    cargo +nightly build --lib --release
+
+# take only what we need and create some polyfills in js
+bindgen:
+    wasm-bindgen --no-typescript --browser --out-dir . ../{{target_dir}}{{name}}.wasm
+
+# make the binary *even smaller* if you installed `wasm-opt`
+opt:
+    wasm-opt -O3 {{name}}_bg.wasm -o {{name}}_bg.wasm
+
+# clean cargo build
+clean:
+    cargo clean
+    rm -f {{name}}.js
+    rm -f {{name}}_bg.wasm
+
+# remove all compiled files from static
+distclean: clean
+    rm -f {{name}}.tar.bz2
+    rm -rf dist
+
+# gzip all files in static for distribution
+gzip:
+    for file in dist/*.{css,js,map,html,wasm}; do \
+      gzip -9 -c "$file" >"$file".gz && touch -r "$file" "$file".gz; \
+    done
+
+# prepare distribution tar
+pack:
+    tar -cvjf {{name}}.tar.bz2 dist
+
+dist: all webpack gzip pack

@@ -1,0 +1,21 @@
+[package]
+name = "plasma-demo"
+version = "0.1.0"
+authors = ["Rafał Michalski <royaltm75@gmail.com>"]
+
+publish = false
+
+build = "build.rs"
+
+[dependencies]
+sdl2 = "0.32.0-beta.2 "
+sdl2-sys = "0.32"
+rand = { git = "https://github.com/rust-random/rand.git" }
+scoped_threadpool = "0.1"
+
+[dependencies.plasma]
+path = "../plasma"
+
+[target.'cfg(windows)'.dependencies]
+winapi = "0.2.8"
+user32-sys = "0.2.0"

@@ -1,0 +1,18 @@
+[package]
+name = "plasma"
+version = "0.1.0"
+authors = ["Rafał Michalski <royaltm75@gmail.com>"]
+
+publish = false
+
+[dependencies]
+lazy_static = "1.2"
+
+[dependencies.palette]
+version = "0.4"
+default-features = false
+
+[dependencies.rand]
+# version = "0.6.0-pre.0"
+git = "https://github.com/rust-random/rand.git"
+default-features = false

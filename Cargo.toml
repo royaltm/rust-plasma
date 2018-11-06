@@ -1,0 +1,7 @@
+[profile.release]
+lto = true
+panic = 'abort'
+opt-level = 3
+
+[workspace]
+members = ["desktop", "plasma", "web"]

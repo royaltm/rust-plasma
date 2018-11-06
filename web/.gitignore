@@ -1,0 +1,5 @@
+node_modules
+dist
+*.tar.bz2
+*.wasm
+plasma_web.js

@@ -8,6 +8,43 @@ use sdl2::VideoSubsystem;
 use sdl2_sys::SDL_Window;
 use sdl2::messagebox::{MESSAGEBOX_ERROR, MESSAGEBOX_INFORMATION, show_simple_message_box};
 
+pub fn alert(text: Cow<str>) {
+    show_simple_message_box(MESSAGEBOX_ERROR, "Plasma", &text, None).expect("to show message box");
+}
+
+pub fn info(text: Cow<str>) {
+    show_simple_message_box(MESSAGEBOX_INFORMATION, "Plasma", &text, None).expect("to show message box");
+}
+
+pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
+    if cfg!(target_os = "windows") {
+        let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;
+        let parent_window = create_window_from_handle_win32(vs, parent_handle)?;
+        // Create window for input events and attach as child window
+        let window = vs.window("plasma.scr preview", 0, 0)
+        .position(0, 0)
+        .borderless()
+        .hidden()
+        .build()
+        .map_err(err_str)?;
+
+        if let Some(handle) = unsafe { get_window_handle_win32(window.raw()) } {
+            if unsafe { set_window_parent_win32(handle, parent_handle) } {
+                // Will render into parent window directly
+                return Ok((parent_window, window.context()));
+            }
+        }
+        Err("Could not set the preview parent handle.".into())
+    }
+    else {
+        Err("Could not create preview window.".into())
+    }
+}
+
+pub fn err_str<E: Error>(e: E) -> String {
+    format!("{}", e)
+}
+
 #[cfg(windows)] use winapi::windef::HWND;
 #[cfg(windows)]
 unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
@@ -62,14 +99,6 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
 //     }
 // }
 
-pub fn alert(text: Cow<str>) {
-    show_simple_message_box(MESSAGEBOX_ERROR, "Plasma", &text, None).expect("to show message box");
-}
-
-pub fn info(text: Cow<str>) {
-    show_simple_message_box(MESSAGEBOX_INFORMATION, "Plasma", &text, None).expect("to show message box");
-}
-
 // #[cfg(windows)]
 // unsafe fn get_window_size_win32(parent_handle: HWND) -> Option<(u32, u32)> {
 //     let mut parent_rect = winapi::windef::RECT {
@@ -103,34 +132,4 @@ fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWN
     else {
         Ok(unsafe { Window::from_ll(video_subsystem.clone(), sdl_window) })
     }
-}
-
-pub fn create_preview_window(video_subsystem: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
-    if cfg!(target_os = "windows") {
-        let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;
-        let parent_window = create_window_from_handle_win32(video_subsystem, parent_handle)?;
-        // Create window for input events and attach as child window
-        let window = video_subsystem
-        .window("plasma.scr preview", 0, 0)
-        .position(0, 0)
-        .borderless()
-        .hidden()
-        .build()
-        .map_err(err_str)?;
-
-        if let Some(handle) = unsafe { get_window_handle_win32(window.raw()) } {
-            if unsafe { set_window_parent_win32(handle, parent_handle) } {
-                // Will render into parent window directly
-                return Ok((parent_window, window.context()));
-            }
-        }
-        Err("Could not set the preview parent handle.".into())
-    }
-    else {
-        Err("Could not create preview window.".into())
-    }
-}
-
-pub fn err_str<E: Error>(e: E) -> String {
-    format!("{}", e)
 }

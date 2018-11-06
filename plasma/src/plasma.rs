@@ -140,7 +140,7 @@ fn gen_pixel<P: PhaseAmpsSelect + ?Sized>(x: f32, y: f32, phase_amps: &P) -> Lin
     // let val1 = compose4(x, y, phase_amps.select(8..16)).to_val();
     // let val2 = compose4(x, y, phase_amps.select(16..24)).to_val();
     let rgb0 = LinSrgb::from(Hsv::new((1.0 - hue0*2.0).to_hue(), 1.0, 1.0));
-    let rgb1 = LinSrgb::from(Hsv::new((hue1*3.0).to_hue(), sat0*2.0, 1.0));
+    let rgb1 = LinSrgb::from(Hsv::new((hue1*3.0).to_hue(), sat0*3.0, 1.0));
     // let rgb = LinSrgb::from(Hsv::new(1.33.to_hue(), 1.0, sat0));
     rgb0 - rgb1
     // rgb

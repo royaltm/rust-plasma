@@ -15,8 +15,8 @@ js-sys = "0.3"
 plasma = { path = "../plasma" }
 
 [dependencies.rand]
-# version = "0.6.0-pre.0"
-git = "https://github.com/rust-random/rand.git"
+version = "0.6.0-pre.1"
+# git = "https://github.com/rust-random/rand.git"
 # default-features = false
 features = ["wasm-bindgen"]
 

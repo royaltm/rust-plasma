@@ -27,7 +27,7 @@ use plasma::*;
 
 Then somwehere in the code:
 
-```
+```rust
     let min_steps = 80.0f32;
     let max_steps = 200.0f32;
     let plasma_width = 200u32;

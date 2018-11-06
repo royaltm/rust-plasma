@@ -17,11 +17,11 @@ This program can be installed as a Windows screen saver. It supports the screen 
 
 To install as a system screen saver:
 
-1. compile using `cargo build --release` it will copy the proper SDL2.dll file in the `desktop` directory.
-2. copy `..\target\release\plasma-demo.exe` to `%SystemRoot%` (e.g. `C:\Windows`)
-3. copy `SDL2.dll` to `%SystemRoot%` (e.g. `C:\Windows`)
+1. compile using `cargo build --release` it will copy the proper SDL2.dll file into the `desktop` directory.
+2. copy `..\target\release\plasma-demo.exe` to `%SystemRoot%\Plasma.scr` (e.g. `C:\Windows\Plasma.scr`)
+3. copy `SDL2.dll` to `%SystemRoot%\SDL2.dll` (e.g. `C:\Windows\SDL2.dll`)
 
-Go to the screen saver settings and select `plasma-demo` from the list. Enjoy.
+Go to the screen saver settings and select `Plasma` from the list. Enjoy.
 
 
 Linux

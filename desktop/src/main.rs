@@ -140,7 +140,6 @@ fn run() -> Result<(), String> {
             plasma_height = PLASMA_HEIGHT;
             window = video_subsystem
             .window("plasma", target_width, target_height)
-            // .fullscreen_desktop()
             .resizable()
             .position_centered()
             .build().map_err(err_str)?;
@@ -190,6 +189,11 @@ fn run() -> Result<(), String> {
                             FullscreenType::Off => FullscreenType::Desktop
                         };
                         canvas.window_mut().set_fullscreen(ft)?;
+                    },
+                    Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
+                        info(concat!("Plasma-demo v", env!("CARGO_PKG_VERSION"), " Copyright (C) 2018 ", env!("CARGO_PKG_AUTHORS"),
+                             "\n\n[ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.\n\n\
+                             This program comes with ABSOLUTELY NO WARRANTY").into());
                     },
                     Event::Window { win_event: WindowEvent::Close, .. } |
                     Event::KeyDown { keycode: Some(Keycode::Escape), .. } |

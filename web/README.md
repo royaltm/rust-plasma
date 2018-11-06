@@ -11,12 +11,13 @@ Prerequisites
 2. `cargo +nightly install wasm-bindgen-cli`
 3. `cargo install just`
 4. optionally get `wasm-opt` from https://github.com/WebAssembly/binaryen
-5. cd `web`
+5. `npm` and `nodejs` from https://nodejs.org/
 
 Development
 -----------
 
 ```
+cd web
 just serve
 ```
 
@@ -27,6 +28,7 @@ Distribution
 ------------
 
 ```
+cd web
 just wasm webpack
 ```
 
@@ -35,6 +37,7 @@ It will compile everything and put all the distribution files in the `./dist` di
 If you have a `wasm-opt` installed, try:
 
 ```
+cd web
 just wasm opt webpack
 ```
 

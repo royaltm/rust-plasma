@@ -41,5 +41,6 @@ Then somwehere in the code:
       let pitch: usize = get_how_many_bytes_per_line();
       plasma.render::<PixelRGB24>(buffer, pitch);
       display_buffer_on_screen();
+      plasma.update();
     }
 ```

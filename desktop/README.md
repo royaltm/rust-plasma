@@ -32,15 +32,15 @@ This is tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain an
 
 ```
 [target.x86_64-pc-windows-gnu]
-linker = "C:/msys64/mingw64/bin/gcc.exe"
-ar = "C:/msys64/mingw64/bin/ar.exe"
+linker = "C:/msys2/mingw64/bin/gcc.exe"
+ar = "C:/msys2/mingw64/bin/ar.exe"
 
 [target.i686-pc-windows-gnu]
-linker = "C:/msys64/mingw32/bin/gcc.exe"
-ar = "C:/msys64/mingw32/bin/ar.exe"
+linker = "C:/msys2/mingw32/bin/gcc.exe"
+ar = "C:/msys2/mingw32/bin/ar.exe"
 ```
 
-assuming you installed MSYS2 in `C:\msys64`.
+assuming you installed MSYS2 in `C:\msys2`.
 
 
 ### Compilation

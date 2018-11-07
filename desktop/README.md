@@ -15,11 +15,53 @@ This program can be installed as a Windows screen saver. It supports the screen 
 * `/p:######` or `/p ######` - run in a preview window with the provided handle
 * `/c` - display configuration window (currently there is none)
 
-To install as a system screen saver:
+To run `plasma-demo` make sure `SDL2.dll` file from `desktop` directory may be found in the current directory or somewhere in the `PATH`.
 
-1. compile using `cargo build --release` it will copy the proper SDL2.dll file into the `desktop` directory.
-2. copy `..\target\release\plasma-demo.exe` to `%SystemRoot%\Plasma.scr` (e.g. `C:\Windows\Plasma.scr`)
-3. copy `SDL2.dll` to `%SystemRoot%\SDL2.dll` (e.g. `C:\Windows\SDL2.dll`)
+If you don't want to depend on `SDL2.dll` you need to statically compile `plasma-demo` with `SDL2`.
+
+This is tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
+
+### Prerequsites
+
+1. Download and install [MSYS2](http://msys2.github.io/).
+2. Launch your __MSYS2__ environment using either `mingw32_shell.bat` or `mingw64_shell.bat`.
+3. Install the mingw toolchains `pacman -S mingw-w64-x86_64-toolchain` or `pacman -S mingw-w64-i686-toolchain` depending upon which architecture (`x86_x64` or `i686`) you want to compile binary to.
+4. Install the base set of developer tools using `pacman -S base-devel`.
+5. Install rust toolchain `rustup install nightly-x86_64-pc-windows-gnu` or `rustup install nightly-i686-pc-windows-gnu` depending on which architecture (`x86_x64` or `i686`) you want to compile binary to.
+6. Edit file in `%USERPROFILE%/.cargo/config` (create this file eventually) and add the following to override rust-embedded linker:
+
+```
+[target.x86_64-pc-windows-gnu]
+linker = "C:/msys64/mingw64/bin/gcc.exe"
+ar = "C:/msys64/mingw64/bin/ar.exe"
+
+[target.i686-pc-windows-gnu]
+linker = "C:/msys64/mingw32/bin/gcc.exe"
+ar = "C:/msys64/mingw32/bin/ar.exe"
+```
+
+assuming you installed MSYS2 in `C:\msys64`.
+
+
+### Compilation
+
+Assuming `C:/full/path/to/plasma` should be a windows directory name (including drive letter, e.g. `C:/`) where you cloned this project to, from MSYS2 console, for a `x86_64` toolchain type:
+
+```sh
+cd C:/full/path/to/plasma/desktop
+RUSTFLAGS='-C link-args=-s -L native=C:/full/path/to/plasma/desktop/sdl-2.0.8-windows/x86_64/gnu-mingw' cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
+```
+
+and for a `i686` toolchain type:
+
+```sh
+cd /full/path/to/plasma/desktop
+RUSTFLAGS='-C link-args=-s -L native=/full/path/to/plasma/desktop/sdl-2.0.8-windows/i686/gnu-mingw' cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
+```
+
+### Installation
+
+To install screensaver just copy it from `..\target\release\plasma-demo.exe` to `%SystemRoot%` (e.g. `C:\Windows`) and change file name to `Plasma.scr`.
 
 Go to the screen saver settings and select `Plasma` from the list. Enjoy.
 

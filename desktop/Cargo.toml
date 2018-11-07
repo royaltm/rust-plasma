@@ -9,8 +9,13 @@ publish = false
 
 build = "build.rs"
 
+[features]
+default = []
+static-link = ["sdl2/static-link"]
+use-pkgconfig = ["sdl2/use-pkgconfig"]
+
 [dependencies]
-sdl2 = "0.32.0-beta.2 "
+sdl2 = "0.32.0-beta.2"
 sdl2-sys = "0.32"
 # rand = { git = "https://github.com/rust-random/rand.git" }
 rand = "0.6.0-pre.1"

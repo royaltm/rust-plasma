@@ -7,6 +7,8 @@ license = "GPL-3.0-or-later"
 
 publish = false
 
+readme = "README.md"
+
 [dependencies]
 lazy_static = "1.2"
 

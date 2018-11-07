@@ -17,7 +17,7 @@ pub fn info(text: Cow<str>) {
 }
 
 pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
-    if cfg!(target_os = "windows") {
+    #[cfg(target_os = "windows")] {
         let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;
         let parent_window = create_window_from_handle_win32(vs, parent_handle)?;
         // Create window for input events and attach as child window
@@ -36,7 +36,7 @@ pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result
         }
         Err("Could not set the preview parent handle.".into())
     }
-    else {
+    #[cfg(not(target_os = "windows"))] {
         Err("Could not create preview window.".into())
     }
 }
@@ -45,7 +45,7 @@ pub fn err_str<E: Error>(e: E) -> String {
     format!("{}", e)
 }
 
-#[cfg(windows)] use winapi::windef::HWND;
+#[cfg(windows)] use winapi::shared::windef::HWND;
 #[cfg(windows)]
 unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
     use sdl2_sys::{ SDL_SysWMinfo, SDL_version, SDL_SysWMinfo__bindgen_ty_1,
@@ -84,7 +84,7 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
 //                 unsafe {
 //                     use winapi::minwindef::FALSE;
 //                     use winapi::winuser::{ HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE };
-//                     match user32::SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0,
+//                     match winapi::um::winuser::SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0,
 //                                                    SWP_NOMOVE|SWP_NOSIZE) {
 //                         FALSE => false,
 //                         _ => true
@@ -104,7 +104,7 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
 //     let mut parent_rect = winapi::windef::RECT {
 //         left: 0, top: 0, right: 0, bottom: 0,
 //     };
-//     match user32::GetClientRect(parent_handle, &mut parent_rect) {
+//     match winapi::um::winuser::GetClientRect(parent_handle, &mut parent_rect) {
 //         winapi::minwindef::FALSE => None,
 //         _ => Some((parent_rect.right as u32, parent_rect.bottom as u32))
 //     }
@@ -112,20 +112,20 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
 
 #[cfg(windows)]
 unsafe fn set_window_parent_win32(handle: HWND, parent_handle: HWND) -> bool {
-    use winapi::winuser::{ GWL_STYLE, WS_CHILD, WS_POPUP };
-    if user32::SetParent(handle, parent_handle).is_null() {
+    use winapi::um::winuser::{ SetParent, GWL_STYLE, WS_CHILD, WS_POPUP };
+    if SetParent(handle, parent_handle).is_null() {
         return false;
     }
     // Make this a child window so it will close when the parent dialog closes
     #[cfg(target_arch = "x86_64")] {
-        use winapi::basetsd::{ LONG_PTR };
-        user32::SetWindowLongPtrA(handle, GWL_STYLE,
-            (user32::GetWindowLongPtrA(handle, GWL_STYLE) & !WS_POPUP as LONG_PTR) | WS_CHILD as LONG_PTR);
+        use winapi::shared::basetsd::LONG_PTR;
+        winapi::um::winuser::SetWindowLongPtrA(handle, GWL_STYLE,
+            (winapi::um::winuser::GetWindowLongPtrA(handle, GWL_STYLE) & !WS_POPUP as LONG_PTR) | WS_CHILD as LONG_PTR);
     }
     #[cfg(not(target_arch = "x86_64"))] {
-        use winapi::winnt::LONG;
-        user32::SetWindowLongA(handle, GWL_STYLE,
-            (user32::GetWindowLongA(handle, GWL_STYLE) & !WS_POPUP as LONG) | WS_CHILD as LONG);
+        use winapi::shared::ntdef::LONG;
+        winapi::um::winuser::SetWindowLongA(handle, GWL_STYLE,
+            (winapi::um::winuser::GetWindowLongA(handle, GWL_STYLE) & !WS_POPUP as LONG) | WS_CHILD as LONG);
     }
     true
 }

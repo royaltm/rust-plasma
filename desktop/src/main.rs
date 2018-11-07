@@ -8,7 +8,6 @@ extern crate scoped_threadpool;
 extern crate plasma;
 
 #[cfg(windows)] extern crate winapi;
-#[cfg(windows)] extern crate user32;
 
 mod utils;
 

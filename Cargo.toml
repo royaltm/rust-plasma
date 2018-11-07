@@ -5,3 +5,4 @@ opt-level = 3
 
 [workspace]
 members = ["desktop", "plasma", "web"]
+default-members = ["desktop"]

@@ -4,17 +4,17 @@ use std::path::PathBuf;
 const SDL2_WINDOWS_DIR: &'static str = "sdl-2.0.8-windows";
 
 fn main() {
-    if cfg!(target_os = "windows") {
+    if cfg!(target_os = "windows") && cfg!(not(feature = "static-link")) {
         let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
         let mut lib_dir = manifest_dir.clone();
 
         lib_dir.push(SDL2_WINDOWS_DIR);
 
         if cfg!(target_arch = "x86_64") {
-            lib_dir.push("x64");
+            lib_dir.push("x86_64");
         }
         else if cfg!(target_arch = "x86") {
-            lib_dir.push("x86");
+            lib_dir.push("i686");
         }
         else {
             return;
@@ -31,7 +31,7 @@ fn main() {
         else {
             return;
         }
-        println!("cargo:rustc-link-search=all={}", lib_dir.display());
+        println!("cargo:rustc-link-search=native={}", lib_dir.display());
         for entry in std::fs::read_dir(dll_dir).expect("Can't read DLL dir")  {
             let entry_path = entry.expect("Invalid fs entry").path();
             if let Some(file_name) = entry_path.file_name() {

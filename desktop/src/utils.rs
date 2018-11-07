@@ -16,6 +16,30 @@ pub fn info(text: Cow<str>) {
     show_simple_message_box(MESSAGEBOX_INFORMATION, "Plasma", &text, None).expect("to show message box");
 }
 
+#[cfg(not(target_os = "windows"))]
+pub fn set_dpi_awareness() -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+pub fn set_dpi_awareness() -> Result<(), String> {
+    use winapi::um::shellscalingapi::{ SetProcessDpiAwareness, GetProcessDpiAwareness,
+                                       PROCESS_DPI_UNAWARE, PROCESS_PER_MONITOR_DPI_AWARE };
+    use winapi::shared::winerror::{ S_OK, E_INVALIDARG };
+
+    match unsafe { SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE) } {
+        S_OK => Ok(()),
+        E_INVALIDARG => Err("Could not set DPI awareness.".into()),
+        _ => {
+            let mut awareness = PROCESS_DPI_UNAWARE;
+            match unsafe { GetProcessDpiAwareness(std::ptr::null_mut(), &mut awareness) } {
+                S_OK if awareness == PROCESS_PER_MONITOR_DPI_AWARE => Ok(()),
+                _ => Err("Please disable DPI awareness override in program properties.".into())
+            }
+        }
+    }
+}
+
 pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
     #[cfg(target_os = "windows")] {
         let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;

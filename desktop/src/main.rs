@@ -74,6 +74,8 @@ fn run() -> Result<(), String> {
         app_mode = AppMode::Standalone;
     }
 
+    set_dpi_awareness()?;
+
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     // eprintln!("driver: {}", video_subsystem.current_video_driver());

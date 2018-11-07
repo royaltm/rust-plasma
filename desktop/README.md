@@ -21,7 +21,7 @@ If you don't want to depend on `SDL2.dll` you need to statically compile `plasma
 
 This is tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
 
-### Prerequsites
+### Prerequisites
 
 1. Download and install [MSYS2](http://msys2.github.io/).
 2. Launch your __MSYS2__ environment using either `mingw32_shell.bat` or `mingw64_shell.bat`.

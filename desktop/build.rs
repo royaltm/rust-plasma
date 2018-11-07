@@ -4,7 +4,7 @@ use std::path::PathBuf;
 const SDL2_WINDOWS_DIR: &'static str = "sdl-2.0.8-windows";
 
 fn main() {
-    if cfg!(target_os = "windows") && cfg!(not(feature = "static-link")) {
+    if cfg!(all(target_os = "windows", not(feature = "static-link"), not(feature = "use-pkgconfig"))) {
         let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
         let mut lib_dir = manifest_dir.clone();
 

@@ -113,13 +113,20 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
 #[cfg(windows)]
 unsafe fn set_window_parent_win32(handle: HWND, parent_handle: HWND) -> bool {
     use winapi::winuser::{ GWL_STYLE, WS_CHILD, WS_POPUP };
-    use winapi::basetsd::LONG_PTR;
     if user32::SetParent(handle, parent_handle).is_null() {
         return false;
     }
     // Make this a child window so it will close when the parent dialog closes
-    user32::SetWindowLongPtrA(handle, GWL_STYLE,
-        (user32::GetWindowLongPtrA(handle, GWL_STYLE) & !WS_POPUP as LONG_PTR) | WS_CHILD as LONG_PTR);
+    #[cfg(target_arch = "x86_64")] {
+        use winapi::basetsd::{ LONG_PTR };
+        user32::SetWindowLongPtrA(handle, GWL_STYLE,
+            (user32::GetWindowLongPtrA(handle, GWL_STYLE) & !WS_POPUP as LONG_PTR) | WS_CHILD as LONG_PTR);
+    }
+    #[cfg(not(target_arch = "x86_64"))] {
+        use winapi::winnt::LONG;
+        user32::SetWindowLongA(handle, GWL_STYLE,
+            (user32::GetWindowLongA(handle, GWL_STYLE) & !WS_POPUP as LONG) | WS_CHILD as LONG);
+    }
     true
 }
 

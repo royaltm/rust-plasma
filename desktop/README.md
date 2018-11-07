@@ -61,9 +61,12 @@ RUSTFLAGS='-C link-args=-s -L native=/full/path/to/plasma/desktop/sdl-2.0.8-wind
 
 ### Installation
 
-To install screensaver just copy it from `..\target\release\plasma-demo.exe` to `%SystemRoot%` (e.g. `C:\Windows`) and change file name to `Plasma.scr`.
+To install screensaver:
 
-Go to the screen saver settings and select `Plasma` from the list. Enjoy.
+1. Copy it from `..\target\release\plasma-demo.exe` to a convenient folder (e.g. `%USERPROFILE%\AppData\Roaming`).
+2. Rename it to `Plasma.scr`.
+
+Right click on `Plasma.scr` and select `Install`. Enjoy.
 
 
 Linux

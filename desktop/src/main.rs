@@ -46,6 +46,20 @@ enum AppState {
     Inactive
 }
 
+#[cfg(target_pointer_width = "32")]
+macro_rules! program_name {
+    () => (concat!(env!("CARGO_PKG_NAME"), " (32-bit)"));
+}
+
+#[cfg(target_pointer_width = "64")]
+macro_rules! program_name {
+    () => (concat!(env!("CARGO_PKG_NAME"), " (64-bit)"));
+}
+
+static ABOUT_INFO: &'static str = concat!(program_name!(), " v", env!("CARGO_PKG_VERSION"), " Copyright © 2018 ", env!("CARGO_PKG_AUTHORS"),
+                                "\n\nThis program comes with ABSOLUTELY NO WARRANTY\n\n\
+                                 [ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.");
+
 fn run() -> Result<(), String> {
     let app_mode: AppMode;
 
@@ -203,9 +217,7 @@ fn run() -> Result<(), String> {
                             canvas.window_mut().set_fullscreen(ft)?;
                         },
                         Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
-                            info(concat!("Plasma-demo v", env!("CARGO_PKG_VERSION"), " Copyright (C) 2018 ", env!("CARGO_PKG_AUTHORS"),
-                                 "\n\n[ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.\n\n\
-                                 This program comes with ABSOLUTELY NO WARRANTY").into());
+                            info(ABOUT_INFO.into());
                         },
                         Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
                         Event::Window { win_event: WindowEvent::Close, .. } |

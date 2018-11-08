@@ -40,6 +40,12 @@ enum AppMode {
     ScreensaverConfig
 }
 
+#[derive(Debug, PartialEq)]
+enum AppState {
+    Active,
+    Inactive
+}
+
 fn run() -> Result<(), String> {
     let app_mode: AppMode;
 
@@ -166,42 +172,62 @@ fn run() -> Result<(), String> {
 
     let mut pool = Pool::new(sdl2::cpuinfo::cpu_count() as u32);
 
+    let mut app_state = AppState::Active;
+
+    let mut event_pump = sdl_context.event_pump()?;
+
     // let mut start = timer_subsystem.performance_counter();
     'mainloop: loop {
-        for event in sdl_context.event_pump()?.poll_iter() {
-            match app_mode {
-                AppMode::ScreensaverPreview(_) => match event {
-                    Event::Window { win_event: WindowEvent::Close, .. } |
-                    Event::Quit { .. } => break 'mainloop,
-                    _ => {}
-                },
-                AppMode::Screensaver => match event {
-                    Event::MouseButtonDown {..} |
-                    Event::Window { win_event: WindowEvent::Close, .. } |
-                    Event::KeyDown { .. } |
-                    Event::Quit { .. } => break 'mainloop,
-                    _ => {}
-                },
-                AppMode::Standalone => match event {
-                    Event::MouseButtonDown { clicks: 2, ..} => {
-                        let ft = match canvas.window().fullscreen_state() {
-                            FullscreenType::Desktop |
-                                FullscreenType::True => FullscreenType::Off,
-                            FullscreenType::Off => FullscreenType::Desktop
-                        };
-                        canvas.window_mut().set_fullscreen(ft)?;
+        if app_state == AppState::Active {
+            for event in event_pump.poll_iter() {
+                match app_mode {
+                    AppMode::ScreensaverPreview(_) => match event {
+                        Event::Window { win_event: WindowEvent::Close, .. } |
+                        Event::Quit { .. } => break 'mainloop,
+                        _ => {}
                     },
-                    Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
-                        info(concat!("Plasma-demo v", env!("CARGO_PKG_VERSION"), " Copyright (C) 2018 ", env!("CARGO_PKG_AUTHORS"),
-                             "\n\n[ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.\n\n\
-                             This program comes with ABSOLUTELY NO WARRANTY").into());
+                    AppMode::Screensaver => match event {
+                        Event::MouseButtonDown {..} |
+                        Event::Window { win_event: WindowEvent::Close, .. } |
+                        Event::KeyDown { .. } |
+                        Event::Quit { .. } => break 'mainloop,
+                        _ => {}
                     },
-                    Event::Window { win_event: WindowEvent::Close, .. } |
-                    Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
-                    Event::Quit { .. } => break 'mainloop,
-                    _ => {}
+                    AppMode::Standalone => match event {
+                        Event::MouseButtonDown { clicks: 2, ..} => {
+                            let ft = match canvas.window().fullscreen_state() {
+                                FullscreenType::Desktop |
+                                    FullscreenType::True => FullscreenType::Off,
+                                FullscreenType::Off => FullscreenType::Desktop
+                            };
+                            canvas.window_mut().set_fullscreen(ft)?;
+                        },
+                        Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
+                            info(concat!("Plasma-demo v", env!("CARGO_PKG_VERSION"), " Copyright (C) 2018 ", env!("CARGO_PKG_AUTHORS"),
+                                 "\n\n[ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.\n\n\
+                                 This program comes with ABSOLUTELY NO WARRANTY").into());
+                        },
+                        Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
+                        Event::Window { win_event: WindowEvent::Close, .. } |
+                        Event::Quit { .. } => break 'mainloop,
+                        Event::Window { win_event: WindowEvent::Minimized, .. } => {
+                            app_state = AppState::Inactive;
+                            continue 'mainloop;
+                        },
+                        _ => {}
+                    },
+                    _ => break 'mainloop
+                }
+            }
+        }
+        else {
+            match event_pump.wait_event() {
+                Event::Window { win_event: WindowEvent::Restored, .. } => {
+                    app_state = AppState::Active;
                 },
-                _ => break 'mainloop
+                Event::Window { win_event: WindowEvent::Close, .. } |
+                Event::Quit { .. } => break 'mainloop,
+                _ => continue 'mainloop
             }
         }
 

@@ -127,7 +127,7 @@ fn run() -> Result<(), String> {
             let flags = window_builder.window_flags() | SDL_WindowFlags::SDL_WINDOW_ALWAYS_ON_TOP as u32;
             window = window_builder.set_window_flags(flags)
             .build().map_err(err_str)?;
-            let target_size = min(min(w, h)*4/3, 900);
+            let target_size = min(min(w, h)*5/6, 900);
             target_width = target_size;
             target_height = target_size;
             let plasma_size = if target_size < 400 { target_size } else { target_size / 2 };

@@ -13,18 +13,25 @@ const PI2: f32 = 2.0*PI;
 
 type PhaseAmpsT = [PhaseAmp; 24];
 
+/// The struct that holds the meta information about current plasma state
 #[derive(Debug, Clone, PartialEq)]
 pub struct Plasma {
+    /// The plasma pixel width
     pub pixel_width: u32,
+    /// The plasma pixel height
     pub pixel_height: u32,
     config: PhaseAmpCfg,
     phase_amps: PhaseAmpsT,
 }
 
+/// The trait for putting pixels into byte buffers.
 pub trait PixelBuffer {
+    /// Puts a single `pixel` into the provided `buffer` at the given `offset`.
+    /// The `pixel` should implement [IntoColor] trait from [palette]
     fn put_pixel<C: IntoColor>(buffer: &mut [u8], offset: usize, pixel: C) -> usize;
 }
 
+/// Implements [PixelBuffer] for RGB24 buffer (3 bytes/pixel: red, green, blue).
 pub struct PixelRGB24;
 
 impl PixelBuffer for PixelRGB24 {
@@ -38,6 +45,7 @@ impl PixelBuffer for PixelRGB24 {
     }    
 }
 
+/// Implements [PixelBuffer] for RGBA8 buffer (4 bytes/pixel: red, green, blue, alpha).
 pub struct PixelRGBA8;
 
 impl PixelBuffer for PixelRGBA8 {
@@ -53,6 +61,10 @@ impl PixelBuffer for PixelRGBA8 {
 }
 
 impl Plasma {
+    /// Creates new plasma instance.
+    ///
+    /// Provide the initial `pixel_width` and `pixel_height`,
+    /// initialized [PhaseAmpCfg] and an instance of [Rng].
     pub fn new<R: Rng + ?Sized>(pixel_width: u32, pixel_height: u32, config: PhaseAmpCfg, rng: &mut R) -> Self {
         let mut phase_amps = PhaseAmpsT::default();
         for p in phase_amps.iter_mut() {
@@ -63,6 +75,9 @@ impl Plasma {
         }
     }
 
+    /// Animates the plasma by modifying the internal [PhaseAmp] variables.
+    ///
+    /// Provide an instance of initialized [Rng] instance.
     pub fn update<R: Rng + ?Sized>(&mut self, rng: &mut R) {
         let config = &self.config;
         for pa in self.phase_amps.iter_mut() {
@@ -70,12 +85,37 @@ impl Plasma {
         }
     }
 
+    /// Renders the plasma into the provided `buffer`.
+    ///
+    /// You must also provide a struct implementing [PixelBuffer] trait.
+    ///
+    /// The `pitch` should contain the number of bytes of a single line in a buffer.
+    ///
+    /// # Panics
+    ///
+    /// __Panics__ if provided `buffer` is too small.
     #[inline(always)]
     pub fn render<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize) {
         self.render_part::<B>(buffer, pitch, 0, 0, self.pixel_width as usize, self.pixel_height as usize, 0)
     }
 
-    /// offset is the current starting offset of the buffer slice provided
+    /// Renders the part of the plasma into the provided `buffer`.
+    ///
+    /// You must also provide a struct implementing [PixelBuffer] trait.
+    ///
+    /// The `pitch` should contain the number of bytes of a single line in a buffer.
+    ///
+    /// The boundary of rendered part should be provided by `x`, `y`, `w` and `h` arguments
+    /// in pixel coordinates starting from left/top corner.
+    ///
+    /// The `offset` is the starting byte offset of the buffer slice provided.
+    /// E.g. if you sliced the buffer to render each slice in a different thread,
+    /// you need to provide the offset of each slice from the beginning of the target buffer.
+    /// Otherwise this function assumes the `buffer` is provided for the whole plasma.
+    ///
+    /// # Panics
+    ///
+    /// __Panics__ if provided `buffer` is too small.
     #[inline(always)]
     pub fn render_part<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize, h: usize, offset: usize) {
         let pw = self.pixel_width as usize;
@@ -84,6 +124,11 @@ impl Plasma {
         render_part::<B, _>(buffer, pitch, pw, ph, phase_amps, x, y, w, h, offset)
     }
 
+    /// Import the internal plasma state from a slice of 32bit floats.
+    ///
+    /// # Panics
+    ///
+    /// __Panics__ when the provided slice is shorter than the data exported by [Plasma::export_phase_amps].
     pub fn import_phase_amps(&mut self, data: &[f32]) {
         for (i, pa) in self.phase_amps.iter_mut().enumerate() {
             let src = data.at(i);
@@ -92,6 +137,7 @@ impl Plasma {
         }
     }
 
+    /// Exports the internal plasma state into the [Vec] of 32bit floats.
     pub fn export_phase_amps(&self) -> Vec<f32> {
         let mut out = Vec::new();
         self.phase_amps.export(&mut out);
@@ -109,6 +155,29 @@ impl Plasma {
     }
 }
 
+/// Renders the part of the plasma into the provided `buffer` without the [Plasma] instance.
+///
+/// You must also provide a struct implementing [PixelBuffer] trait.
+///
+/// The `pitch` should contain the number of bytes of a single line in a buffer.
+///
+/// The `pw` is the plasma total pixel width, the `ph` is the total pixel height.
+///
+/// This static method allows to use directly exported plasma state
+/// from [Plasma::export_phase_amps] without the instance of the [Plasma] struct.
+/// The `phase_amps` type should implement trait [PhaseAmpsSelect].
+///
+/// The boundary of rendered part should be provided by `x`, `y`, `w` and `h` arguments
+/// in pixel coordinates starting from left/top corner.
+///
+/// The `offset` is the starting byte offset of the buffer slice provided.
+/// E.g. if you sliced the buffer to render each slice in a different thread,
+/// you need to provide the offset of each slice from the beginning of the target buffer.
+/// Otherwise this function assumes the `buffer` is provided for the whole plasma.
+///
+/// # Panics
+///
+/// __Panics__ if provided `buffer` is too small or if [PhaseAmpsSelect::select] panics.
 pub fn render_part<B, P>(buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &P, x: usize, y: usize, w: usize, h: usize, offset: usize)
 where B: PixelBuffer, P: PhaseAmpsSelect + ?Sized
 {

@@ -39,7 +39,7 @@ Then somwehere in the code:
     loop {
       let buffer_rgb24: &mut [u8] = get_image_buffer_from_somwhere();
       let pitch: usize = get_how_many_bytes_per_line();
-      plasma.render::<PixelRGB24>(buffer, pitch);
+      plasma.render::<PixelRGB24>(buffer_rgb24, pitch);
       display_buffer_on_screen();
       plasma.update();
     }

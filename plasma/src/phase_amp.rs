@@ -10,7 +10,7 @@ const PI05: f32 = 0.5*PI;
 const MIN_STEPS: f32 = 100.0;
 const MAX_STEPS: f32 = 200.0;
 
-
+/// A trait for querying parameters of phase and amplitude changes.
 pub trait PhaseAmpConfig {
     fn min_steps(&self) -> f32;
     fn max_steps(&self) -> f32;
@@ -18,6 +18,7 @@ pub trait PhaseAmpConfig {
     fn delta_delta_phase_abs_max(&self) -> f32;
 }
 
+/// Holds parameters of phase and amplitude changes for [PhaseAmpConfig] trait.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct PhaseAmpCfg {
     min_steps: f32,
@@ -26,6 +27,7 @@ pub struct PhaseAmpCfg {
     delta_delta_phase_abs_max: f32
 }
 
+/// Holds a phase and an amplitude along with their animation state.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct PhaseAmp {
     phase: f32,
@@ -37,6 +39,7 @@ pub struct PhaseAmp {
     transition_amplitude: f32
 }
 
+/// A trait for querying and updating phase and amplitude
 pub trait PhaseAmpAccess {
     fn phase(&self) -> f32;
     fn amplitude(&self) -> f32;
@@ -49,10 +52,12 @@ pub trait PhaseAmpAccess {
     }
 }
 
+/// A trait for selecting a collection of phase and amplitude pairs.
 pub trait PhaseAmpsSelect {
     type Item: PhaseAmpAccess + ?Sized;
     fn at(&self, idx: usize) -> &Self::Item;
     fn at_mut(&mut self, idx: usize) -> &mut Self::Item;
+    /// The range should always be bounded.
     fn select(&self, range: Range<usize>) -> &Self;
     fn export(&self, out: &mut Vec<f32>);
 }
@@ -171,7 +176,19 @@ impl Default for PhaseAmpCfg {
 }
 
 impl PhaseAmpCfg {
+    /// Creates new [PhaseAmpCfg] instance from the provided arguments.
+    ///
+    /// The arguments define the range `[min, max)` for a number of animation steps
+    /// between phase and amplitude transitions.
+    /// The larger the numbers the slower plasma animates.
+    ///
+    /// # Panics
+    ///
+    /// __Panics__ if `min_steps` is equal or larger than `max_steps` or
+    /// if `min_steps` is less than or equal to `1.0`.
     pub fn new(min_steps: f32, max_steps: f32) -> Self {
+        assert!(min_steps < max_steps, "min steps must be lower than max steps");
+        assert!(min_steps > 1.0, "min steps must be larger than 1.0");
         PhaseAmpCfg {
             min_steps, max_steps,
             delta_phase_abs_max: PI05 / min_steps,
@@ -181,6 +198,7 @@ impl PhaseAmpCfg {
 }
 
 impl PhaseAmp {
+    /// Creates randomized single phase and amplitude pair.
     pub fn new<C, R>(cfg: &C, rng: &mut R) -> Self
     where C: PhaseAmpConfig,
           R: Rng + ?Sized
@@ -201,6 +219,7 @@ impl PhaseAmp {
         }
     }
 
+    /// Performs a one step update of the phase and amplitude pair animation.
     pub fn update<C, R>(&mut self, cfg: &C, rng: &mut R)
     where C: PhaseAmpConfig,
           R: Rng + ?Sized

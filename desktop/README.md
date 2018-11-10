@@ -15,20 +15,22 @@ This program can be installed as a Windows screen saver. It supports the screen 
 * `/p:######` or `/p ######` - run in a preview window with the provided handle
 * `/c` - display configuration window (currently there is none)
 
+Additionally the experimental `/w` argument will run this program as the desktop wallpaper animation. In this instance there is no other way to exit the program but to terminate it from the task manager. You will have to manually restore the original desktop wallpaper afterwards.
+
 To run `plasma-demo` make sure `SDL2.dll` file from `desktop` directory may be found in the current directory or somewhere in the `PATH`.
 
 If you don't want to depend on `SDL2.dll` you need to statically compile `plasma-demo` with `SDL2`.
 
-This is tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
+This is a little bit tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
 
 ### Prerequisites
 
 1. Download and install [MSYS2](http://msys2.github.io/).
-2. Launch your __MSYS2__ environment using either `mingw32_shell.bat` or `mingw64_shell.bat`.
-3. Install the mingw toolchains `pacman -S mingw-w64-x86_64-toolchain` or `pacman -S mingw-w64-i686-toolchain` depending upon which architecture (`x86_x64` or `i686`) you want to compile binary to.
+2. Launch your __MSYS2__ environment using either `msys2_shell.cmd -mingw32` or `msys2_shell.cmd -mingw64`.
+3. From MinGW console install `pacman -S mingw-w64-x86_64-toolchain` or `pacman -S mingw-w64-i686-toolchain` depending upon which architecture (`x86_x64` or `i686`) you want to compile to.
 4. Install the base set of developer tools using `pacman -S base-devel`.
-5. Install rust toolchain `rustup install nightly-x86_64-pc-windows-gnu` or `rustup install nightly-i686-pc-windows-gnu` depending on which architecture (`x86_x64` or `i686`) you want to compile binary to.
-6. Edit file in `%USERPROFILE%/.cargo/config` (create this file eventually) and add the following to override rust-embedded linker:
+5. Install rust toolchain `rustup install nightly-x86_64-pc-windows-gnu` or `rustup install nightly-i686-pc-windows-gnu` depending on which architecture (`x86_x64` or `i686`) you want to compile to.
+6. Edit file in `%USERPROFILE%/.cargo/config` (create this file eventually) and add the following to override rust-embedded gnu linker:
 
 ```
 [target.x86_64-pc-windows-gnu]
@@ -45,19 +47,20 @@ assuming you installed MSYS2 in `C:\msys2`.
 
 ### Compilation
 
-Assuming `C:/full/path/to/plasma` should be a windows directory name (including drive letter, e.g. `C:/`) where you cloned this project to, from MSYS2 console, for a `x86_64` toolchain type:
+From MSYS2 console, for a `x86_64` toolchain type:
 
 ```sh
-cd C:/full/path/to/plasma/desktop
-RUSTFLAGS='-C link-args=-s -L native=C:/full/path/to/plasma/desktop/sdl-2.0.8-windows/x86_64/gnu-mingw' cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
+cd plasma/desktop
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.8-windows/x86_64/gnu-mingw" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
 ```
 
 and for a `i686` toolchain type:
 
 ```sh
-cd /full/path/to/plasma/desktop
-RUSTFLAGS='-C link-args=-s -L native=/full/path/to/plasma/desktop/sdl-2.0.8-windows/i686/gnu-mingw' cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
+cd plasma/desktop
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.8-windows/i686/gnu-mingw" cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
 ```
+
 
 ### Installation
 
@@ -99,7 +102,19 @@ Arch example:
 sudo pacman -S sdl2
 ```
 
-Then `cargo run --release`.
+
+### Compilation
+
+```
+cargo build --release
+```
+
+Optionally if SDL2 files are not in the path you may use pkgconfig to find SDL2 libraries:
+
+
+```sh
+cargo build --features=use-pkgconfig --release
+```
 
 
 Mac OS X
@@ -107,4 +122,8 @@ Mac OS X
 
 See https://github.com/Rust-SDL2/rust-sdl2#mac-os-x
 
-Then `cargo run --release`.
+### Compilation
+
+```
+cargo build --release
+```

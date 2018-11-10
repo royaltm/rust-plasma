@@ -37,7 +37,8 @@ enum AppMode {
     Standalone,
     Screensaver,
     ScreensaverPreview(String),
-    ScreensaverConfig
+    ScreensaverConfig,
+    Wallpaper
 }
 
 #[derive(Debug, PartialEq)]
@@ -72,6 +73,9 @@ fn run() -> Result<(), String> {
             },
             Some("/c") => {
                 app_mode = AppMode::ScreensaverConfig
+            },
+            Some("/w")|Some("-w") => {
+                app_mode = AppMode::Wallpaper
             },
             Some("/p") => {
                 let handle = std::env::args().nth(2).ok_or_else(|| "No window handle for preview")?;
@@ -154,6 +158,16 @@ fn run() -> Result<(), String> {
             plasma_width = plasma_size;
             plasma_height = plasma_size;
         },
+        AppMode::Wallpaper => {
+            window = create_wallpaper_window(&video_subsystem)?;
+            let (w, h) = window.drawable_size();
+            let target_size = min(min(w, h)*5/6, 900);
+            target_width = target_size;
+            target_height = target_size;
+            let plasma_size = if target_size < 400 { target_size } else { target_size / 2 };
+            plasma_width = plasma_size;
+            plasma_height = plasma_size;
+        },
         AppMode::Standalone => {
             target_width = TARGET_WIDTH;
             target_height = TARGET_HEIGHT;
@@ -167,7 +181,7 @@ fn run() -> Result<(), String> {
         }
     }
 
-    sdl_context.mouse().show_cursor(false);
+    sdl_context.mouse().show_cursor(app_mode == AppMode::Wallpaper);
 
     // let timer_subsystem = sdl_context.timer()?;
 
@@ -195,7 +209,7 @@ fn run() -> Result<(), String> {
         if app_state == AppState::Active {
             for event in event_pump.poll_iter() {
                 match app_mode {
-                    AppMode::ScreensaverPreview(_) => match event {
+                    AppMode::ScreensaverPreview(_) | AppMode::Wallpaper => match event {
                         Event::Window { win_event: WindowEvent::Close, .. } |
                         Event::Quit { .. } => break 'mainloop,
                         _ => {}

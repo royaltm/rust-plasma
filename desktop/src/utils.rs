@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::borrow::Cow;
 use std::rc::Rc;
+use std::ptr;
 
 use sdl2::get_error;
 use sdl2::video::{Window, WindowContext};
@@ -16,12 +17,12 @@ pub fn info(text: Cow<str>) {
     show_simple_message_box(MESSAGEBOX_INFORMATION, "Plasma", &text, None).expect("to show message box");
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(not(windows))]
 pub fn set_dpi_awareness() -> Result<(), String> {
     Ok(())
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 pub fn set_dpi_awareness() -> Result<(), String> {
     use winapi::um::shellscalingapi::{ SetProcessDpiAwareness, GetProcessDpiAwareness,
                                        PROCESS_DPI_UNAWARE, PROCESS_PER_MONITOR_DPI_AWARE };
@@ -32,7 +33,7 @@ pub fn set_dpi_awareness() -> Result<(), String> {
         E_INVALIDARG => Err("Could not set DPI awareness.".into()),
         _ => {
             let mut awareness = PROCESS_DPI_UNAWARE;
-            match unsafe { GetProcessDpiAwareness(std::ptr::null_mut(), &mut awareness) } {
+            match unsafe { GetProcessDpiAwareness(ptr::null_mut(), &mut awareness) } {
                 S_OK if awareness == PROCESS_PER_MONITOR_DPI_AWARE => Ok(()),
                 _ => Err("Please disable DPI awareness override in program properties.".into())
             }
@@ -41,7 +42,7 @@ pub fn set_dpi_awareness() -> Result<(), String> {
 }
 
 pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
-    #[cfg(target_os = "windows")] {
+    #[cfg(windows)] {
         let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;
         let parent_window = create_window_from_handle_win32(vs, parent_handle)?;
         // Create window for input events and attach as child window
@@ -60,8 +61,18 @@ pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result
         }
         Err("Could not set the preview parent handle.".into())
     }
-    #[cfg(not(target_os = "windows"))] {
+    #[cfg(not(windows))] {
         Err("Could not create preview window.".into())
+    }
+}
+
+pub fn create_wallpaper_window(vs: &VideoSubsystem) -> Result<Window, String> {
+    #[cfg(windows)] {
+        let wallpaper_handle = find_wallpaper_window_handle_win32()?;
+        create_window_from_handle_win32(vs, wallpaper_handle)
+    }
+    #[cfg(not(windows))] {
+        Err("Could not create wallpaper window.".into())
     }
 }
 
@@ -101,39 +112,6 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
     }
 }
 
-// pub fn set_window_topmost(window: &Window) -> bool {
-//     if cfg!(target_os = "windows") {
-//         match unsafe { get_window_handle_win32(window.raw()) } {
-//             Some(handle) => {
-//                 unsafe {
-//                     use winapi::minwindef::FALSE;
-//                     use winapi::winuser::{ HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE };
-//                     match winapi::um::winuser::SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0,
-//                                                    SWP_NOMOVE|SWP_NOSIZE) {
-//                         FALSE => false,
-//                         _ => true
-//                     }
-//                 }
-//             },
-//             None => false
-//         }
-//     }
-//     else {
-//         false
-//     }
-// }
-
-// #[cfg(windows)]
-// unsafe fn get_window_size_win32(parent_handle: HWND) -> Option<(u32, u32)> {
-//     let mut parent_rect = winapi::windef::RECT {
-//         left: 0, top: 0, right: 0, bottom: 0,
-//     };
-//     match winapi::um::winuser::GetClientRect(parent_handle, &mut parent_rect) {
-//         winapi::minwindef::FALSE => None,
-//         _ => Some((parent_rect.right as u32, parent_rect.bottom as u32))
-//     }
-// }
-
 #[cfg(windows)]
 unsafe fn set_window_parent_win32(handle: HWND, parent_handle: HWND) -> bool {
     use winapi::um::winuser::{ SetParent, GWL_STYLE, WS_CHILD, WS_POPUP };
@@ -156,6 +134,9 @@ unsafe fn set_window_parent_win32(handle: HWND, parent_handle: HWND) -> bool {
 
 #[cfg(windows)]
 fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWND) ->  Result<Window, String> {
+    if handle.is_null() {
+        return Err("Could not find window".into());
+    }
     let sdl_window = unsafe { sdl2_sys::SDL_CreateWindowFrom(std::mem::transmute(handle)) };
     if sdl_window.is_null() {
         Err(get_error())
@@ -164,3 +145,75 @@ fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWN
         Ok(unsafe { Window::from_ll(video_subsystem.clone(), sdl_window) })
     }
 }
+
+#[cfg(windows)]
+fn find_wallpaper_window_handle_win32() -> Result<HWND, String> {
+    use winapi::um::winuser::{ GetShellWindow, FindWindowExA };
+    let lpc_empty = std::ffi::CString::new("").unwrap();
+    let lpc_shelldll = std::ffi::CString::new("SHELLDLL_DefView").unwrap();
+    let mut wallpaper_handle = {
+        let shell_handle = unsafe { GetShellWindow() };
+        if !shell_handle.is_null() {
+            unsafe {
+                FindWindowExA(shell_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr())
+            }
+        }
+        else {
+            ptr::null_mut()
+        }
+    };
+    Ok(if wallpaper_handle.is_null() {
+        let lpc_workerw = std::ffi::CString::new("WorkerW").unwrap();
+        let mut worker_handle: HWND = ptr::null_mut();
+        loop {
+            worker_handle = unsafe {
+                FindWindowExA(ptr::null_mut(), worker_handle, lpc_workerw.as_ptr(), ptr::null_mut())
+            };
+            if worker_handle.is_null() {
+                return Err("Could not find wallpaper window".into());
+            }
+            wallpaper_handle = unsafe {
+                FindWindowExA(worker_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr())
+            };
+            if !wallpaper_handle.is_null() {
+                break wallpaper_handle;
+            }
+        }
+    }
+    else {
+        wallpaper_handle
+    })
+}
+
+// pub fn set_window_topmost(window: &Window) -> bool {
+//     #[cfg(windows)] {
+//         match unsafe { get_window_handle_win32(window.raw()) } {
+//             Some(handle) => {
+//                 unsafe {
+//                     use winapi::minwindef::FALSE;
+//                     use winapi::winuser::{ HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE };
+//                     match winapi::um::winuser::SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0,
+//                                                    SWP_NOMOVE|SWP_NOSIZE) {
+//                         FALSE => false,
+//                         _ => true
+//                     }
+//                 }
+//             },
+//             None => false
+//         }
+//     }
+//     #[cfg(not(windows))] {
+//         false
+//     }
+// }
+
+// #[cfg(windows)]
+// unsafe fn get_window_size_win32(handle: HWND) -> Option<(u32, u32)> {
+//     let mut parent_rect = winapi::shared::windef::RECT {
+//         left: 0, top: 0, right: 0, bottom: 0,
+//     };
+//     match winapi::um::winuser::GetClientRect(handle, &mut parent_rect) {
+//         winapi::shared::minwindef::FALSE => None,
+//         _ => Some((parent_rect.right as u32, parent_rect.bottom as u32))
+//     }
+// }

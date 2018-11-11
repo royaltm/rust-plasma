@@ -1,7 +1,7 @@
 Plasma
 ======
 
-The Plasma library written in rust.
+The Plasma library written in rust. [Api reference](royaltm.github.io/rust-plasma/master/plasma/index.html).
 
 How to implement
 ----------------

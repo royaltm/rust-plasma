@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use std::f32::EPSILON;
 
 use rand::Rng;
-use fast_math::sin;
+// use fast_math::sin;
 
 const PI2: f32 = 2.0*PI;
 const PI05: f32 = 0.5*PI;
@@ -250,5 +250,5 @@ impl PhaseAmp {
 
 #[inline(always)]
 fn transform(val: f32) -> f32 {
-    sin(PI05 * val).powi(4)
+    (PI05 * val).sin().powi(4)
 }

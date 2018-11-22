@@ -30,7 +30,8 @@ pub struct PlasmaHandle {
     plasma: Plasma,
     rng: OsRng,
     data: Vec<u8>,
-    area: Area
+    area: Area,
+    wrkspc: Vec<u8>
 }
 
 #[wasm_bindgen]
@@ -47,11 +48,13 @@ impl PlasmaHandle {
         let cfg = PhaseAmpCfg::new(min_steps, max_steps);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
         let data = vec![0; width as usize * height as usize * 4];
+        let wrkspc = Vec::new();
         Ok(PlasmaHandle {
             plasma,
             rng,
             data,
-            area: Area { x: 0, y: 0, w: width as usize, h: height as usize }
+            area: Area { x: 0, y: 0, w: width as usize, h: height as usize },
+            wrkspc
         })
     }
 
@@ -75,7 +78,7 @@ impl PlasmaHandle {
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
         let pitch: usize = 4 * w;
-        self.plasma.render_part::<PixelRGBA8>(&mut self.data, pitch, x, y, w, h, y*pitch);
+        self.plasma.render_part::<PixelRGBA8>(&mut self.data, pitch, x, y, w, h, Some(&mut self.wrkspc));
     }
 
     #[wasm_bindgen(js_name=renderPhaseAmps)]
@@ -84,7 +87,7 @@ impl PlasmaHandle {
         let pitch: usize = 4 * w;
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
-        render_part::<PixelRGBA8, _>(&mut self.data, pitch, pw, ph, phase_amps, x, y, w, h, y*pitch)
+        render_part::<PixelRGBA8, _>(&mut self.data, pitch, pw, ph, phase_amps, x, y, w, h, Some(&mut self.wrkspc))
     }
 
     pub fn update(&mut self) {

@@ -23,18 +23,29 @@
 //!     plasma.update();
 //! }
 //! ```
-
 // #![allow(unused_variables)]
 // #![allow(unused_imports)]
 // #![allow(dead_code)]
+#[cfg(all(not(any(target_arch = "x86", target_arch = "x86_64")), feature = "use-simd"))]
+compile_error!("Currently use-simd feature requires x86 target architecture.");
 
+#[cfg(all(feature = "use-sleef", target_family = "windows", target_env = "gnu"))]
+compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" chaintool on windows.");
+
+#[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
+compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
+
+#[macro_use]
+extern crate cfg_if;
 extern crate palette;
 extern crate rand;
-#[macro_use] extern crate lazy_static;
+// #[macro_use] extern crate lazy_static;
+#[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))]
+extern crate packed_simd;
 
 mod phase_amp;
 mod plasma;
-mod fast_math;
+// mod fast_math;
 
 pub use phase_amp::*;
 pub use plasma::*;

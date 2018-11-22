@@ -9,14 +9,34 @@ publish = false
 
 readme = "README.md"
 
+autobenches = false
+
+[[bench]]
+name = "render"
+path = "benches/render.rs"
+test = true
+bench = true
+harness = true
+required-features = ["rand/std"]
+
+[features]
+default = []
+use-sleef = ["use-simd", "packed_simd/sleef-sys"]
+use-simd = ["packed_simd"]
+
 [dependencies]
-lazy_static = "1.2"
+lazy_static = "^1.2"
+cfg-if = "^0.1"
+
+[dependencies.packed_simd]
+version = "^0.3.1"
+optional = true
+features = [] # "sleef-sys", "coresimd"
 
 [dependencies.palette]
-version = "0.4"
+version = "^0.4"
 default-features = false
 
 [dependencies.rand]
-version = "0.6.0-pre.1"
-# git = "https://github.com/rust-random/rand.git"
+version = "^0.6"
 default-features = false

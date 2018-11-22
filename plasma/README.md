@@ -44,3 +44,27 @@ Then somwehere in the code:
       plasma.update();
     }
 ```
+
+
+Features
+--------
+
+* `use-simd` - specialized implementation with SIMD instructions is selected.
+* `use-sleef` - enables `use-simd` and also includes SIMD math [sleef-sys](https://crates.io/crates/sleef-sys), currently this does not build on windows with a "gnu" toolchain.
+
+Example:
+
+```
+RUSTFLAGS='-C target-cpu=native' cargo build --release --features=use-sleef
+```
+
+Benchmarking
+------------
+
+```
+cargo bench --bench render --features=rand/std -- --nocapture
+```
+
+```
+RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,use-sleef -- --nocapture
+```

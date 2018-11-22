@@ -9,26 +9,24 @@ extern crate plasma;
 
 #[cfg(windows)] extern crate winapi;
 
+#[macro_use]
 mod utils;
 
-use std::rc::Rc;
-use std::cmp::{min, max};
-use std::sync::Arc;
+use std::{rc::Rc, cmp::{min, max}, sync::Arc};
 use plasma::*;
 use utils::*;
 
 use sdl2_sys::SDL_WindowFlags;
-use sdl2::event::{WindowEvent, Event};
-use sdl2::keyboard::Keycode;
-use sdl2::pixels::PixelFormatEnum;
-use sdl2::rect::Rect;
-use sdl2::video::{Window, WindowContext, FullscreenType};
+use sdl2::{
+    event::{WindowEvent, Event}, keyboard::Keycode, pixels::PixelFormatEnum,
+    rect::Rect, video::{Window, WindowContext, FullscreenType}
+};
 use scoped_threadpool::Pool;
 
-const PLASMA_WIDTH: u32 = 450;
-const PLASMA_HEIGHT: u32 = 450;
-const TARGET_WIDTH: u32 = 900;
-const TARGET_HEIGHT: u32 = 900;
+const PLASMA_WIDTH: u32 = 512;
+const PLASMA_HEIGHT: u32 = 512;
+const TARGET_WIDTH: u32 = 1024;
+const TARGET_HEIGHT: u32 = 1024;
 const MIN_STEPS: f32 = 80.0;
 const MAX_STEPS: f32 = 200.0;
 
@@ -58,7 +56,10 @@ macro_rules! program_name {
 }
 
 static ABOUT_INFO: &'static str = concat!(program_name!(), " v", env!("CARGO_PKG_VERSION"), " Copyright © 2018 ", env!("CARGO_PKG_AUTHORS"),
-                                "\n\nThis program comes with ABSOLUTELY NO WARRANTY\n\n\
+                                "\nCompiled using", target_env!(),
+                                " toolchain. Features:", features!(),
+                                ".\nTarget CPU features: ", target_features!(),
+                                ".\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n\
                                  [ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.");
 
 fn run() -> Result<(), String> {
@@ -199,6 +200,7 @@ fn run() -> Result<(), String> {
     let mut plasma = Arc::new(Plasma::new(plasma_width, plasma_height, cfg, &mut rng));
 
     let mut pool = Pool::new(sdl2::cpuinfo::cpu_count() as u32);
+    let mut workspaces: Vec<Vec<u8>> = std::iter::repeat_with(Vec::new).take(pool.thread_count() as usize).collect();
 
     let mut app_state = AppState::Active;
 
@@ -262,13 +264,12 @@ fn run() -> Result<(), String> {
             let count = pool.thread_count();
             let segmh = (plasma_height + count - 1) as usize / count as usize;
             pool.scoped(|scope| {
-                for (i, chunk) in buffer.chunks_mut(segmh*pitch).enumerate() {
-                    let y = i*segmh;
+                for (i, (chunk, wrkspc)) in buffer.chunks_mut(segmh*pitch).zip(workspaces.iter_mut()).enumerate() {
+                    let y = i * segmh;
                     let h = min(segmh, plasma_height as usize - y);
-                    let offset = y*pitch;
                     let plasma = Arc::clone(&plasma);
                     scope.execute(move || {
-                        plasma.render_part::<PixelRGB24>(chunk, pitch, 0, y, plasma_width as usize, h, offset);
+                        plasma.render_part::<PixelRGB24>(chunk, pitch, 0, y, plasma_width as usize, h, Some(wrkspc));
                     });
                 }
             })
@@ -300,6 +301,7 @@ fn run() -> Result<(), String> {
         // eprintln!("{}", 1.0 / elapsed);
         // start = now;
     }
+    // eprintln!("time to quit");
     Ok(())
 }
 

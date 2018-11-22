@@ -217,3 +217,92 @@ fn find_wallpaper_window_handle_win32() -> Result<HWND, String> {
 //         _ => Some((parent_rect.right as u32, parent_rect.bottom as u32))
 //     }
 // }
+
+#[cfg(target_feature = "mmx")]
+macro_rules! target_feature_mmx { () => (" mmx"); }
+#[cfg(target_feature = "sse")]
+macro_rules! target_feature_sse { () => (" sse"); }
+#[cfg(target_feature = "sse2")]
+macro_rules! target_feature_sse2 { () => (" sse2"); }
+#[cfg(target_feature = "sse3")]
+macro_rules! target_feature_sse3 { () => (" sse3"); }
+#[cfg(target_feature = "ssse3")]
+macro_rules! target_feature_ssse3 { () => (" ssse3"); }
+#[cfg(target_feature = "sse4.1")]
+macro_rules! target_feature_sse4_1 { () => (" sse4.1"); }
+#[cfg(target_feature = "sse4.2")]
+macro_rules! target_feature_sse4_2 { () => (" sse4.2"); }
+#[cfg(target_feature = "sse4a")]
+macro_rules! target_feature_sse4a { () => (" sse4a"); }
+#[cfg(target_feature = "avx")]
+macro_rules! target_feature_avx { () => (" avx"); }
+#[cfg(target_feature = "avx2")]
+macro_rules! target_feature_avx2 { () => (" avx2"); }
+#[cfg(not(target_feature = "mmx"))]
+macro_rules! target_feature_mmx { () => (""); }
+#[cfg(not(target_feature = "sse"))]
+macro_rules! target_feature_sse { () => (""); }
+#[cfg(not(target_feature = "sse2"))]
+macro_rules! target_feature_sse2 { () => (""); }
+#[cfg(not(target_feature = "sse3"))]
+macro_rules! target_feature_sse3 { () => (""); }
+#[cfg(not(target_feature = "ssse3"))]
+macro_rules! target_feature_ssse3 { () => (""); }
+#[cfg(not(target_feature = "sse4.1"))]
+macro_rules! target_feature_sse4_1 { () => (""); }
+#[cfg(not(target_feature = "sse4.2"))]
+macro_rules! target_feature_sse4_2 { () => (""); }
+#[cfg(not(target_feature = "sse4a"))]
+macro_rules! target_feature_sse4a { () => (""); }
+#[cfg(not(target_feature = "avx"))]
+macro_rules! target_feature_avx { () => (""); }
+#[cfg(not(target_feature = "avx2"))]
+macro_rules! target_feature_avx2 { () => (""); }
+macro_rules! target_features { () => (concat!(
+    target_feature_mmx!(),
+    target_feature_sse!(),
+    target_feature_sse2!(),
+    target_feature_sse3!(),
+    target_feature_ssse3!(),
+    target_feature_sse4_1!(),
+    target_feature_sse4_2!(),
+    target_feature_sse4a!(),
+    target_feature_avx!(),
+    target_feature_avx2!(),
+)); }
+
+#[cfg(all(target_family = "windows", target_env = "gnu"))]
+macro_rules! target_env { () => (" gnu"); }
+#[cfg(all(target_family = "windows", target_env = "msvc"))]
+macro_rules! target_env { () => (" msvc"); }
+#[cfg(not(all(target_family = "windows", any(target_env = "msvc", target_env = "gnu"))))]
+macro_rules! target_env { () => (" unknown"); }
+
+#[cfg(feature = "use-simd")]
+macro_rules! features_use_simd { () => (" use-simd"); }
+#[cfg(not(feature = "use-simd"))]
+macro_rules! features_use_simd { () => (""); }
+#[cfg(feature = "use-sleef")]
+macro_rules! features_use_sleef { () => (" use-sleef"); }
+#[cfg(not(feature = "use-sleef"))]
+macro_rules! features_use_sleef { () => (""); }
+#[cfg(feature = "static-link")]
+macro_rules! features_static_link { () => (" static-link"); }
+#[cfg(not(feature = "static-link"))]
+macro_rules! features_static_link { () => (""); }
+#[cfg(feature = "use-pkgconfig")]
+macro_rules! features_use_pkgconfig { () => (" use-pkgconfig"); }
+#[cfg(not(feature = "use-pkgconfig"))]
+macro_rules! features_use_pkgconfig { () => (""); }
+#[cfg(any(feature = "use-simd", feature = "use-sleef", feature = "static-link", feature = "use-pkgconfig"))]
+macro_rules! features_none { () => (""); }
+#[cfg(not(any(feature = "use-simd", feature = "use-sleef", feature = "static-link", feature = "use-pkgconfig")))]
+macro_rules! features_none { () => (" -none-"); }
+
+macro_rules! features { () => (concat!(
+    features_none!(),
+    features_use_simd!(),
+    features_use_sleef!(),
+    features_static_link!(),
+    features_use_pkgconfig!(),
+)); }

@@ -1,5 +1,6 @@
 name = 'plasma_web'
 target_dir = 'target/wasm32-unknown-unknown/release/'
+features = env_var_or_default('FEATURES', "")
 
 # build all
 all: wasm opt
@@ -21,7 +22,7 @@ wasm: build bindgen
 
 # build wasm files
 build:
-    cargo +nightly build --lib --release
+    cargo +nightly build --lib --release --package plasma-web --features={{features}}
 
 # take only what we need and create some polyfills in js
 bindgen:

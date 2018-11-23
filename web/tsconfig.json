@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "sourceMap": true,
+        "lib": [
+          "es2015",
+          "dom"
+        ],
+        "listEmittedFiles": true,
+        "listFiles": false,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "module": "esNext",
+        "target": "es6"
+    },
+    "include": [
+        "src/ts/*.ts",
+        "*.d.ts"
+    ],
+    "exclude": []
+}

@@ -26,7 +26,7 @@ features = ["wasm-bindgen"]
 version = "0.3"
 features = [
   "ImageData",
-  # "CanvasRenderingContext2d",
   "Window",
-  "WorkerGlobalScope"
+  "WorkerGlobalScope",
+  "DedicatedWorkerGlobalScope"
 ]

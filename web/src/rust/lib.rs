@@ -99,23 +99,18 @@ impl PlasmaHandle {
         ImageData::new_with_u8_clamped_array(Clamped(&mut self.data), self.area.w as u32)
     }
 
-    // #[wasm_bindgen(js_name=createImageBitmap)]
-    // pub fn create_image_bitmap(&mut self) -> Result<js_sys::Promise, JsValue> {
-    //     let global = js_sys::global();
-    //     let image_data = self.image_data()?;
-    //     if js_sys::eval("typeof WorkerGlobalScope !== 'undefined'")?.as_bool().unwrap() {
-    //         let scope = global.dyn_into::<WorkerGlobalScope>()?;
-    //         scope.create_image_bitmap_with_image_data(&image_data)
-    //     }
-    //     else {
-    //         let window = global.dyn_into::<Window>()?;
-    //         window.create_image_bitmap_with_image_data(&image_data)
-    //     }
-    // }
+    #[wasm_bindgen(js_name=createImageBitmap)]
+    pub fn create_image_bitmap(&mut self) -> Result<js_sys::Promise, JsValue> {
+        let image_data = self.image_data()?;
+        let scope = self_()?;
+        scope.create_image_bitmap_with_image_data(&image_data)
+    }
 
     #[wasm_bindgen(js_name=exportPhaseAmps)]
     pub fn export_phase_amps(&self) -> Box<[f32]> {
-        self.plasma.export_phase_amps().into_boxed_slice()
+        let mut out = Vec::new();
+        self.plasma.export_phase_amps(&mut out);
+        out.into_boxed_slice()
     }
 
     #[wasm_bindgen(js_name=importPhaseAmps)]
@@ -131,5 +126,32 @@ impl PlasmaHandle {
     #[wasm_bindgen(js_name=maxSteps)]
     pub fn max_steps(&self) -> f32 {
         self.plasma.max_steps()
+    }
+}
+
+
+enum GlobalProxy {
+    Window(Window),
+    WorkerGlobalScope(WorkerGlobalScope),
+    //... more scopes
+}
+
+impl GlobalProxy {
+    fn create_image_bitmap_with_image_data(&self, a_image: &ImageData) -> Result<js_sys::Promise, JsValue> {
+        match self {
+            GlobalProxy::Window(window) => window.create_image_bitmap_with_image_data(a_image),
+            GlobalProxy::WorkerGlobalScope(scope) => scope.create_image_bitmap_with_image_data(a_image),
+            //... more of that
+        }
+    }
+}
+
+fn self_() -> Result<GlobalProxy, JsValue> {
+    let global = js_sys::global();
+    if js_sys::eval("typeof WorkerGlobalScope !== 'undefined'")?.as_bool().unwrap() {
+        Ok(global.dyn_into::<WorkerGlobalScope>().map(GlobalProxy::WorkerGlobalScope)?)
+    }
+    else {
+        Ok(global.dyn_into::<Window>().map(GlobalProxy::Window)?)
     }
 }

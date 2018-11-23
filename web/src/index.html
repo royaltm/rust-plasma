@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <title>Plasma</title>
     <style>
-      html, body, canvas {
+      html, body, canvas, #plasma {
+        display: block;
         margin: 0px;
         padding: 0px;
         width: 100%;
@@ -14,6 +15,10 @@
     </style>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <plasma id="plasma" class="autostart"
+            data-plasma-width="400" data-plasma-height="400"
+            data-target-width="800" data-target-height="800"
+            data-min-steps="80" data-max-steps="200"
+            ></plasma>
   </body>
 </html>

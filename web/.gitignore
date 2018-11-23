@@ -3,3 +3,4 @@ dist
 *.tar.bz2
 *.wasm
 plasma_web.js
+plasma_web.d.ts

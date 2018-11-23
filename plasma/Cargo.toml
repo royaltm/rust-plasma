@@ -14,9 +14,11 @@ autobenches = false
 [[bench]]
 name = "render"
 path = "benches/render.rs"
-test = true
-bench = true
-harness = true
+required-features = ["rand/std"]
+
+[[bench]]
+name = "export"
+path = "benches/export.rs"
 required-features = ["rand/std"]
 
 [features]

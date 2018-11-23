@@ -56,8 +56,7 @@ macro_rules! program_name {
 }
 
 static ABOUT_INFO: &'static str = concat!(program_name!(), " v", env!("CARGO_PKG_VERSION"), " Copyright © 2018 ", env!("CARGO_PKG_AUTHORS"),
-                                "\nCompiled using", target_env!(),
-                                " toolchain. Features:", features!(),
+                                "\n", target_env_info!(), "Features:", features!(),
                                 ".\nTarget CPU features: ", target_features!(),
                                 ".\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n\
                                  [ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.");

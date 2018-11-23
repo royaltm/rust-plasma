@@ -127,23 +127,15 @@ impl Plasma {
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
-    ///
-    /// # Panics
-    ///
-    /// __Panics__ when the provided slice is shorter than the data exported by [Plasma::export_phase_amps].
-    pub fn import_phase_amps(&mut self, data: &[f32]) {
-        for (i, pa) in self.phase_amps.iter_mut().enumerate() {
-            let src = data.at(i);
-            pa.set_phase(src.phase());
-            pa.set_amplitude(src.amplitude());
-        }
+    #[inline(always)]
+    pub fn import_phase_amps(&mut self, source: &[f32]) {
+        self.phase_amps.import_phase_amps(source);
     }
 
     /// Exports the internal plasma state into the [Vec] of 32bit floats.
-    pub fn export_phase_amps(&self) -> Vec<f32> {
-        let mut out = Vec::new();
-        self.phase_amps.export(&mut out);
-        out
+    #[inline(always)]
+    pub fn export_phase_amps(&self, out: &mut Vec<f32>) {
+        self.phase_amps.export_phase_amps(out);
     }
 
     #[inline(always)]
@@ -232,17 +224,22 @@ else {
 ///
 /// The `wrkspc` is an optional temporary memory scractchpad.
 /// If None is provided the new memory will be allocated.
-pub fn render_part<B, P>(buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &P, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
-where B: PixelBuffer, P: PhaseAmpsSelect + ?Sized
+///
+/// # Panics
+///
+/// __Panics__ if [PhaseAmpsSelect::select] panics.
+pub fn render_part<'a, B, P>(buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
+where B: PixelBuffer, P: PhaseAmpsSelect<'a> + ?Sized
 {
     if x >= pw { return }
     else if y >= ph { return }
     /* let's ensure we have some workspace */
     let mut tmpwrkspc: Vec<u8>;
     let wrkspc = match wrkspc {
-        Some(w) => w,
+        Some(w) => w, /* the provided one */
         None => {
-            tmpwrkspc = Vec::new(); &mut tmpwrkspc
+            tmpwrkspc = Vec::new(); /* the new one */
+            &mut tmpwrkspc
         }
     };
     /* make sure dimensions are ok */
@@ -254,17 +251,21 @@ where B: PixelBuffer, P: PhaseAmpsSelect + ?Sized
     /* precalculate horizontal tables */
     let mut vxps: &mut [Xf32] = prepare_workspace(wrkspc, dx);
     let dsize = vx_size(dx);
-    for i in 0..PXMAX {
-        prepare_composition_line(x, wr, phase_amps.at(i*2), phase_amps.at(i*2 + 1), &mut vxps[i..dsize*PXMAX]);
+    for (i, (pa1, pa2)) in phase_amps.select(0..2*PXMAX)
+                           .into_pa_pair_iter()
+                           .enumerate()
+    {
+        prepare_composition_line(x, wr, pa1, pa2, &mut vxps[i..dsize*PXMAX]);
     }
     /* render lines */
     let mut vyp: [Yf32; PXMAX] = Default::default();
     for (line, y) in buffer.chunks_exact_mut(pitch).zip(y..y2) {
         /* calculate vertical values */
         let y = y as f32 * hr;
-        for (i, vy) in vyp.iter_mut().enumerate() {
-            let n = 2 * (PXMAX + i);
-            *vy = compose(y, phase_amps.at(n), phase_amps.at(n + 1));
+        for (vy, (pa1, pa2)) in vyp.iter_mut()
+                                .zip(phase_amps.select(2*PXMAX..PXMAX*4).into_pa_pair_iter())
+        {
+            *vy = compose(y, pa1, pa2);
         }
         let mut writer = line.iter_mut();
         gen_line(dx, &vyp, &mut vxps, &mut |pixel| {

@@ -1,6 +1,7 @@
 use std::ops::Range;
 use std::f32::consts::PI;
 use std::f32::EPSILON;
+use std::slice::ChunksExact;
 
 use rand::Rng;
 // use fast_math::sin;
@@ -39,7 +40,7 @@ pub struct PhaseAmp {
     transition_amplitude: f32
 }
 
-/// A trait for querying and updating phase and amplitude
+/// A trait for querying and updating phase'n'amplitude
 pub trait PhaseAmpAccess {
     fn phase(&self) -> f32;
     fn amplitude(&self) -> f32;
@@ -47,69 +48,27 @@ pub trait PhaseAmpAccess {
     fn set_amplitude(&mut self, amplitude: f32);
     #[inline(always)]
     fn export(&self, out: &mut Vec<f32>) {
-        out.push(self.phase());
-        out.push(self.amplitude());
+        // out.extend_from_slice(&[self.phase(), self.amplitude()]);
+        out.extend(&[self.phase(), self.amplitude()]);
     }
 }
 
-/// A trait for selecting a collection of phase and amplitude pairs.
-pub trait PhaseAmpsSelect {
-    type Item: PhaseAmpAccess + ?Sized;
-    fn at(&self, idx: usize) -> &Self::Item;
-    fn at_mut(&mut self, idx: usize) -> &mut Self::Item;
+/// A trait that allows importing and exporting of phase'n'amplitude data
+pub trait PhaseAmpDataExp {
+    fn export_phase_amps(&self, out: &mut Vec<f32>);
+    fn import_phase_amps(&mut self, source: &[f32]);
+}
+
+/// A trait that allows selecting a subset of phase'n'amplitude and iterate over pairs of it.
+pub trait PhaseAmpsSelect<'a> {
+    type PairIter: Iterator<Item=(&'a Self::Item, &'a Self::Item)>;
+    type Item: PhaseAmpAccess + ?Sized + 'a;
     /// The range should always be bounded.
+    /// # Panics
+    ///
+    /// __Panics__ if range exceeds the underlying data boundaries.
     fn select(&self, range: Range<usize>) -> &Self;
-    fn export(&self, out: &mut Vec<f32>);
-}
-
-impl PhaseAmpsSelect for [PhaseAmp] {
-    type Item = PhaseAmp;
-
-    #[inline(always)]
-    fn at(&self, idx: usize) -> &PhaseAmp {
-        &self[idx]
-    }
-
-    #[inline(always)]
-    fn at_mut(&mut self, idx: usize) -> &mut PhaseAmp {
-        &mut self[idx]
-    }
-
-    #[inline(always)]
-    fn select(&self, range: Range<usize>) -> &[PhaseAmp] {
-        &self[range]
-    }
-
-    #[inline(always)]
-    fn export(&self, out: &mut Vec<f32>) {
-        out.reserve_exact(2*self.len());
-        for pa in self.iter() {
-            pa.export(out);
-        }
-    }
-}
-
-impl PhaseAmpsSelect for [f32] {
-    type Item = [f32];
-    #[inline(always)]
-    fn at(&self, idx: usize) -> &[f32] {
-        &self[idx*2..(idx+1)*2]
-    }
-
-    #[inline(always)]
-    fn at_mut(&mut self, idx: usize) -> &mut [f32] {
-        &mut self[idx*2..(idx+1)*2]
-    }
-
-    #[inline(always)]
-    fn select(&self, range: Range<usize>) -> &[f32] {
-        &self[range.start*2..range.end*2]
-    }
-
-    #[inline(always)]
-    fn export(&self, out: &mut Vec<f32>) {
-        out.extend_from_slice(self);
-    }
+    fn into_pa_pair_iter(&'a self) -> Self::PairIter;
 }
 
 impl PhaseAmpAccess for PhaseAmp {
@@ -156,6 +115,82 @@ impl PhaseAmpAccess for [f32] {
     }
 }
 
+pub struct PhaseAmpsPairIterator<'a> {
+    iter: ChunksExact<'a, PhaseAmp>
+}
+
+impl<'a> Iterator for PhaseAmpsPairIterator<'a> {
+    type Item = (&'a PhaseAmp, &'a PhaseAmp);
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.iter.next() {
+            Some(&[ref pa1, ref pa2]) => Some((pa1, pa2)),
+            _ => None
+        }
+    }
+}
+
+pub struct F32PaPairIterator<'a> {
+    iter: ChunksExact<'a, f32>
+}
+
+impl<'a> Iterator for F32PaPairIterator<'a> {
+    type Item = (&'a [f32], &'a [f32]);
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.iter.next() {
+            Some(ref chunk) => Some((&chunk[0..2], &chunk[2..4])),
+            _ => None
+        }
+    }
+}
+
+impl<'a> PhaseAmpsSelect<'a> for [PhaseAmp] {
+    type PairIter = PhaseAmpsPairIterator<'a>;
+    type Item = PhaseAmp;
+
+    #[inline(always)]
+    fn into_pa_pair_iter(&'a self) -> Self::PairIter {
+        PhaseAmpsPairIterator { iter: self.chunks_exact(2) }
+    }
+
+    #[inline(always)]
+    fn select(&self, range: Range<usize>) -> &[PhaseAmp] {
+        &self[range]
+    }
+}
+
+impl<'a> PhaseAmpsSelect<'a> for [f32] {
+    type PairIter = F32PaPairIterator<'a>;
+    type Item = [f32];
+
+    #[inline(always)]
+    fn into_pa_pair_iter(&'a self) -> Self::PairIter {
+        F32PaPairIterator { iter: self.chunks_exact(4) }
+    }
+
+    #[inline(always)]
+    fn select(&self, range: Range<usize>) -> &[f32] {
+        &self[range.start*2..range.end*2]
+    }
+}
+
+impl PhaseAmpDataExp for [PhaseAmp] {
+    #[inline(always)]
+    fn export_phase_amps(&self, out: &mut Vec<f32>) {
+        out.reserve_exact(2*self.len());
+        for pa in self.iter() {
+            pa.export(out);
+        }
+    }
+    #[inline(always)]
+    fn import_phase_amps(&mut self, source: &[f32]) {
+        for (src, pa) in source.chunks_exact(2).zip(self.iter_mut()) {
+            pa.set_phase(src.phase());
+            pa.set_amplitude(src.amplitude());
+        }
+    }
+}
 
 impl PhaseAmpConfig for PhaseAmpCfg {
     fn min_steps(&self) -> f32 { self.min_steps }

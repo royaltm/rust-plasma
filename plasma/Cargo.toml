@@ -1,7 +1,7 @@
 [package]
 name = "plasma"
 version = "0.1.0"
-authors = ["Rafał Michalski <royaltm75@gmail.com>"]
+authors = ["Rafał Michalski <royal@yeondir.com>"]
 
 license = "GPL-3.0-or-later"
 

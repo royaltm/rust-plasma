@@ -198,7 +198,7 @@ fn run() -> Result<(), String> {
     let cfg = PhaseAmpCfg::new(MIN_STEPS, MAX_STEPS);
     let mut plasma = Arc::new(Plasma::new(plasma_width, plasma_height, cfg, &mut rng));
 
-    let mut pool = Pool::new(sdl2::cpuinfo::cpu_count() as u32);
+    let mut pool = Pool::new(max(2, min(1, sdl2::cpuinfo::cpu_count() as u32)));
     let mut workspaces: Vec<Vec<u8>> = std::iter::repeat_with(Vec::new).take(pool.thread_count() as usize).collect();
 
     let mut app_state = AppState::Active;

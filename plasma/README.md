@@ -49,8 +49,10 @@ Then somwehere in the code:
 Features
 --------
 
-* `use-simd` - specialized implementation with SIMD instructions is selected.
-* `use-sleef` - enables `use-simd` and also includes SIMD math [sleef-sys](https://crates.io/crates/sleef-sys), currently this does not build on windows with a "gnu" toolchain.
+* `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86` or `x86_64` architectures.
+* `use-sleef` - enables `use-simd` and also includes SLEEF Vectorized Math Library [sleef-sys](https://crates.io/crates/sleef-sys), currently this does not build on windows with a "gnu" toolchain. Also available only for a `x86_64` architecture.
+
+To compile with [SLEEF](https://sleef.org) you'll need to have a [LLVM](http://releases.llvm.org/download.html#7.0.0) (clang) compiler and a [CMake](https://cmake.org) installed on the `PATH`. On Windows it's best to use CMake from a MS Visual Studio. Usually found at: `%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin`.
 
 Example:
 

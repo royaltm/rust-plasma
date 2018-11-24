@@ -445,4 +445,4 @@ unsafe fn make_temporary_slice_mut<'a, T>(vec: &'a mut Vec<u8>, len: usize) -> &
 }
 
 #[inline(always)]
-pub const fn identity<T>(x: T) -> T { x }
+const fn identity<T>(x: T) -> T { x }

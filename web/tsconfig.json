@@ -19,5 +19,21 @@
         "src/ts/*.ts",
         "*.d.ts"
     ],
-    "exclude": []
+    "exclude": [],
+    "typedocOptions": {
+        "excludeExternals": true,
+        "excludeNotExported": false,
+        "externalPattern": "**/*node*",
+        "exclude": [],
+        "ignoreCompilerErrors": true,
+        "includeDeclarations": true,
+        "mode": "modules",
+        "module": "commonjs",
+        "name": "plasma-web",
+        "out": "doc",
+        "readme": "README.me",
+        "target": "ES5",
+        "theme": "default",
+        "sourcefile-url-prefix": "https://github.com/royaltm/rust-plasma/blob/master/web/"
+    }
 }

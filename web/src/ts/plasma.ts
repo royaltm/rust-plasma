@@ -1,26 +1,46 @@
+/**
+ * @module plasma
+ */
 export { PlasmaHandle } from '../../plasma_web';
 import { PlasmaHandle } from '../../plasma_web';
 
+/** Options passed to a [[PlasmaGenerator]] constructor. */
 export interface PlasmaGeneratorOptions {
+   /**
+    *  A least possible count of radnom animation steps between phase and amplitude transitions.
+    *
+    *  The larger the number the slower plasma animates.
+    */
    minSteps?: number,
+   /**
+    *  A largest possible count of radnom animation steps between phase and amplitude transitions.
+    *
+    *  The larger the number the slower plasma animates.
+    */
    maxSteps?: number
+   /** Width in pixels of the generated plasma. */
    width?: number,
+   /** Height in pixels of the generated plasma. */
    height?: number,
+   /** Should the rendering be performed with asynchronous worker threads. */
    parallel?: boolean,
+   /** The worker URL. */
    workerUrl?: string,
+   /** Specifies how many workers will be used for parallel rendition. */
    workers?: number,
 }
 
+/** Received in a `detail` property of a "bitmap" CustomEvent. */
 export interface BitmapDetail {
-   // left offset in original bitmap
+   /** Left pixel offset of this fragment in the original bitmap. */
    x: number,
-   // top offset in original bitmap
+   /** Top pixel offset of this fragment in the original bitmap. */
    y: number,
-   // original plasma width
+   /** Original bitmap width. */
    width: number,
-   // original plasma height
+   /** Original bitmap height. */
    height: number,
-   // fragment of original bitmap
+   /** A fragment of the original bitmap. */
    bitmap: ImageBitmap
 }
 
@@ -31,11 +51,14 @@ export const DefaultPlasmaGeneratorOptions: PlasmaGeneratorOptions = {
    height: 128,
    parallel: true,
    workerUrl: 'worker.js',
-   workers: Math.min(2, Math.max(1, (self.navigator.hardwareConcurrency)))
+   workers: Math.min(2, Math.max(1, (self.navigator.hardwareConcurrency|0)))
 }
 
+/** Options passed to a [[CanvasRenderer]] constructor. */
 export interface CanvasRendererOptions {
+   /** Target pixel width of the rendered image. */
    width?: number,
+   /** Target pixel height of the rendered image. */
    height?: number,
 }
 
@@ -55,17 +78,23 @@ interface WorkerPlasmaSetup {
    h: number
 }
 
+/**
+ * A renderer for a HTMLCanvasElement.
+ *
+ * Attach an instance of a [[BitmapGenerator]] with a [[CanvasRenderer.attach]] method.
+ */
 export class CanvasRenderer implements CanvasRendererOptions {
-   /** target width */
+   /** Target image width in pixels. */
    width: number;
-   /** target height */
+   /** Target image height in pixels. */
    height: number;
-   /** is renderer animating */
-   animating: boolean;
-   /** target canvas */
+   /** Animation state. */
+   isAnimating: boolean;
+   /** The target canvas. */
    target: HTMLCanvasElement;
-   /** bitmap generator */
+   /** The attached bitmap generator. */
    generator: BitmapGenerator;
+   /** The rendering context of a target canvas. */
    ctx: CanvasRenderingContext2D;
    protected readyHandler: () => void;
    protected bitmapHandler: (event: CustomEvent) => void;
@@ -77,7 +106,7 @@ export class CanvasRenderer implements CanvasRendererOptions {
       Object.assign(this, DefaultCanvasRendererOptions, options);
       this.target = target;
       this.ctx = target.getContext('2d');
-      this.animating = false;
+      this.isAnimating = false;
       this.spool = [];
       this.readyHandler = () => {
          let spool = this.spool;
@@ -100,7 +129,7 @@ export class CanvasRenderer implements CanvasRendererOptions {
                }
                bitmap.close();
             });
-            if (this.animating) {
+            if (this.isAnimating) {
                let generator = this.generator;
                if (generator) generator.render();
             }
@@ -140,25 +169,53 @@ export class CanvasRenderer implements CanvasRendererOptions {
     * Controls animation state.
     */
    animate(enable: boolean): void {
-      if (!enable === !this.animating) return;
+      if (!enable === !this.isAnimating) return;
       if (enable) {
-         this.animating = true;
+         this.isAnimating = true;
          let generator = this.generator;
          if (generator && generator.isReady) {
             generator.render();
          }
       }
       else {
-         this.animating = false;
+         this.isAnimating = false;
       }
    }
 }
 
+/**
+ *  An interface for a bitmap generator.
+ *
+ *  Add an event listener to listen to a "ready" and a "bitmap" events.
+ * 
+ *  May be attached to a [[CanvasRenderer]].
+ */
 export interface BitmapGenerator extends EventTarget {
+   /** Readiness of the generator to render the next frame. */
    readonly isReady: boolean;
+   /**
+    *  Requests the next bitmap rendition.
+    *
+    *  A "bitmap" custom event with a property `detail`
+    *  of the [[BitmapDetail]] type is being emitted.
+    *
+    *  There may be more than one event per single rendition
+    *  if the data comes from multiple workers.
+    *
+    *  An "error" event is being emitted in case of an error.
+    *
+    *  A "ready" event is being emitted when generator finishes rendering
+    *  the whole bitmap and can render again.
+    *
+    *  Returns `false` if the generator has not yet finished its previous rendition.
+    *  In this instance wait for a "ready" event and try again once it arrives.
+    */
    render(): boolean;
 }
 
+/**
+ *  A plasma generator.
+ */
 export class PlasmaGenerator extends EventTarget implements BitmapGenerator {
    protected handle: PlasmaHandle;
    protected workers: Worker[];
@@ -167,7 +224,7 @@ export class PlasmaGenerator extends EventTarget implements BitmapGenerator {
    /**
     * Creates a new generator instance.
     *
-    * An event "ready" is being emitted as soon as the generator is ready for requests.
+    * An event "ready" is being emitted as soon as the generator is ready for work.
     */
    constructor(options?: PlasmaGeneratorOptions) {
       const opts: PlasmaGeneratorOptions = Object.assign({}, DefaultPlasmaGeneratorOptions, options);
@@ -227,23 +284,10 @@ export class PlasmaGenerator extends EventTarget implements BitmapGenerator {
       }
    }
 
-   /** Is true if ready for the next frame. */
    get isReady(): boolean {
       return this.queued === 0;
    }
 
-   /**
-    *  Request next bitmap rendition.
-    *
-    *  A "bitmap" CutomEvent (or many events) with a property detail
-    *  of type BitmapDetail is being emitted.
-    *
-    *  An "error" Event is being emitted in case of an error.
-    *
-    *  A "ready" Event is being emitted when generator is again ready for a next request.
-    *
-    *  @returns true if a request was accepted.
-    */
    render(): boolean {
       if (this.queued !== 0) return false;
       const workers = this.workers;

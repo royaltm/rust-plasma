@@ -133,7 +133,7 @@ Features
 --------
 
 * `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86` or `x86_64` architectures.
-* `use-sleef` - enables `use-simd` and also includes SLEEF Vectorized Math Library [sleef-sys](https://crates.io/crates/sleef-sys), currently this does not build on windows with a "gnu" toolchain. Also available only for a `x86_64` architecture. See [../plasma/README.md](../plasma/README.md) for more information.
+* `use-sleef` - enables `use-simd` and also includes SLEEF Vectorized Math Library [sleef-sys](https://crates.io/crates/sleef-sys). Currently this does not build on windows with a "gnu" toolchain. Also available only for a `x86_64` architecture. See [../plasma/README.md](../plasma/README.md) for more information.
 * `static-link` - compile with a static SDL2 library. Not available with "msvc" toolchain.
 * `use-pkgconfig` - search for SDL2 library in the system using pkgconfig.
 

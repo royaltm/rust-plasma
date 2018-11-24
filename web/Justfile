@@ -57,3 +57,7 @@ pack:
 
 # create distribution files and pack them
 dist: all webpack gzip pack
+
+# generate TypeScript documentation
+doc:
+  npx typedoc --tsconfig tsconfig.json src/ts/plasma.ts plasma_web.d.ts

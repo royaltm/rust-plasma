@@ -4,3 +4,4 @@ target
 *.exe
 *.dll
 *.lnk
+/ghp

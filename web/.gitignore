@@ -4,3 +4,4 @@ dist
 *.wasm
 plasma_web.js
 plasma_web.d.ts
+/doc

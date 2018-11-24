@@ -1,7 +1,7 @@
 Plasma Web
 ==========
 
-This is a demo of how to run plasma with webassembly.
+This is a demo of how to run plasma with webassembly. See [TypeScript API docs](https://royaltm.github.io/rust-plasma/master/ts/modules/plasma.html).
 
 
 Prerequisites

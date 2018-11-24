@@ -10,4 +10,4 @@ Plasma
             data-min-steps="80" data-max-steps="200"
             ></plasma>
 
-<script type="text/javascript" src="master/dist/plasma.js"/></script>
+<script type="text/javascript" src="plasma.js"/></script>

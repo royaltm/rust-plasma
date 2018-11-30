@@ -1,6 +1,5 @@
 export default import("./plasma").then(plasma => {
   const document = self.document;
-
   Array.from(document.querySelectorAll("plasma.autostart")).forEach((element: HTMLElement) => {
      let minSteps: number = parseInt(element.dataset.minSteps) || plasma.DefaultPlasmaGeneratorOptions.minSteps;
      let maxSteps: number = parseInt(element.dataset.maxSteps) || plasma.DefaultPlasmaGeneratorOptions.maxSteps;

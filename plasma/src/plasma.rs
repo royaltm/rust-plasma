@@ -352,6 +352,9 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 }
 else {
 
+    #[inline(always)]
+    const fn identity<T>(x: T) -> T { x }
+
     make_comps!(f32, 0.0, 1.0 / 3.0, identity);
 
     #[inline(always)]
@@ -443,6 +446,3 @@ unsafe fn make_temporary_slice_mut<'a, T>(vec: &'a mut Vec<u8>, len: usize) -> &
     let (_, res, _) = raw_bytes.align_to_mut::<T>();
     res
 }
-
-#[inline(always)]
-const fn identity<T>(x: T) -> T { x }

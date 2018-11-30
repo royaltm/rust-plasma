@@ -1,20 +1,12 @@
 #![windows_subsystem="windows"] // it is "console" by default
 #![allow(unused_assignments)]
 
-extern crate sdl2;
-extern crate sdl2_sys;
-extern crate rand;
-extern crate scoped_threadpool;
-extern crate plasma;
-
-#[cfg(windows)] extern crate winapi;
-
 #[macro_use]
 mod utils;
 
 use std::{rc::Rc, cmp::{min, max}, sync::Arc};
 use plasma::*;
-use utils::*;
+use crate::utils::*;
 
 use sdl2_sys::SDL_WindowFlags;
 use sdl2::{

@@ -1,10 +1,4 @@
 #![allow(unused_imports)]
-extern crate plasma;
-extern crate rand;
-extern crate wasm_bindgen;
-extern crate web_sys;
-extern crate js_sys;
-
 use plasma::*;
 use rand::rngs::OsRng;
 use wasm_bindgen::prelude::*;

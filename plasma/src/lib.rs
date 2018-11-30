@@ -35,17 +35,9 @@ compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" 
 #[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
 compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
 
-#[macro_use]
-extern crate cfg_if;
-extern crate palette;
-extern crate rand;
-// #[macro_use] extern crate lazy_static;
-#[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))]
-extern crate packed_simd;
-
 mod phase_amp;
 mod plasma;
 // mod fast_math;
 
-pub use phase_amp::*;
-pub use plasma::*;
+pub use crate::phase_amp::*;
+pub use crate::plasma::*;

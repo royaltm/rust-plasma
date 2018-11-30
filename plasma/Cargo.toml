@@ -2,7 +2,7 @@
 name = "plasma"
 version = "0.1.0"
 authors = ["Rafał Michalski <royal@yeondir.com>"]
-
+edition = "2018"
 license = "GPL-3.0-or-later"
 
 publish = false

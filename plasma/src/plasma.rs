@@ -3,9 +3,11 @@ use std::f32::consts::PI;
 
 use rand::Rng;
 
+use cfg_if::cfg_if;
+
 use palette::{LinSrgb, Hsv, RgbHue, IntoColor};
 
-use phase_amp::*;
+use crate::phase_amp::*;
 
 // use fast_math::{sin, cos};
 

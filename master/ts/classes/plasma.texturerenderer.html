@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>CanvasRenderer | plasma-web</title>
+	<title>TextureRenderer | plasma-web</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -57,10 +57,10 @@
 					<a href="../modules/plasma.html">plasma</a>
 				</li>
 				<li>
-					<a href="plasma.canvasrenderer.html">CanvasRenderer</a>
+					<a href="plasma.texturerenderer.html">TextureRenderer</a>
 				</li>
 			</ul>
-			<h1>Class CanvasRenderer</h1>
+			<h1>Class TextureRenderer</h1>
 		</div>
 	</div>
 </header>
@@ -70,9 +70,9 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>A renderer for a HTMLCanvasElement.</p>
+						<p>A renderer for a [[THREE.Texture]].</p>
 					</div>
-					<p>Attach an instance of a <a href="../interfaces/plasma.bitmapgenerator.html">BitmapGenerator</a> with a <a href="plasma.canvasrenderer.html#attach">CanvasRenderer.attach</a> method.</p>
+					<p>Attach an instance of a <a href="../interfaces/plasma.bitmapgenerator.html">BitmapGenerator</a> with a <a href="plasma.texturerenderer.html#attach">TextureRenderer.attach</a> method.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -82,16 +82,10 @@
 						<a href="plasma.baserenderer.html" class="tsd-signature-type">BaseRenderer</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">CanvasRenderer</span>
+								<span class="target">TextureRenderer</span>
 							</li>
 						</ul>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implements</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../interfaces/plasma.canvasrendereroptions.html" class="tsd-signature-type">CanvasRendererOptions</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -101,29 +95,28 @@
 						<section class="tsd-index-section ">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="plasma.canvasrenderer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite"><a href="plasma.texturerenderer.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="plasma.canvasrenderer.html#bitmaphandler" class="tsd-kind-icon">bitmap<wbr>Handler</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plasma.canvasrenderer.html#ctx" class="tsd-kind-icon">ctx</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plasma.canvasrenderer.html#generator" class="tsd-kind-icon">generator</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plasma.canvasrenderer.html#height" class="tsd-kind-icon">height</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plasma.canvasrenderer.html#isanimating" class="tsd-kind-icon">is<wbr>Animating</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="plasma.canvasrenderer.html#readyhandler" class="tsd-kind-icon">ready<wbr>Handler</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="plasma.canvasrenderer.html#spool" class="tsd-kind-icon">spool</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plasma.canvasrenderer.html#target" class="tsd-kind-icon">target</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plasma.canvasrenderer.html#width" class="tsd-kind-icon">width</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="plasma.texturerenderer.html#bitmap" class="tsd-kind-icon">bitmap</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="plasma.texturerenderer.html#bitmaphandler" class="tsd-kind-icon">bitmap<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="plasma.texturerenderer.html#canvas" class="tsd-kind-icon">canvas</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="plasma.texturerenderer.html#ctx" class="tsd-kind-icon">ctx</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plasma.texturerenderer.html#generator" class="tsd-kind-icon">generator</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="plasma.texturerenderer.html#isanimating" class="tsd-kind-icon">is<wbr>Animating</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="plasma.texturerenderer.html#readyhandler" class="tsd-kind-icon">ready<wbr>Handler</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="plasma.texturerenderer.html#target" class="tsd-kind-icon">target</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-inherited">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.canvasrenderer.html#animate" class="tsd-kind-icon">animate</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.canvasrenderer.html#attach" class="tsd-kind-icon">attach</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.canvasrenderer.html#detach" class="tsd-kind-icon">detach</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.texturerenderer.html#animate" class="tsd-kind-icon">animate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.texturerenderer.html#attach" class="tsd-kind-icon">attach</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="plasma.texturerenderer.html#detach" class="tsd-kind-icon">detach</a></li>
 							</ul>
 						</section>
 					</div>
@@ -135,37 +128,44 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Canvas<wbr>Renderer<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLCanvasElement</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/plasma.canvasrendereroptions.html" class="tsd-signature-type">CanvasRendererOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="plasma.canvasrenderer.html" class="tsd-signature-type">CanvasRenderer</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Texture<wbr>Renderer<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Texture</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="plasma.texturerenderer.html" class="tsd-signature-type">TextureRenderer</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides <a href="plasma.baserenderer.html">BaseRenderer</a>.<a href="plasma.baserenderer.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L35">src/ts/canvas.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/three.ts#L28">src/ts/three.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates a new canvas renderer instance.</p>
+									<p>Creates a new Texture renderer instance.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>target: <span class="tsd-signature-type">HTMLCanvasElement</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/plasma.canvasrendereroptions.html" class="tsd-signature-type">CanvasRendererOptions</a></h5>
+									<h5>target: <span class="tsd-signature-type">Texture</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="plasma.canvasrenderer.html" class="tsd-signature-type">CanvasRenderer</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="plasma.texturerenderer.html" class="tsd-signature-type">TextureRenderer</a></h4>
 						</li>
 					</ul>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="bitmap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> bitmap</h3>
+					<div class="tsd-signature tsd-kind-icon">bitmap<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ImageBitmap</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/three.ts#L26">src/ts/three.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 					<a name="bitmaphandler" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagProtected">Protected</span> bitmap<wbr>Handler</h3>
@@ -198,20 +198,25 @@
 						</ul>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="canvas" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> canvas</h3>
+					<div class="tsd-signature tsd-kind-icon">canvas<span class="tsd-signature-symbol">:</span> <a href="plasma.offscreencanvas.html" class="tsd-signature-type">OffscreenCanvas</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/three.ts#L27">src/ts/three.ts:27</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
 					<a name="ctx" class="tsd-anchor"></a>
-					<h3>ctx</h3>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> ctx</h3>
 					<div class="tsd-signature tsd-kind-icon">ctx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CanvasRenderingContext2D</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L34">src/ts/canvas.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/three.ts#L28">src/ts/three.ts:28</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The rendering context of a target canvas.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="generator" class="tsd-anchor"></a>
@@ -226,22 +231,6 @@
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>The attached bitmap generator.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="height" class="tsd-anchor"></a>
-					<h3>height</h3>
-					<div class="tsd-signature tsd-kind-icon">height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/plasma.canvasrendereroptions.html">CanvasRendererOptions</a>.<a href="../interfaces/plasma.canvasrendereroptions.html#height">height</a></p>
-						<ul>
-							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L30">src/ts/canvas.ts:30</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Target image height in pixels.</p>
 						</div>
 					</div>
 				</section>
@@ -287,44 +276,18 @@
 						</ul>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
-					<a name="spool" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagProtected">Protected</span> spool</h3>
-					<div class="tsd-signature tsd-kind-icon">spool<span class="tsd-signature-symbol">:</span> <a href="../interfaces/plasma.bitmapdetail.html" class="tsd-signature-type">BitmapDetail</a><span class="tsd-signature-symbol">[]</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L35">src/ts/canvas.ts:35</a></li>
-						</ul>
-					</aside>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="target" class="tsd-anchor"></a>
 					<h3>target</h3>
-					<div class="tsd-signature tsd-kind-icon">target<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">HTMLCanvasElement</span></div>
+					<div class="tsd-signature tsd-kind-icon">target<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Texture</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L32">src/ts/canvas.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/three.ts#L25">src/ts/three.ts:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The target canvas.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
-					<a name="width" class="tsd-anchor"></a>
-					<h3>width</h3>
-					<div class="tsd-signature tsd-kind-icon">width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
-					<aside class="tsd-sources">
-						<p>Implementation of <a href="../interfaces/plasma.canvasrendereroptions.html">CanvasRendererOptions</a>.<a href="../interfaces/plasma.canvasrendereroptions.html#width">width</a></p>
-						<ul>
-							<li>Defined in <a href="https://github.com/royaltm/rust-plasma/blob/master/web/src/ts/canvas.ts#L28">src/ts/canvas.ts:28</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Target image width in pixels.</p>
+							<p>The target Texture.</p>
 						</div>
 					</div>
 				</section>
@@ -433,63 +396,60 @@
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="plasma.baserenderer.html" class="tsd-kind-icon">Base<wbr>Renderer</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-class tsd-parent-kind-external-module">
+					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="plasma.canvasrenderer.html" class="tsd-kind-icon">Canvas<wbr>Renderer</a>
-						<ul>
-							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-								<a href="plasma.canvasrenderer.html#constructor" class="tsd-kind-icon">constructor</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
-								<a href="plasma.canvasrenderer.html#bitmaphandler" class="tsd-kind-icon">bitmap<wbr>Handler</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="plasma.canvasrenderer.html#ctx" class="tsd-kind-icon">ctx</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="plasma.canvasrenderer.html#generator" class="tsd-kind-icon">generator</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="plasma.canvasrenderer.html#height" class="tsd-kind-icon">height</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
-								<a href="plasma.canvasrenderer.html#isanimating" class="tsd-kind-icon">is<wbr>Animating</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
-								<a href="plasma.canvasrenderer.html#readyhandler" class="tsd-kind-icon">ready<wbr>Handler</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
-								<a href="plasma.canvasrenderer.html#spool" class="tsd-kind-icon">spool</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="plasma.canvasrenderer.html#target" class="tsd-kind-icon">target</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="plasma.canvasrenderer.html#width" class="tsd-kind-icon">width</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="plasma.canvasrenderer.html#animate" class="tsd-kind-icon">animate</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="plasma.canvasrenderer.html#attach" class="tsd-kind-icon">attach</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="plasma.canvasrenderer.html#detach" class="tsd-kind-icon">detach</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-class tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="plasma.offscreencanvas.html" class="tsd-kind-icon">Offscreen<wbr>Canvas</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="plasma.plasmagenerator.html" class="tsd-kind-icon">Plasma<wbr>Generator</a>
 					</li>
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-external-module">
 						<a href="plasma.texturerenderer.html" class="tsd-kind-icon">Texture<wbr>Renderer</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
+								<a href="plasma.texturerenderer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="plasma.texturerenderer.html#bitmap" class="tsd-kind-icon">bitmap</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="plasma.texturerenderer.html#bitmaphandler" class="tsd-kind-icon">bitmap<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="plasma.texturerenderer.html#canvas" class="tsd-kind-icon">canvas</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="plasma.texturerenderer.html#ctx" class="tsd-kind-icon">ctx</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plasma.texturerenderer.html#generator" class="tsd-kind-icon">generator</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="plasma.texturerenderer.html#isanimating" class="tsd-kind-icon">is<wbr>Animating</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="plasma.texturerenderer.html#readyhandler" class="tsd-kind-icon">ready<wbr>Handler</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="plasma.texturerenderer.html#target" class="tsd-kind-icon">target</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plasma.texturerenderer.html#animate" class="tsd-kind-icon">animate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plasma.texturerenderer.html#attach" class="tsd-kind-icon">attach</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="plasma.texturerenderer.html#detach" class="tsd-kind-icon">detach</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="../interfaces/plasma.bitmapdetail.html" class="tsd-kind-icon">Bitmap<wbr>Detail</a>
 					</li>

@@ -60,4 +60,4 @@ dist: all webpack gzip pack
 
 # generate TypeScript documentation
 doc:
-  npx typedoc --tsconfig tsconfig.json src/ts/plasma.ts plasma_web.d.ts
+  npx typedoc --tsconfig tsconfig.json

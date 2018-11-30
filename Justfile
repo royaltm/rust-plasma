@@ -19,6 +19,7 @@ update-ghp: doc
   rsync -rvah --delete target/doc/ ghp/master/rust
   @echo '{{index_redirect_html}}' >ghp/master/rust/index.html
   rsync -rvah --delete web/doc/ ghp/master/ts
+  rm -rf ghp/*.wasm
   rsync -rvah --include '*.js' --include '*.wasm' --exclude '*' web/dist/ ghp
 
 # generate Rust documentation

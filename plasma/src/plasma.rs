@@ -1,3 +1,4 @@
+use std::borrow::BorrowMut;
 use std::cmp::min;
 use std::f32::consts::PI;
 
@@ -5,18 +6,22 @@ use rand::Rng;
 
 use cfg_if::cfg_if;
 
-use palette::{LinSrgb, Hsv, RgbHue};
-
+use crate::simd_polyfill::*;
 use crate::pixel_buffer::*;
 use crate::phase_amp::*;
-
-// use fast_math::{sin, cos};
+use crate::mixer::*;
 
 const PI2: f32 = 2.0*PI;
 
 type PhaseAmpsT = [PhaseAmp; 24];
 
-const PXMAX: usize = 6;
+cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
+    use packed_simd::Cast;
+    type Xf32 = f32s;
+}
+else {
+    type Xf32 = f32;
+}}
 
 /// The struct that holds the meta information about current plasma state
 #[derive(Debug, Clone, PartialEq)]
@@ -27,6 +32,7 @@ pub struct Plasma {
     pub pixel_height: u32,
     config: PhaseAmpCfg,
     phase_amps: PhaseAmpsT,
+    mixer: PlasmaMixer<Xf32>
 }
 
 impl Plasma {
@@ -39,8 +45,9 @@ impl Plasma {
         for p in phase_amps.iter_mut() {
             *p = PhaseAmp::new(&config, rng);
         }
+        let mixer = PlasmaMixer::new();
         Plasma {
-            pixel_width, pixel_height, config, phase_amps
+            pixel_width, pixel_height, config, phase_amps, mixer
         }
     }
 
@@ -83,7 +90,7 @@ impl Plasma {
         let pw = self.pixel_width as usize;
         let ph = self.pixel_height as usize;
         let phase_amps = &self.phase_amps[..];
-        render_part::<B, _>(buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
+        render_part::<B, PlasmaLineCalcProducer<_, _>, _, _>(&self.mixer, buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
@@ -109,64 +116,6 @@ impl Plasma {
     }
 }
 
-macro_rules! make_comps {
-    ($float:ty, $zero:expr, $third:expr, $splat:path) => {
-
-        #[inline(always)]
-        fn compose4(x1: $float, x2: $float, y1: $float, y2: $float) -> $float {
-            const THIRD: $float = $third;
-            (x1 + y1 * x2 + y2) * THIRD
-        }
-
-        #[inline(always)]
-        fn compose<P: PhaseAmpAccess + ?Sized>(x: f32, pa1: &P, pa2: &P) -> $float {
-            let x = $splat(x);
-            let pa1_ampl = $splat(pa1.amplitude());
-            let pa1_phse = $splat(pa1.phase());
-            let pa2_ampl = $splat(pa2.amplitude());
-            let pa2_phse = $splat(pa2.phase());
-            let nor = pa1_ampl + pa2_ampl;
-            compose_raw(x, pa1_ampl, pa1_phse, pa2_ampl, pa2_phse, nor)
-        }
-
-        #[inline(always)]
-        fn compose_raw(x: $float, pa1_ampl: $float, pa1_phse: $float, pa2_ampl: $float, pa2_phse: $float, nor: $float) -> $float {
-            const ZERO: $float = $zero;
-            if nor == ZERO {
-                ZERO
-            }
-            else {
-                (
-                    (x + pa1_phse).sin()*pa1_ampl
-                  + (x + pa2_phse).cos()*pa2_ampl
-                ) / nor
-            }
-        }
-    }
-}
-
-cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
-    use packed_simd::{u32x8, f32x8, Cast};
-
-    #[allow(non_camel_case_types)]
-    type u32s = u32x8;
-    #[allow(non_camel_case_types)]
-    type f32s = f32x8;
-
-    type Xf32 = f32s;
-    type Yf32 = f32s;
-
-    macro_rules! simd_new_consecutive {
-        // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7, $v+8, $v+9, $v+10, $v+11, $v+12, $v+13, $v+14 ,$v+15));
-        ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7));
-        // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3));
-    }
-}
-else {
-    type Xf32 = f32;
-    type Yf32 = f32;
-}}
-
 /// Renders the part of the plasma into the provided `buffer` without the [Plasma] instance.
 ///
 /// You must also provide a struct implementing [PixelBuffer] trait.
@@ -188,8 +137,11 @@ else {
 /// # Panics
 ///
 /// __Panics__ if [PhaseAmpsSelect::select] panics.
-pub fn render_part<'a, B, P>(buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
-where B: PixelBuffer, P: PhaseAmpsSelect<'a> + ?Sized
+pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
+where B: PixelBuffer
+    , M: Mixer<Xf32>
+    , L: IntermediateCalculatorProducer<'a, P, Xf32>
+    , P: PhaseAmpsSelect<'a> + ?Sized
 {
     if x >= pw { return }
     else if y >= ph { return }
@@ -206,177 +158,130 @@ where B: PixelBuffer, P: PhaseAmpsSelect<'a> + ?Sized
     let x2 = min(pw, x + w);
     let y2 = min(ph, y + h);
     let dx = x2 - x;
+    let dy = y2 - y;
     let wr = PI2 / pw as f32;
     let hr = PI2 / ph as f32;
+    /* limit buffer view to the requested height */
+    let buffer = &mut buffer[0..pitch*dy];
+    /* prepare workspaces */
+    let (vxps, vyps) = prepare_workspace::<M>(wrkspc, dx, dy);
     /* precalculate horizontal tables */
-    let mut vxps: &mut [Xf32] = prepare_workspace(wrkspc, dx);
-    let dsize = vx_size(dx);
-    for (i, (pa1, pa2)) in phase_amps.select(0..2*PXMAX)
-                           .into_pa_pair_iter()
-                           .enumerate()
     {
-        prepare_composition_line(x, wr, pa1, pa2, &mut vxps[i..dsize*PXMAX]);
+        let mixiter_x = L::compose_x_iter(phase_amps);
+        assert_eq!(M::intermediate_h_len(), mixiter_x.len());
+        for (i, calc) in mixiter_x.enumerate() {
+            prepare_composition_line(i, x, wr, &calc, vxps);
+        }
+    }
+    {
+        let mixiter_y = L::compose_y_iter(phase_amps);
+        assert_eq!(M::intermediate_v_len(), mixiter_y.len());
+        for (i, calc) in mixiter_y.enumerate() {
+            prepare_composition_line(i, y, hr, &calc, vyps);
+        }
     }
     /* render lines */
-    let mut vyp: [Yf32; PXMAX] = Default::default();
-    for (line, y) in buffer.chunks_exact_mut(pitch).zip(y..y2) {
-        /* calculate vertical values */
-        let y = y as f32 * hr;
-        for (vy, (pa1, pa2)) in vyp.iter_mut()
-                                .zip(phase_amps.select(2*PXMAX..PXMAX*4).into_pa_pair_iter())
-        {
-            *vy = compose(y, pa1, pa2);
-        }
-        let mut writer = line.iter_mut();
-        gen_line(dx, &vyp, &mut vxps, &mut |pixel| {
-            B::put_pixel(&mut writer, pixel);
-        });
+    for (lines, vyp) in buffer.chunks_mut(LANES*pitch).zip(vyps.iter()) {
+        gen_lines::<B,_>(mixer, vyp, vxps, lines, pitch, dx);
     }
 }
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
-    const LANES: usize = u32s::lanes();
+    use std::borrow::Borrow;
 
-    make_comps!(f32s, f32s::splat(0.0), f32s::splat(1.0 / 3.0), f32s::splat);
-
-    #[inline(always)]
-    fn prepare_composition_line<P>(x0: usize, wr: f32, pa1: &P, pa2: &P, out: &mut [f32s])
-    where P: PhaseAmpAccess + ?Sized
+    fn prepare_composition_line<C, D>(index: usize, x0: usize, wr: f32, calc: &C, out: &mut [D])
+    where C: IntermediateCalculator<f32s>, D: BorrowMut<[f32s]>
     {
         let wr = f32s::splat(wr);
-        let pa1_ampl = f32s::splat(pa1.amplitude());
-        let pa1_phse = f32s::splat(pa1.phase());
-        let pa2_ampl = f32s::splat(pa2.amplitude());
-        let pa2_phse = f32s::splat(pa2.phase());
-        let nor = pa1_ampl + pa2_ampl;
-        for (i, op) in out.iter_mut().step_by(PXMAX).enumerate() {
+        for (i, op) in out.iter_mut().enumerate() {
             let x = (i * LANES + x0) as u32;
             let xs: f32s = simd_new_consecutive!(u32s, x).cast();
-            *op = compose_raw(xs * wr, pa1_ampl, pa1_phse, pa2_ampl, pa2_phse, nor);
+            op.borrow_mut()[index] = calc.calculate(xs * wr);
         }
     }
 
     #[inline(always)]
-    fn vx_size(dx: usize) -> usize {
-        (dx + LANES - 1) / LANES
+    fn vd_size(dv: usize) -> usize {
+        (dv + LANES - 1) / LANES
     }
 
-    const TXMAX: usize = 3;
-
-    #[inline(always)]
-    fn prepare_workspace(tmp: &mut Vec<u8>, dx: usize) -> &mut [f32s] {
-        let size = vx_size(dx)*(PXMAX + TXMAX);
-        unsafe { make_temporary_slice_mut(tmp, size) }
+    fn prepare_workspace<M>(tmp: &mut Vec<u8>, dx: usize, dy: usize) -> (&mut [M::IntermediateH], &mut [M::IntermediateV])
+    where M: Mixer<f32s>
+    {
+        let dxsize = vd_size(dx);
+        let dysize = vd_size(dy);
+        let xsize = dxsize * M::intermediate_h_len();
+        let ysize = dysize * M::intermediate_v_len();
+        let slice: &mut[f32s] = unsafe { make_temporary_slice_mut(tmp, xsize + ysize) };
+        let (ax, ay) = slice.split_at_mut(xsize);
+        let (_, ax, _) = unsafe { ax.align_to_mut::<M::IntermediateH>() };
+        let (_, ay, _) = unsafe { ay.align_to_mut::<M::IntermediateV>() };
+        assert_eq!(ax.len(), dxsize);
+        assert_eq!(ay.len(), dysize);
+        (ax, ay)
     }
 
-    #[inline(always)]
-    fn gen_line(dx: usize, vyp: &[f32s;PXMAX], vxps: &mut [f32s], next_pixel: &mut FnMut(LinSrgb)) {
-        let dsize = vx_size(dx);
-        let (vxps, tmp) = vxps.split_at_mut(dsize * PXMAX);
-        for (vxp, t) in vxps.chunks_exact(PXMAX)
-                       .zip(tmp.chunks_exact_mut(TXMAX))
-        {
-            let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
-            let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
-            let sat0 = compose4(vxp[4], vxp[5], vyp[4], vyp[5]);
-            let hue0 = (f32s::splat(1.0) - hue0 * f32s::splat(1.5)) * f32s::splat(180.0);
-            let hue1 = hue1 * f32s::splat(3.0 * 180.0);
-            let sat0 = sat0.abs() * f32s::splat(1.5);
-            for (pt, &val) in t.iter_mut().zip(&[hue0, hue1, sat0]) {
-                *pt = val;
+    fn gen_lines<B, M>(mixer: &M, vyp: &M::IntermediateV, vxps: &[M::IntermediateH], lines: &mut [u8], pitch: usize, dx: usize)
+    where B: PixelBuffer, M: Mixer<f32s>, M::IntermediateV: Borrow<[f32s]> + BorrowMut<[f32s]>
+    {
+        /* splat each y */
+        let mut vypl: [M::IntermediateV; LANES] = Default::default();
+        for (i, &ys) in vyp.borrow().iter().enumerate() {
+            let ys: f32tuple = ys.into();
+            for (&y, vyp) in ys.iter().zip(vypl.iter_mut()) {
+                vyp.borrow_mut()[i] = f32s::splat(y);
             }
         }
-        let tmp: &[[f32;LANES]] = unsafe { std::mem::transmute(tmp) };
-        let precalc = tmp.chunks_exact(TXMAX).flat_map(|tchunk| {
-            if let [hue0, hue1, sat0] = tchunk {
-                hue0.iter().zip(
-                hue1.iter()).zip(
-                sat0.iter())
-            }
-            else {
-                unreachable!();
-            }
-        });
-        for ((&hue0, &hue1), &sat0) in precalc.take(dx) {
-            let hue0 = RgbHue::from_degrees(hue0);
-            let hue1 = RgbHue::from_degrees(hue1);
-            let sat0 = match sat0 {
-                v if v > 1.0 => 1.0,
-                v => v
+        let line_end = B::PIXEL_BYTES * dx;
+        for (line, vyp) in lines.chunks_exact_mut(pitch).zip(vypl.iter()) {
+            let mut writer = line[0..line_end].iter_mut();
+            let mut next_pixel = |pixel| {
+                B::put_pixel(&mut writer, pixel);
             };
-            let rgb0 = LinSrgb::from(Hsv::new(hue0, 1.0, 1.0));
-            let rgb1 = LinSrgb::from(Hsv::new(hue1, sat0, 1.0));
-            next_pixel(rgb0 - rgb1);
+            for vxp in vxps.iter() {
+                mixer.mix_pixels(vxp, vyp, &mut next_pixel);
+            }
         }
     }
 }
 else {
 
-    #[inline(always)]
-    const fn identity<T>(x: T) -> T { x }
-
-    make_comps!(f32, 0.0, 1.0 / 3.0, identity);
-
-    #[inline(always)]
-    fn prepare_composition_line<P>(x0: usize, wr: f32, pa1: &P, pa2: &P, out: &mut [f32])
-    where P: PhaseAmpAccess + ?Sized
+    fn prepare_composition_line<C, D>(index: usize, x0: usize, wr: f32, calc: &C, out: &mut [D])
+    where C: IntermediateCalculator<f32>, D: BorrowMut<[f32]>
     {
-        let pa1_ampl = pa1.amplitude();
-        let pa1_phse = pa1.phase();
-        let pa2_ampl = pa2.amplitude();
-        let pa2_phse = pa2.phase();
-        let nor = pa1_ampl + pa2_ampl;
-        for (op, x) in out.iter_mut().step_by(PXMAX).zip(x0..) {
-            *op = compose_raw(x as f32 * wr, pa1_ampl, pa1_phse, pa2_ampl, pa2_phse, nor);
+        for (op, x) in out.iter_mut().zip(x0..) {
+            op.borrow_mut()[index] = calc.calculate(x as f32 * wr);
         }
     }
 
-    #[inline(always)]
-    fn vx_size(dx: usize) -> usize {
-        dx
+    fn prepare_workspace<M>(tmp: &mut Vec<u8>, dx: usize, dy: usize) -> (&mut [M::IntermediateH], &mut [M::IntermediateV])
+    where M: Mixer<f32>
+    {
+        let xsize = dx * M::intermediate_h_len();
+        let ysize = dy * M::intermediate_v_len();
+        let slice: &mut[f32] = unsafe { make_temporary_slice_mut(tmp, xsize + ysize) };
+        let (ax, ay) = slice.split_at_mut(xsize);
+        let (_, ax, _) = unsafe { ax.align_to_mut::<M::IntermediateH>() };
+        let (_, ay, _) = unsafe { ay.align_to_mut::<M::IntermediateV>() };
+        assert_eq!(ax.len(), dx);
+        assert_eq!(ay.len(), dy);
+        (ax, ay)
     }
 
-    #[inline(always)]
-    fn prepare_workspace(tmp: &mut Vec<u8>, dx: usize) -> &mut [f32] {
-        let size = vx_size(dx) * PXMAX;
-        unsafe { make_temporary_slice_mut(tmp, size) }
-    }
+    fn gen_lines<B, M>(mixer: &M, vyp: &M::IntermediateV, vxps: &[M::IntermediateH], line: &mut [u8], _pitch: usize, _dx: usize)
+    where B: PixelBuffer, M: Mixer<f32>
+    {
+        let mut writer = line.iter_mut();
+        let mut next_pixel = |pixel| {
+            B::put_pixel(&mut writer, pixel);
+        };
 
-    #[inline(always)]
-    fn gen_line(dx: usize, vyp: &[f32;PXMAX], vxps: &[f32], next_pixel: &mut FnMut(LinSrgb)) {
-        for vxp in vxps.chunks_exact(PXMAX).take(dx) {
-            let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
-            let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
-            let sat0 = compose4(vxp[4], vxp[5], vyp[4], vyp[5]);
-            let hue0 = (1.0 - hue0*1.5).to_hue();
-            let hue1 = (hue1*3.0).to_hue();
-            let sat0 = (sat0*1.5).to_val();
-            let rgb0 = LinSrgb::from(Hsv::new(hue0, 1.0, 1.0));
-            let rgb1 = LinSrgb::from(Hsv::new(hue1, sat0, 1.0));
-            next_pixel(rgb0 - rgb1);
+        for vxp in vxps.iter() {
+            mixer.mix_pixels(vxp, vyp, &mut next_pixel);
         }
     }
 }}
 
-trait ToColor {
-    fn to_hue(&self) -> RgbHue;
-    fn to_val(&self) -> f32;
-}
-
-impl ToColor for f32 {
-    #[inline(always)]
-    fn to_hue(&self) -> RgbHue {
-        RgbHue::from_degrees(self * 180.0)
-    }
-
-    #[inline(always)]
-    fn to_val(&self) -> f32 {
-        match self.abs() {
-            v if v > 1.0 => 1.0,
-            v => v
-        }
-    }
-}
 
 // 1. this function will clear provided vec
 // 2. uses vecs memory without initialization (reserves more if needed)

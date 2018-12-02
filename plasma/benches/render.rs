@@ -54,7 +54,7 @@ fn bench_render(ben: &mut Bencher) {
     let mut rng = rand::thread_rng();
     let cfg = PhaseAmpCfg::new(min_steps, max_steps);
     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &mut rng);
-    let pitch: usize = PBuf::pixel_bytes() * plasma_width as usize;
+    let pitch: usize = PBuf::PIXEL_BYTES * plasma_width as usize;
     let mut buffer_rgb24: Vec<u8> = vec![0; pitch * plasma_height as usize];
 
     let mut workspc = Vec::new();

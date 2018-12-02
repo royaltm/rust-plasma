@@ -4,7 +4,6 @@ use std::f32::EPSILON;
 use std::slice::ChunksExact;
 
 use rand::Rng;
-// use fast_math::sin;
 
 const PI2: f32 = 2.0*PI;
 const PI05: f32 = 0.5*PI;
@@ -61,7 +60,7 @@ pub trait PhaseAmpDataExp {
 
 /// A trait that allows selecting a subset of phase'n'amplitude and iterate over pairs of it.
 pub trait PhaseAmpsSelect<'a> {
-    type PairIter: Iterator<Item=(&'a Self::Item, &'a Self::Item)>;
+    type PairIter: Iterator<Item=(&'a Self::Item, &'a Self::Item)> + ExactSizeIterator;
     type Item: PhaseAmpAccess + ?Sized + 'a;
     /// The range should always be bounded.
     /// # Panics
@@ -119,6 +118,13 @@ pub struct PhaseAmpsPairIterator<'a> {
     iter: ChunksExact<'a, PhaseAmp>
 }
 
+impl<'a> ExactSizeIterator for PhaseAmpsPairIterator<'a> {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
 impl<'a> Iterator for PhaseAmpsPairIterator<'a> {
     type Item = (&'a PhaseAmp, &'a PhaseAmp);
     #[inline(always)]
@@ -132,6 +138,13 @@ impl<'a> Iterator for PhaseAmpsPairIterator<'a> {
 
 pub struct F32PaPairIterator<'a> {
     iter: ChunksExact<'a, f32>
+}
+
+impl<'a> ExactSizeIterator for F32PaPairIterator<'a> {
+    #[inline(always)]
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
 }
 
 impl<'a> Iterator for F32PaPairIterator<'a> {

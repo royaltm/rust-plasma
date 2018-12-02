@@ -35,11 +35,15 @@ compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" 
 #[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
 compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
 
-// mod fast_math;
+#[macro_use] mod simd_polyfill;
+mod color;
 mod phase_amp;
+mod mixer;
 mod plasma;
 mod pixel_buffer;
 
+pub use crate::color::*;
 pub use crate::phase_amp::*;
+pub use crate::mixer::*;
 pub use crate::plasma::*;
 pub use crate::pixel_buffer::*;

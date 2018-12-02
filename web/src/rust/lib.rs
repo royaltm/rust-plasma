@@ -41,7 +41,7 @@ impl PlasmaHandle {
         let mut rng = OsRng::new().map_err(|e| js_sys::Error::new(e.msg))?;
         let cfg = PhaseAmpCfg::new(min_steps, max_steps);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
-        let data = vec![0; width as usize * height as usize * 4];
+        let data = vec![0; width as usize * height as usize * PixelRGBA8::PIXEL_BYTES];
         let wrkspc = Vec::new();
         Ok(PlasmaHandle {
             plasma,
@@ -58,7 +58,7 @@ impl PlasmaHandle {
             panic!("invalid area provided");
         }
         self.area = Area { x, y, w, h };
-        self.data.resize(w * h * 4, 0u8);
+        self.data.resize(w * h * PixelRGBA8::PIXEL_BYTES, 0u8);
     }
 
     pub fn width(&self) -> u32 {
@@ -71,17 +71,18 @@ impl PlasmaHandle {
 
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = 4 * w;
+        let pitch: usize = PixelRGBA8::PIXEL_BYTES * w;
         self.plasma.render_part::<PixelRGBA8>(&mut self.data, pitch, x, y, w, h, Some(&mut self.wrkspc));
     }
 
     #[wasm_bindgen(js_name=renderPhaseAmps)]
     pub fn render_phase_amps(&mut self, phase_amps: &[f32]) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = 4 * w;
+        let pitch: usize = PixelRGBA8::PIXEL_BYTES * w;
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
-        render_part::<PixelRGBA8, _>(&mut self.data, pitch, pw, ph, phase_amps, x, y, w, h, Some(&mut self.wrkspc))
+        let mixer = PlasmaMixer::new();
+        render_part::<PixelRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer, &mut self.data, pitch, pw, ph, phase_amps, x, y, w, h, Some(&mut self.wrkspc))
     }
 
     pub fn update(&mut self) {

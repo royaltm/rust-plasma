@@ -15,6 +15,9 @@ onmessage = (event) => {
         // plasma.importPhaseAmps(new Float32Array(data));
         // plasma.render();
         plasma.renderPhaseAmps(new Float32Array(data));
+        if (imageData.data.byteLength === 0) {
+            imageData = plasma.imageData();
+        }
         createImageBitmap(imageData).then(imageBitmap => {
             worker.postMessage(imageBitmap, [imageBitmap]);
         }, (err: any) => {

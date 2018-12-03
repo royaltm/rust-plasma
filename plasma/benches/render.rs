@@ -6,10 +6,10 @@ RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,
 */
 #![feature(test)]
 
-extern crate test;
 extern crate plasma;
 extern crate rand;
-use test::{Bencher, black_box};
+extern crate test;
+use test::{black_box, Bencher};
 
 macro_rules! target_feature_print {
     ($feature:tt) => {
@@ -40,10 +40,28 @@ fn bench_render(ben: &mut Bencher) {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
         print!("Target features:");
-        target_feature_print!("mmx","sse","sse2","sse3","ssse3","sse4.1","sse4.2","sse4a","avx","avx2");
+        target_feature_print!("mmx", "sse", "sse2", "sse3", "ssse3", "sse4.1", "sse4.2", "sse4a", "avx", "avx2");
         print!("\nNative features:");
-        detected_feature_print!("mmx","sse","sse2","sse3","ssse3","sse4.1","sse4.2","sse4a","avx","avx2",
-            "avx512f","avx512cd","avx512er","avx512pf","avx512bw","avx512dq","avx512vl","avx512ifma","avx512vbmi","avx512vpopcntdq");
+        detected_feature_print!("mmx",
+                                "sse",
+                                "sse2",
+                                "sse3",
+                                "ssse3",
+                                "sse4.1",
+                                "sse4.2",
+                                "sse4a",
+                                "avx",
+                                "avx2",
+                                "avx512f",
+                                "avx512cd",
+                                "avx512er",
+                                "avx512pf",
+                                "avx512bw",
+                                "avx512dq",
+                                "avx512vl",
+                                "avx512ifma",
+                                "avx512vbmi",
+                                "avx512vpopcntdq");
         println!();
     }
 
@@ -59,11 +77,11 @@ fn bench_render(ben: &mut Bencher) {
 
     let mut workspc = Vec::new();
     ben.iter(|| {
-        for _ in 0..10 {
-            let buffer: &mut [u8] = &mut buffer_rgb24;
-            plasma.render::<PBuf>(buffer, pitch, Some(&mut workspc));
-            plasma.update(&mut rng);
-            black_box(buffer);
-        }
-    });
+           for _ in 0..10 {
+               let buffer: &mut [u8] = &mut buffer_rgb24;
+               plasma.render::<PBuf>(buffer, pitch, Some(&mut workspc));
+               plasma.update(&mut rng);
+               black_box(buffer);
+           }
+       });
 }

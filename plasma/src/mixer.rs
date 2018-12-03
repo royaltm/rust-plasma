@@ -1,8 +1,8 @@
 //! A pixel mixer module.
-use std::marker::PhantomData;
-use std::borrow::{Borrow, BorrowMut};
-use cfg_if::cfg_if;
 use crate::color::PixelRgb;
+use cfg_if::cfg_if;
+use std::{borrow::{Borrow, BorrowMut},
+          marker::PhantomData};
 
 use crate::phase_amp::*;
 
@@ -16,29 +16,23 @@ pub trait Mixer<T: Sized + Default + Copy> {
     type Mixed: Sized + Default + Copy + BorrowMut<[T]> + Borrow<[T]>;
 
     /// returns the number of intermediate x-values
-    fn intermediate_h_len() -> usize {
-        std::mem::size_of::<Self::IntermediateH>() / std::mem::size_of::<T>()
-    }
+    fn intermediate_h_len() -> usize { std::mem::size_of::<Self::IntermediateH>() / std::mem::size_of::<T>() }
 
     /// returns the number of intermediate y-values
-    fn intermediate_v_len() -> usize {
-        std::mem::size_of::<Self::IntermediateV>() / std::mem::size_of::<T>()
-    }
+    fn intermediate_v_len() -> usize { std::mem::size_of::<Self::IntermediateV>() / std::mem::size_of::<T>() }
 
     /// returns the number of mix values output
-    fn mixed_len() -> usize {
-        std::mem::size_of::<Self::Mixed>() / std::mem::size_of::<T>()
-    }
+    fn mixed_len() -> usize { std::mem::size_of::<Self::Mixed>() / std::mem::size_of::<T>() }
 
     fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut FnMut(PixelRgb));
 }
 
 pub trait IntermediateCalculatorProducer<'a, P, T>
-where P: PhaseAmpsSelect<'a> + ?Sized
-    , T: Sized + Default + Copy
+    where P: PhaseAmpsSelect<'a> + ?Sized,
+          T: Sized + Default + Copy
 {
     type MixerType: Mixer<T>;
-    type CalcIter: ExactSizeIterator + Iterator<Item=Self::LineCalc> + Sized;
+    type CalcIter: ExactSizeIterator + Iterator<Item = Self::LineCalc> + Sized;
     type LineCalc: IntermediateCalculator<T> + Sized;
 
     fn compose_x_iter(pa: &'a P) -> Self::CalcIter;
@@ -52,27 +46,23 @@ pub struct PlasmaMixer<T>(PhantomData<T>);
 
 pub struct PlasmaLineCalc<T> {
     amplitude1: T,
-    phase1: T,
+    phase1:     T,
     amplitude2: T,
-    phase2: T,
-    normal: T
+    phase2:     T,
+    normal:     T,
 }
 
 pub struct PlasmaMixIter<'a, P, T>
-where P: PhaseAmpsSelect<'a> + ?Sized
+    where P: PhaseAmpsSelect<'a> + ?Sized
 {
     pa_pair_iter: <P as PhaseAmpsSelect<'a>>::PairIter,
-    calc_val: PhantomData<T>
+    calc_val:     PhantomData<T>,
 }
 
-pub struct PlasmaLineCalcProducer<'a, P: 'a, T>(PhantomData<T>, PhantomData<&'a P>)
-where P: PhaseAmpsSelect<'a> + ?Sized;
-
+pub struct PlasmaLineCalcProducer<'a, P: 'a, T>(PhantomData<T>, PhantomData<&'a P>) where P: PhaseAmpsSelect<'a> + ?Sized;
 
 impl<T> PlasmaMixer<T> {
-    pub fn new() -> Self {
-        PlasmaMixer(PhantomData)
-    }
+    pub fn new() -> Self { PlasmaMixer(PhantomData) }
 }
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
@@ -112,8 +102,8 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             }
             else {
                 (
-                    (v + self.phase1).sin()*self.amplitude1
-                  + (v + self.phase2).cos()*self.amplitude2
+                    (v + self.phase1).sin() * self.amplitude1
+                  + (v + self.phase2).cos() * self.amplitude2
                 ) / self.normal
             }
         }
@@ -174,8 +164,8 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             }
             else {
                 (
-                    (v + self.phase1).sin()*self.amplitude1
-                  + (v + self.phase2).cos()*self.amplitude2
+                    (v + self.phase1).sin() * self.amplitude1
+                  + (v + self.phase2).cos() * self.amplitude2
                 ) / self.normal
             }
         }
@@ -202,34 +192,29 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 }}
 
 impl<'a, P, T> ExactSizeIterator for PlasmaMixIter<'a, P, T>
-where PlasmaMixIter<'a, P, T>: Iterator, P: PhaseAmpsSelect<'a> + ?Sized
+    where PlasmaMixIter<'a, P, T>: Iterator,
+          P: PhaseAmpsSelect<'a> + ?Sized
 {
     #[inline(always)]
-    fn len(&self) -> usize {
-        self.pa_pair_iter.len()
-    }
+    fn len(&self) -> usize { self.pa_pair_iter.len() }
 }
 
 impl<'a, P, T> IntermediateCalculatorProducer<'a, P, T> for PlasmaLineCalcProducer<'a, P, T>
-where P: PhaseAmpsSelect<'a> + ?Sized
-    , PlasmaLineCalc<T>: IntermediateCalculator<T>
-    , PlasmaMixIter<'a, P, T>: Iterator<Item=PlasmaLineCalc<T>>
-    , PlasmaMixer<T>: Mixer<T>
-    , T: Sized + Default + Copy
+    where P: PhaseAmpsSelect<'a> + ?Sized,
+          PlasmaLineCalc<T>: IntermediateCalculator<T>,
+          PlasmaMixIter<'a, P, T>: Iterator<Item = PlasmaLineCalc<T>>,
+          PlasmaMixer<T>: Mixer<T>,
+          T: Sized + Default + Copy
 {
-    type MixerType = PlasmaMixer<T>;
     type CalcIter = PlasmaMixIter<'a, P, T>;
     type LineCalc = PlasmaLineCalc<T>;
+    type MixerType = PlasmaMixer<T>;
 
     fn compose_x_iter(pa: &'a P) -> Self::CalcIter {
-        PlasmaMixIter {
-            pa_pair_iter: pa.select(0..12).into_pa_pair_iter(),
-            calc_val: PhantomData }
+        PlasmaMixIter { pa_pair_iter: pa.select(0..12).into_pa_pair_iter(), calc_val: PhantomData }
     }
 
     fn compose_y_iter(pa: &'a P) -> Self::CalcIter {
-        PlasmaMixIter {
-            pa_pair_iter: pa.select(12..24).into_pa_pair_iter(),
-            calc_val: PhantomData }
+        PlasmaMixIter { pa_pair_iter: pa.select(12..24).into_pa_pair_iter(), calc_val: PhantomData }
     }
 }

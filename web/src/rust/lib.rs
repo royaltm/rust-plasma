@@ -5,27 +5,30 @@ use wasm_bindgen::prelude::*;
 // use wasm_bindgen::closure::Closure;
 use wasm_bindgen::{Clamped, JsCast};
 // use web_sys::*;
-use web_sys::{Window, ImageData, WorkerGlobalScope};
+use web_sys::{ImageData, Window, WorkerGlobalScope};
 // use js_sys::JsCast;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
-    // fn alert(s: &str);
+// fn alert(s: &str);
 }
 
 struct Area {
-    x: usize, y: usize, w: usize, h: usize
+    x: usize,
+    y: usize,
+    w: usize,
+    h: usize,
 }
 
 #[wasm_bindgen]
 pub struct PlasmaHandle {
     plasma: Plasma,
-    rng: OsRng,
-    data: Vec<u8>,
-    area: Area,
-    wrkspc: Vec<u8>
+    rng:    OsRng,
+    data:   Vec<u8>,
+    area:   Area,
+    wrkspc: Vec<u8>,
 }
 
 #[wasm_bindgen]
@@ -43,13 +46,7 @@ impl PlasmaHandle {
         let plasma = Plasma::new(width, height, cfg, &mut rng);
         let data = vec![0; width as usize * height as usize * PixelRGBA8::PIXEL_BYTES];
         let wrkspc = Vec::new();
-        Ok(PlasmaHandle {
-            plasma,
-            rng,
-            data,
-            area: Area { x: 0, y: 0, w: width as usize, h: height as usize },
-            wrkspc
-        })
+        Ok(PlasmaHandle { plasma, rng, data, area: Area { x: 0, y: 0, w: width as usize, h: height as usize }, wrkspc })
     }
 
     #[wasm_bindgen(js_name=setArea)]
@@ -61,13 +58,9 @@ impl PlasmaHandle {
         self.data.resize(w * h * PixelRGBA8::PIXEL_BYTES, 0u8);
     }
 
-    pub fn width(&self) -> u32 {
-        self.plasma.pixel_width
-    }
+    pub fn width(&self) -> u32 { self.plasma.pixel_width }
 
-    pub fn height(&self) -> u32 {
-        self.plasma.pixel_height
-    }
+    pub fn height(&self) -> u32 { self.plasma.pixel_height }
 
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
@@ -82,12 +75,20 @@ impl PlasmaHandle {
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
         let mixer = PlasmaMixer::new();
-        render_part::<PixelRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer, &mut self.data, pitch, pw, ph, phase_amps, x, y, w, h, Some(&mut self.wrkspc))
+        render_part::<PixelRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer,
+                                                                      &mut self.data,
+                                                                      pitch,
+                                                                      pw,
+                                                                      ph,
+                                                                      phase_amps,
+                                                                      x,
+                                                                      y,
+                                                                      w,
+                                                                      h,
+                                                                      Some(&mut self.wrkspc))
     }
 
-    pub fn update(&mut self) {
-        self.plasma.update(&mut self.rng);
-    }
+    pub fn update(&mut self) { self.plasma.update(&mut self.rng); }
 
     #[wasm_bindgen(js_name=imageData)]
     pub fn image_data(&mut self) -> Result<ImageData, JsValue> {
@@ -109,21 +110,14 @@ impl PlasmaHandle {
     }
 
     #[wasm_bindgen(js_name=importPhaseAmps)]
-    pub fn import_phase_amps(&mut self, phase_amps: &[f32]) {
-        self.plasma.import_phase_amps(phase_amps);
-    }
+    pub fn import_phase_amps(&mut self, phase_amps: &[f32]) { self.plasma.import_phase_amps(phase_amps); }
 
     #[wasm_bindgen(js_name=minSteps)]
-    pub fn min_steps(&self) -> f32 {
-        self.plasma.min_steps()
-    }
+    pub fn min_steps(&self) -> f32 { self.plasma.min_steps() }
 
     #[wasm_bindgen(js_name=maxSteps)]
-    pub fn max_steps(&self) -> f32 {
-        self.plasma.max_steps()
-    }
+    pub fn max_steps(&self) -> f32 { self.plasma.max_steps() }
 }
-
 
 enum GlobalProxy {
     Window(Window),

@@ -20,7 +20,8 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     pub const LANES: usize = f32s::lanes();
 
     macro_rules! simd_new_consecutive {
-        // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7, $v+8, $v+9, $v+10, $v+11, $v+12, $v+13, $v+14 ,$v+15));
+        // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7,
+        //                                       $v+8, $v+9, $v+10, $v+11, $v+12, $v+13, $v+14 ,$v+15));
         ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7));
         // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3));
     }

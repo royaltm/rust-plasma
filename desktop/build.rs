@@ -1,5 +1,4 @@
-use std::env;
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 
 #[cfg(windows)]
 extern crate winres;
@@ -8,7 +7,8 @@ extern crate winres;
 const SDL2_WINDOWS_DIR: &'static str = "sdl-2.0.8-windows";
 
 fn main() {
-    #[cfg(windows)] {
+    #[cfg(windows)]
+    {
         let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
         let mut res = winres::WindowsResource::new();
@@ -42,7 +42,7 @@ fn main() {
                 return;
             }
             println!("cargo:rustc-link-search=native={}", lib_dir.display());
-            for entry in std::fs::read_dir(dll_dir).expect("Can't read DLL dir")  {
+            for entry in std::fs::read_dir(dll_dir).expect("Can't read DLL dir") {
                 let entry_path = entry.expect("Invalid fs entry").path();
                 if let Some(file_name) = entry_path.file_name() {
                     let mut new_file_path = manifest_dir.clone();

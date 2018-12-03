@@ -1,17 +1,12 @@
-use std::borrow::BorrowMut;
-use std::cmp::min;
-use std::f32::consts::PI;
+use std::{borrow::BorrowMut, cmp::min, f32::consts::PI};
 
 use rand::Rng;
 
 use cfg_if::cfg_if;
 
-use crate::simd_polyfill::*;
-use crate::pixel_buffer::*;
-use crate::phase_amp::*;
-use crate::mixer::*;
+use crate::{mixer::*, phase_amp::*, pixel_buffer::*, simd_polyfill::*};
 
-const PI2: f32 = 2.0*PI;
+const PI2: f32 = 2.0 * PI;
 
 type PhaseAmpsT = [PhaseAmp; 24];
 
@@ -32,7 +27,7 @@ pub struct Plasma {
     pub pixel_height: u32,
     config: PhaseAmpCfg,
     phase_amps: PhaseAmpsT,
-    mixer: PlasmaMixer<Xf32>
+    mixer: PlasmaMixer<Xf32>,
 }
 
 impl Plasma {
@@ -46,9 +41,7 @@ impl Plasma {
             *p = PhaseAmp::new(&config, rng);
         }
         let mixer = PlasmaMixer::new();
-        Plasma {
-            pixel_width, pixel_height, config, phase_amps, mixer
-        }
+        Plasma { pixel_width, pixel_height, config, phase_amps, mixer }
     }
 
     /// Animates the plasma by modifying the internal [PhaseAmp] variables.
@@ -86,34 +79,37 @@ impl Plasma {
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     #[inline(always)]
-    pub fn render_part<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>) {
+    pub fn render_part<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize, h: usize,
+                                       wrkspc: Option<&mut Vec<u8>>) {
         let pw = self.pixel_width as usize;
         let ph = self.pixel_height as usize;
         let phase_amps = &self.phase_amps[..];
-        render_part::<B, PlasmaLineCalcProducer<_, _>, _, _>(&self.mixer, buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
+        render_part::<B, PlasmaLineCalcProducer<_, _>, _, _>(&self.mixer,
+                                                             buffer,
+                                                             pitch,
+                                                             pw,
+                                                             ph,
+                                                             phase_amps,
+                                                             x,
+                                                             y,
+                                                             w,
+                                                             h,
+                                                             wrkspc)
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
     #[inline(always)]
-    pub fn import_phase_amps(&mut self, source: &[f32]) {
-        self.phase_amps.import_phase_amps(source);
-    }
+    pub fn import_phase_amps(&mut self, source: &[f32]) { self.phase_amps.import_phase_amps(source); }
 
     /// Exports the internal plasma state into the [Vec] of 32bit floats.
     #[inline(always)]
-    pub fn export_phase_amps(&self, out: &mut Vec<f32>) {
-        self.phase_amps.export_phase_amps(out);
-    }
+    pub fn export_phase_amps(&self, out: &mut Vec<f32>) { self.phase_amps.export_phase_amps(out); }
 
     #[inline(always)]
-    pub fn min_steps(&self) -> f32 {
-        self.config.min_steps()
-    }
+    pub fn min_steps(&self) -> f32 { self.config.min_steps() }
 
     #[inline(always)]
-    pub fn max_steps(&self) -> f32 {
-        self.config.max_steps()
-    }
+    pub fn max_steps(&self) -> f32 { self.config.max_steps() }
 }
 
 /// Renders the part of the plasma into the provided `buffer` without the [Plasma] instance.
@@ -137,14 +133,19 @@ impl Plasma {
 /// # Panics
 ///
 /// __Panics__ if [PhaseAmpsSelect::select] panics.
-pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P, x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
-where B: PixelBuffer
-    , M: Mixer<Xf32>
-    , L: IntermediateCalculatorProducer<'a, P, Xf32>
-    , P: PhaseAmpsSelect<'a> + ?Sized
+pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P,
+                                   x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
+    where B: PixelBuffer,
+          M: Mixer<Xf32>,
+          L: IntermediateCalculatorProducer<'a, P, Xf32>,
+          P: PhaseAmpsSelect<'a> + ?Sized
 {
-    if x >= pw { return }
-    else if y >= ph { return }
+    if x >= pw {
+        return;
+    }
+    else if y >= ph {
+        return;
+    }
     /* let's ensure we have some workspace */
     let mut tmpwrkspc: Vec<u8>;
     let wrkspc = match wrkspc {
@@ -152,7 +153,7 @@ where B: PixelBuffer
         None => {
             tmpwrkspc = Vec::new(); /* the new one */
             &mut tmpwrkspc
-        }
+        },
     };
     /* make sure dimensions are ok */
     let x2 = min(pw, x + w);
@@ -162,7 +163,7 @@ where B: PixelBuffer
     let wr = PI2 / pw as f32;
     let hr = PI2 / ph as f32;
     /* limit buffer view to the requested height */
-    let buffer = &mut buffer[0..pitch*dy];
+    let buffer = &mut buffer[0..pitch * dy];
     /* prepare workspaces */
     let (vxps, vyps) = prepare_workspace::<M>(wrkspc, dx, dy);
     /* precalculate horizontal tables */
@@ -181,8 +182,8 @@ where B: PixelBuffer
         }
     }
     /* render lines */
-    for (lines, vyp) in buffer.chunks_mut(LANES*pitch).zip(vyps.iter()) {
-        gen_lines::<B,_>(mixer, vyp, vxps, lines, pitch, dx);
+    for (lines, vyp) in buffer.chunks_mut(LANES * pitch).zip(vyps.iter()) {
+        gen_lines::<B, _>(mixer, vyp, vxps, lines, pitch, dx);
     }
 }
 
@@ -281,7 +282,6 @@ else {
         }
     }
 }}
-
 
 // 1. this function will clear provided vec
 // 2. uses vecs memory without initialization (reserves more if needed)

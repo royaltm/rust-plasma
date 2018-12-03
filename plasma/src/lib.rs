@@ -5,7 +5,7 @@
 //! ```
 //! extern create rand;
 //! extern create plasma;
-//! 
+//!
 //! use plasma::*;
 //! fn main() {
 //!     let min_steps = 80.0f32;
@@ -35,15 +35,12 @@ compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" 
 #[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
 compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
 
-#[macro_use] mod simd_polyfill;
+#[macro_use]
+mod simd_polyfill;
 mod color;
-mod phase_amp;
 mod mixer;
-mod plasma;
+mod phase_amp;
 mod pixel_buffer;
+mod plasma;
 
-pub use crate::color::*;
-pub use crate::phase_amp::*;
-pub use crate::mixer::*;
-pub use crate::plasma::*;
-pub use crate::pixel_buffer::*;
+pub use crate::{color::*, mixer::*, phase_amp::*, pixel_buffer::*, plasma::*};

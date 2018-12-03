@@ -1,19 +1,22 @@
-#![windows_subsystem="windows"] // it is "console" by default
+#![windows_subsystem = "windows"] // it is "console" by default
 #![allow(unused_assignments)]
 
 #[macro_use]
 mod utils;
 
-use std::{rc::Rc, cmp::{min, max}, sync::Arc};
-use plasma::*;
 use crate::utils::*;
+use plasma::*;
+use std::{cmp::{max, min},
+          rc::Rc,
+          sync::Arc};
 
-use sdl2_sys::SDL_WindowFlags;
-use sdl2::{
-    event::{WindowEvent, Event}, keyboard::Keycode, pixels::PixelFormatEnum,
-    rect::Rect, video::{Window, WindowContext, FullscreenType}
-};
 use scoped_threadpool::Pool;
+use sdl2::{event::{Event, WindowEvent},
+           keyboard::Keycode,
+           pixels::PixelFormatEnum,
+           rect::Rect,
+           video::{FullscreenType, Window, WindowContext}};
+use sdl2_sys::SDL_WindowFlags;
 
 const PLASMA_WIDTH: u32 = 512;
 const PLASMA_HEIGHT: u32 = 512;
@@ -28,13 +31,13 @@ enum AppMode {
     Screensaver,
     ScreensaverPreview(String),
     ScreensaverConfig,
-    Wallpaper
+    Wallpaper,
 }
 
 #[derive(Debug, PartialEq)]
 enum AppState {
     Active,
-    Inactive
+    Inactive,
 }
 
 #[cfg(target_pointer_width = "32")]
@@ -47,28 +50,31 @@ macro_rules! program_name {
     () => (concat!(env!("CARGO_PKG_NAME"), " (64-bit)"));
 }
 
-static ABOUT_INFO: &'static str = concat!(program_name!(), " v", env!("CARGO_PKG_VERSION"), " Copyright © 2018 ", env!("CARGO_PKG_AUTHORS"),
-                                "\n", target_env_info!(), "Features:", features!(),
-                                ".\nTarget CPU features: ", target_features!(),
-                                ".\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n\
-                                 [ESC] to quit.\n[F1] for this message.\nDouble click to toggle fullscreen.");
+static ABOUT_INFO: &'static str = concat!(program_name!(),
+                                          " v",
+                                          env!("CARGO_PKG_VERSION"),
+                                          " Copyright © 2018 ",
+                                          env!("CARGO_PKG_AUTHORS"),
+                                          "\n",
+                                          target_env_info!(),
+                                          "Features:",
+                                          features!(),
+                                          ".\nTarget CPU features: ",
+                                          target_features!(),
+                                          ".\n\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n[ESC] to quit.\n[F1] \
+                                           for this message.\nDouble click to toggle fullscreen.");
 
 fn run() -> Result<(), String> {
     let app_mode: AppMode;
 
     if cfg!(target_os = "windows") {
         match std::env::args().nth(1).as_mut().map(|s| {
-                    s.make_ascii_lowercase(); s.as_str()
-                }) {
-            Some("/s")|Some("-s") => {
-                app_mode = AppMode::Screensaver
-            },
-            Some("/c") => {
-                app_mode = AppMode::ScreensaverConfig
-            },
-            Some("/w")|Some("-w") => {
-                app_mode = AppMode::Wallpaper
-            },
+                                                  s.make_ascii_lowercase();
+                                                  s.as_str()
+                                              }) {
+            Some("/s") | Some("-s") => app_mode = AppMode::Screensaver,
+            Some("/c") => app_mode = AppMode::ScreensaverConfig,
+            Some("/w") | Some("-w") => app_mode = AppMode::Wallpaper,
             Some("/p") => {
                 let handle = std::env::args().nth(2).ok_or_else(|| "No window handle for preview")?;
                 app_mode = AppMode::ScreensaverPreview(handle);
@@ -83,7 +89,7 @@ fn run() -> Result<(), String> {
             Some(s) => {
                 return Err(format!("Unknown argument: {}", s));
             },
-            None => app_mode = AppMode::Standalone
+            None => app_mode = AppMode::Standalone,
         }
     }
     else {
@@ -128,22 +134,17 @@ fn run() -> Result<(), String> {
         AppMode::Screensaver => {
             // find the largest window bounds to cover all displays
             let ndisp = video_subsystem.num_video_displays()?;
-            let (x0, y0, x1, y1) = (0..ndisp)
-            .try_fold((0, 0, 0, 0), |(x0, y0, x1, y1), n| -> Result<_,String> {
-                let rect: Rect = video_subsystem.display_bounds(n)?;
-                let (x, y, w, h) = (rect.x(), rect.y(), rect.width(), rect.height());
-                Ok((min(x0, x), min(y0, y), max(x1, x + w as i32), max(y1, y + h as i32)))
-            })?;
+            let (x0, y0, x1, y1) = (0..ndisp).try_fold((0, 0, 0, 0), |(x0, y0, x1, y1), n| -> Result<_, String> {
+                                                 let rect: Rect = video_subsystem.display_bounds(n)?;
+                                                 let (x, y, w, h) = (rect.x(), rect.y(), rect.width(), rect.height());
+                                                 Ok((min(x0, x), min(y0, y), max(x1, x + w as i32), max(y1, y + h as i32)))
+                                             })?;
             let (w, h) = ((x1 - x0) as u32, (y1 - y0) as u32);
             let mut window_builder = video_subsystem.window("plasma", w, h);
-            window_builder
-            .input_grabbed()
-            .position(x0, y0)
-            .borderless();
+            window_builder.input_grabbed().position(x0, y0).borderless();
             let flags = window_builder.window_flags() | SDL_WindowFlags::SDL_WINDOW_ALWAYS_ON_TOP as u32;
-            window = window_builder.set_window_flags(flags)
-            .build().map_err(err_str)?;
-            let target_size = min(min(w, h)*5/6, 900);
+            window = window_builder.set_window_flags(flags).build().map_err(err_str)?;
+            let target_size = min(min(w, h) * 5 / 6, 900);
             target_width = target_size;
             target_height = target_size;
             let plasma_size = if target_size < 400 { target_size } else { target_size / 2 };
@@ -153,7 +154,7 @@ fn run() -> Result<(), String> {
         AppMode::Wallpaper => {
             window = create_wallpaper_window(&video_subsystem)?;
             let (w, h) = window.drawable_size();
-            let target_size = min(min(w, h)*5/6, 900);
+            let target_size = min(min(w, h) * 5 / 6, 900);
             target_width = target_size;
             target_height = target_size;
             let plasma_size = if target_size < 400 { target_size } else { target_size / 2 };
@@ -165,26 +166,24 @@ fn run() -> Result<(), String> {
             target_height = TARGET_HEIGHT;
             plasma_width = PLASMA_WIDTH;
             plasma_height = PLASMA_HEIGHT;
-            window = video_subsystem
-            .window("plasma", target_width, target_height)
-            .resizable()
-            .position_centered()
-            .build().map_err(err_str)?;
-        }
+            window = video_subsystem.window("plasma", target_width, target_height)
+                                    .resizable()
+                                    .position_centered()
+                                    .build()
+                                    .map_err(err_str)?;
+        },
     }
 
     sdl_context.mouse().show_cursor(app_mode == AppMode::Wallpaper);
 
     // let timer_subsystem = sdl_context.timer()?;
 
-    let mut canvas = window.into_canvas()
-        .present_vsync()
-        .build().map_err(err_str)?;
+    let mut canvas = window.into_canvas().present_vsync().build().map_err(err_str)?;
 
     let texture_creator = canvas.texture_creator();
 
-    let mut texture = texture_creator.create_texture_streaming(
-        PixelFormatEnum::RGB24, plasma_width, plasma_height).map_err(err_str)?;
+    let mut texture =
+        texture_creator.create_texture_streaming(PixelFormatEnum::RGB24, plasma_width, plasma_height).map_err(err_str)?;
 
     let mut rng = rand::thread_rng();
     let cfg = PhaseAmpCfg::new(MIN_STEPS, MAX_STEPS);
@@ -203,39 +202,37 @@ fn run() -> Result<(), String> {
             for event in event_pump.poll_iter() {
                 match app_mode {
                     AppMode::ScreensaverPreview(_) | AppMode::Wallpaper => match event {
-                        Event::Window { win_event: WindowEvent::Close, .. } |
-                        Event::Quit { .. } => break 'mainloop,
-                        _ => {}
+                        Event::Window { win_event: WindowEvent::Close, .. } | Event::Quit { .. } => break 'mainloop,
+                        _ => {},
                     },
                     AppMode::Screensaver => match event {
-                        Event::MouseButtonDown {..} |
-                        Event::Window { win_event: WindowEvent::Close, .. } |
-                        Event::KeyDown { .. } |
-                        Event::Quit { .. } => break 'mainloop,
-                        _ => {}
+                        Event::MouseButtonDown { .. }
+                        | Event::Window { win_event: WindowEvent::Close, .. }
+                        | Event::KeyDown { .. }
+                        | Event::Quit { .. } => break 'mainloop,
+                        _ => {},
                     },
                     AppMode::Standalone => match event {
-                        Event::MouseButtonDown { clicks: 2, ..} => {
+                        Event::MouseButtonDown { clicks: 2, .. } => {
                             let ft = match canvas.window().fullscreen_state() {
-                                FullscreenType::Desktop |
-                                    FullscreenType::True => FullscreenType::Off,
-                                FullscreenType::Off => FullscreenType::Desktop
+                                FullscreenType::Desktop | FullscreenType::True => FullscreenType::Off,
+                                FullscreenType::Off => FullscreenType::Desktop,
                             };
                             canvas.window_mut().set_fullscreen(ft)?;
                         },
                         Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
                             info(ABOUT_INFO.into());
                         },
-                        Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
-                        Event::Window { win_event: WindowEvent::Close, .. } |
-                        Event::Quit { .. } => break 'mainloop,
+                        Event::KeyDown { keycode: Some(Keycode::Escape), .. }
+                        | Event::Window { win_event: WindowEvent::Close, .. }
+                        | Event::Quit { .. } => break 'mainloop,
                         Event::Window { win_event: WindowEvent::Minimized, .. } => {
                             app_state = AppState::Inactive;
                             continue 'mainloop;
                         },
-                        _ => {}
+                        _ => {},
                     },
-                    _ => break 'mainloop
+                    _ => break 'mainloop,
                 }
             }
         }
@@ -244,31 +241,37 @@ fn run() -> Result<(), String> {
                 Event::Window { win_event: WindowEvent::Restored, .. } => {
                     app_state = AppState::Active;
                 },
-                Event::Window { win_event: WindowEvent::Close, .. } |
-                Event::Quit { .. } => break 'mainloop,
-                _ => continue 'mainloop
+                Event::Window { win_event: WindowEvent::Close, .. } | Event::Quit { .. } => break 'mainloop,
+                _ => continue 'mainloop,
             }
         }
 
         // render plasma
         texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-            let count = pool.thread_count();
-            let segmh = (plasma_height + count - 1) as usize / count as usize;
-            pool.scoped(|scope| {
-                for (i, (chunk, wrkspc)) in buffer.chunks_mut(segmh*pitch).zip(workspaces.iter_mut()).enumerate() {
-                    let y = i * segmh;
-                    let h = min(segmh, plasma_height as usize - y);
-                    let plasma = Arc::clone(&plasma);
-                    scope.execute(move || {
-                        plasma.render_part::<PixelRGB24>(chunk, pitch, 0, y, plasma_width as usize, h, Some(wrkspc));
-                    });
-                }
-            })
-        })?;
+                   let count = pool.thread_count();
+                   let segmh = (plasma_height + count - 1) as usize / count as usize;
+                   pool.scoped(|scope| {
+                           for (i, (chunk, wrkspc)) in
+                               buffer.chunks_mut(segmh * pitch).zip(workspaces.iter_mut()).enumerate()
+                           {
+                               let y = i * segmh;
+                               let h = min(segmh, plasma_height as usize - y);
+                               let plasma = Arc::clone(&plasma);
+                               scope.execute(move || {
+                                        plasma.render_part::<PixelRGB24>(chunk,
+                                                                         pitch,
+                                                                         0,
+                                                                         y,
+                                                                         plasma_width as usize,
+                                                                         h,
+                                                                         Some(wrkspc));
+                                    });
+                           }
+                       })
+               })?;
 
         // update plasma
-        Arc::get_mut(&mut plasma).ok_or_else(|| "Could not access plasma data exclusively")?
-        .update(&mut rng);
+        Arc::get_mut(&mut plasma).ok_or_else(|| "Could not access plasma data exclusively")?.update(&mut rng);
         // canvas.set_draw_color(Color::RGBA(0, 0, 0, 255));
         // let dst = Some(Rect::new(0, 0, 400, 300));
         // canvas.clear();
@@ -279,9 +282,7 @@ fn run() -> Result<(), String> {
         while y < ch {
             let mut x = 0;
             while x < cw {
-                canvas.copy(&texture,
-                             None,
-                             Some(Rect::new(x as i32, y as i32, target_width, target_height)))?;
+                canvas.copy(&texture, None, Some(Rect::new(x as i32, y as i32, target_width, target_height)))?;
                 x += target_width;
             }
             y += target_height;
@@ -298,10 +299,10 @@ fn run() -> Result<(), String> {
 
 fn main() {
     std::process::exit(match run() {
-       Ok(_) => 0,
-       Err(err) => {
-           alert(format!("{}", err).into());
-           1
-       }
-    });
+                           Ok(_) => 0,
+                           Err(err) => {
+                               alert(format!("{}", err).into());
+                               1
+                           },
+                       });
 }

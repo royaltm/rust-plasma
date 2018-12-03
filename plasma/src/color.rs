@@ -37,7 +37,7 @@ macro_rules! define_pixel_rgb {
         impl RgbaIter {
             const LEN: usize = 4;
         }
-    }
+    };
 }
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {

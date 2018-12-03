@@ -1,14 +1,11 @@
 #![allow(unused_macros)]
-use std::error::Error;
-use std::borrow::Cow;
-use std::rc::Rc;
-use std::ptr;
+use std::{borrow::Cow, error::Error, ptr, rc::Rc};
 
-use sdl2::get_error;
-use sdl2::video::{Window, WindowContext};
-use sdl2::VideoSubsystem;
+use sdl2::{get_error,
+           messagebox::{show_simple_message_box, MESSAGEBOX_ERROR, MESSAGEBOX_INFORMATION},
+           video::{Window, WindowContext},
+           VideoSubsystem};
 use sdl2_sys::SDL_Window;
-use sdl2::messagebox::{MESSAGEBOX_ERROR, MESSAGEBOX_INFORMATION, show_simple_message_box};
 
 pub fn alert(text: Cow<str>) {
     show_simple_message_box(MESSAGEBOX_ERROR, "Plasma", &text, None).expect("to show message box");
@@ -19,15 +16,13 @@ pub fn info(text: Cow<str>) {
 }
 
 #[cfg(not(windows))]
-pub fn set_dpi_awareness() -> Result<(), String> {
-    Ok(())
-}
+pub fn set_dpi_awareness() -> Result<(), String> { Ok(()) }
 
 #[cfg(windows)]
 pub fn set_dpi_awareness() -> Result<(), String> {
-    use winapi::um::shellscalingapi::{ SetProcessDpiAwareness, GetProcessDpiAwareness,
-                                       PROCESS_DPI_UNAWARE, PROCESS_PER_MONITOR_DPI_AWARE };
-    use winapi::shared::winerror::{ S_OK, E_INVALIDARG };
+    use winapi::{shared::winerror::{E_INVALIDARG, S_OK},
+                 um::shellscalingapi::{GetProcessDpiAwareness, SetProcessDpiAwareness, PROCESS_DPI_UNAWARE,
+                                       PROCESS_PER_MONITOR_DPI_AWARE}};
 
     match unsafe { SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE) } {
         S_OK => Ok(()),
@@ -36,23 +31,19 @@ pub fn set_dpi_awareness() -> Result<(), String> {
             let mut awareness = PROCESS_DPI_UNAWARE;
             match unsafe { GetProcessDpiAwareness(ptr::null_mut(), &mut awareness) } {
                 S_OK if awareness == PROCESS_PER_MONITOR_DPI_AWARE => Ok(()),
-                _ => Err("Please disable DPI awareness override in program properties.".into())
+                _ => Err("Please disable DPI awareness override in program properties.".into()),
             }
-        }
+        },
     }
 }
 
 pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
-    #[cfg(windows)] {
+    #[cfg(windows)]
+    {
         let parent_handle: HWND = parent_handle.parse::<usize>().map_err(err_str)? as HWND;
         let parent_window = create_window_from_handle_win32(vs, parent_handle)?;
         // Create window for input events and attach as child window
-        let window = vs.window("plasma.scr preview", 0, 0)
-        .position(0, 0)
-        .borderless()
-        .hidden()
-        .build()
-        .map_err(err_str)?;
+        let window = vs.window("plasma.scr preview", 0, 0).position(0, 0).borderless().hidden().build().map_err(err_str)?;
 
         if let Some(handle) = unsafe { get_window_handle_win32(window.raw()) } {
             if unsafe { set_window_parent_win32(handle, parent_handle) } {
@@ -62,43 +53,38 @@ pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result
         }
         Err("Could not set the preview parent handle.".into())
     }
-    #[cfg(not(windows))] {
+    #[cfg(not(windows))]
+    {
         Err("Could not create preview window.".into())
     }
 }
 
 pub fn create_wallpaper_window(vs: &VideoSubsystem) -> Result<Window, String> {
-    #[cfg(windows)] {
+    #[cfg(windows)]
+    {
         let wallpaper_handle = find_wallpaper_window_handle_win32()?;
         create_window_from_handle_win32(vs, wallpaper_handle)
     }
-    #[cfg(not(windows))] {
+    #[cfg(not(windows))]
+    {
         Err("Could not create wallpaper window.".into())
     }
 }
 
-pub fn err_str<E: Error>(e: E) -> String {
-    format!("{}", e)
-}
+pub fn err_str<E: Error>(e: E) -> String { format!("{}", e) }
 
-#[cfg(windows)] use winapi::shared::windef::HWND;
+#[cfg(windows)]
+use winapi::shared::windef::HWND;
 #[cfg(windows)]
 unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
-    use sdl2_sys::{ SDL_SysWMinfo, SDL_version, SDL_SysWMinfo__bindgen_ty_1,
-            SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL, SDL_SYSWM_TYPE,
-            SDL_GetWindowWMInfo, SDL_bool };
+    use sdl2_sys::{SDL_GetWindowWMInfo, SDL_SysWMinfo, SDL_SysWMinfo__bindgen_ty_1, SDL_bool, SDL_version,
+                   SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL, SDL_SYSWM_TYPE};
 
-    let mut syswmi = SDL_SysWMinfo {
-        version: SDL_version {
-            major: SDL_MAJOR_VERSION as u8,
-            minor: SDL_MINOR_VERSION as u8,
-            patch: SDL_PATCHLEVEL as u8,
-        },
-        subsystem: SDL_SYSWM_TYPE::SDL_SYSWM_UNKNOWN,
-        info: SDL_SysWMinfo__bindgen_ty_1 {
-            dummy: [0; 64]
-        }
-    };
+    let mut syswmi = SDL_SysWMinfo { version:   SDL_version { major: SDL_MAJOR_VERSION as u8,
+                                                              minor: SDL_MINOR_VERSION as u8,
+                                                              patch: SDL_PATCHLEVEL as u8, },
+                                     subsystem: SDL_SYSWM_TYPE::SDL_SYSWM_UNKNOWN,
+                                     info:      SDL_SysWMinfo__bindgen_ty_1 { dummy: [0; 64] }, };
 
     match SDL_GetWindowWMInfo(sdl_window, &mut syswmi) {
         SDL_bool::SDL_TRUE => {
@@ -109,32 +95,39 @@ unsafe fn get_window_handle_win32(sdl_window: *mut SDL_Window) -> Option<HWND> {
             assert!(!handle.is_null());
             Some(handle)
         },
-        SDL_bool::SDL_FALSE => None
+        SDL_bool::SDL_FALSE => None,
     }
 }
 
 #[cfg(windows)]
 unsafe fn set_window_parent_win32(handle: HWND, parent_handle: HWND) -> bool {
-    use winapi::um::winuser::{ SetParent, GWL_STYLE, WS_CHILD, WS_POPUP };
+    use winapi::um::winuser::{SetParent, GWL_STYLE, WS_CHILD, WS_POPUP};
     if SetParent(handle, parent_handle).is_null() {
         return false;
     }
     // Make this a child window so it will close when the parent dialog closes
-    #[cfg(target_arch = "x86_64")] {
+    #[cfg(target_arch = "x86_64")]
+    {
         use winapi::shared::basetsd::LONG_PTR;
-        winapi::um::winuser::SetWindowLongPtrA(handle, GWL_STYLE,
-            (winapi::um::winuser::GetWindowLongPtrA(handle, GWL_STYLE) & !WS_POPUP as LONG_PTR) | WS_CHILD as LONG_PTR);
+        winapi::um::winuser::SetWindowLongPtrA(handle,
+                                               GWL_STYLE,
+                                               (winapi::um::winuser::GetWindowLongPtrA(handle, GWL_STYLE)
+                                                & !WS_POPUP as LONG_PTR)
+                                               | WS_CHILD as LONG_PTR);
     }
-    #[cfg(not(target_arch = "x86_64"))] {
+    #[cfg(not(target_arch = "x86_64"))]
+    {
         use winapi::shared::ntdef::LONG;
-        winapi::um::winuser::SetWindowLongA(handle, GWL_STYLE,
-            (winapi::um::winuser::GetWindowLongA(handle, GWL_STYLE) & !WS_POPUP as LONG) | WS_CHILD as LONG);
+        winapi::um::winuser::SetWindowLongA(handle,
+                                            GWL_STYLE,
+                                            (winapi::um::winuser::GetWindowLongA(handle, GWL_STYLE) & !WS_POPUP as LONG)
+                                            | WS_CHILD as LONG);
     }
     true
 }
 
 #[cfg(windows)]
-fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWND) ->  Result<Window, String> {
+fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWND) -> Result<Window, String> {
     if handle.is_null() {
         return Err("Could not find window".into());
     }
@@ -149,15 +142,13 @@ fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWN
 
 #[cfg(windows)]
 fn find_wallpaper_window_handle_win32() -> Result<HWND, String> {
-    use winapi::um::winuser::{ GetShellWindow, FindWindowExA };
+    use winapi::um::winuser::{FindWindowExA, GetShellWindow};
     let lpc_empty = std::ffi::CString::new("").unwrap();
     let lpc_shelldll = std::ffi::CString::new("SHELLDLL_DefView").unwrap();
     let mut wallpaper_handle = {
         let shell_handle = unsafe { GetShellWindow() };
         if !shell_handle.is_null() {
-            unsafe {
-                FindWindowExA(shell_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr())
-            }
+            unsafe { FindWindowExA(shell_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr()) }
         }
         else {
             ptr::null_mut()
@@ -167,15 +158,12 @@ fn find_wallpaper_window_handle_win32() -> Result<HWND, String> {
         let lpc_workerw = std::ffi::CString::new("WorkerW").unwrap();
         let mut worker_handle: HWND = ptr::null_mut();
         loop {
-            worker_handle = unsafe {
-                FindWindowExA(ptr::null_mut(), worker_handle, lpc_workerw.as_ptr(), ptr::null_mut())
-            };
+            worker_handle = unsafe { FindWindowExA(ptr::null_mut(), worker_handle, lpc_workerw.as_ptr(), ptr::null_mut()) };
             if worker_handle.is_null() {
                 return Err("Could not find wallpaper window".into());
             }
-            wallpaper_handle = unsafe {
-                FindWindowExA(worker_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr())
-            };
+            wallpaper_handle =
+                unsafe { FindWindowExA(worker_handle, ptr::null_mut(), lpc_shelldll.as_ptr(), lpc_empty.as_ptr()) };
             if !wallpaper_handle.is_null() {
                 break wallpaper_handle;
             }
@@ -220,17 +208,17 @@ fn find_wallpaper_window_handle_win32() -> Result<HWND, String> {
 // }
 
 macro_rules! define_target_features {
-    (@inner $name:ident: $feature:tt) => {
+    (@inner $name:ident : $feature:tt) => {
         #[cfg(target_feature = $feature)]
         macro_rules! $name { () => (concat!(" ", $feature)); }
         #[cfg(not(target_feature = $feature))]
         macro_rules! $name { () => (""); }
     };
-    (@inner $name:ident: $feature:tt, $($names:ident: $features:tt),*) => {
+    (@inner $name:ident : $feature:tt, $($names:ident : $features:tt),*) => {
         define_target_features!(@inner $name: $feature);
         define_target_features!(@inner $($names: $features),*);
     };
-    ($($names:ident: $features:tt),*) => {
+    ($($names:ident : $features:tt),*) => {
         define_target_features! {@inner $($names: $features),*}
         #[cfg(any($(target_feature = $features),*))]
         macro_rules! target_features { () => (concat!($($names!()),*)); }
@@ -253,17 +241,17 @@ define_target_features! {
 }
 
 macro_rules! define_features {
-    (@inner $name:ident: $feature:tt) => {
+    (@inner $name:ident : $feature:tt) => {
         #[cfg(feature = $feature)]
         macro_rules! $name { () => (concat!(" ", $feature)); }
         #[cfg(not(feature = $feature))]
         macro_rules! $name { () => (""); }
     };
-    (@inner $name:ident: $feature:tt, $($names:ident: $features:tt),*) => {
+    (@inner $name:ident : $feature:tt, $($names:ident : $features:tt),*) => {
         define_features!(@inner $name: $feature);
         define_features!(@inner $($names: $features),*);
     };
-    ($($names:ident: $features:tt),*) => {
+    ($($names:ident : $features:tt),*) => {
         define_features! {@inner $($names: $features),*}
         #[cfg(any($(feature = $features),*))]
         macro_rules! features { () => (concat!($($names!()),*)); }
@@ -280,8 +268,14 @@ define_features! {
 }
 
 #[cfg(all(target_family = "windows", target_env = "gnu"))]
-macro_rules! target_env_info { () => ("Compiled using gnu toolchain. "); }
+macro_rules! target_env_info {
+    () => ("Compiled using gnu toolchain. ");
+}
 #[cfg(all(target_family = "windows", target_env = "msvc"))]
-macro_rules! target_env_info { () => ("Compiled using msvc toolchain. "); }
+macro_rules! target_env_info {
+    () => ("Compiled using msvc toolchain. ");
+}
 #[cfg(not(all(target_family = "windows", any(target_env = "msvc", target_env = "gnu"))))]
-macro_rules! target_env_info { () => (""); }
+macro_rules! target_env_info {
+    () => ("");
+}

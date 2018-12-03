@@ -49,7 +49,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             impl Iterator for $name {
                 type Item = f32;
 
-                #[inline(always)]
+                #[inline]
                 fn next(&mut self) -> Option<f32> {
                     const SIZE: usize = LANES * $name::LEN;
                     match self.offs {
@@ -73,14 +73,14 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     rgb_iterator_impl!(RgbaIter, rgba);
 
     impl PixelRgb {
-        #[inline(always)]
+        #[inline]
         pub fn iter_rgb_values(self) -> RgbIter {
             let PixelRgb { r, g, b } = self;
             let rgb: [f32tuple; RgbIter::LEN] = [r.into(), g.into(), b.into()];
             RgbIter { rgb, offs: 0 }
         }
 
-        #[inline(always)]
+        #[inline]
         pub fn iter_rgba_values(self, a: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
             let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), f32s::splat(a).into()];
@@ -137,7 +137,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             impl Iterator for $name {
                 type Item = f32;
 
-                #[inline(always)]
+                #[inline]
                 fn next(&mut self) -> Option<f32> {
                     match self.offs {
                         offs if offs < $name::LEN => {
@@ -156,14 +156,14 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     rgb_iterator_impl!(RgbaIter, rgba);
 
     impl PixelRgb {
-        #[inline(always)]
+        #[inline]
         pub fn iter_rgb_values(self) -> RgbIter {
             let PixelRgb { r, g, b } = self;
             let rgb = [r, g, b];
             RgbIter { rgb, offs: 0 }
         }
 
-        #[inline(always)]
+        #[inline]
         pub fn iter_rgba_values(self, a: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
             let rgba = [r, g, b, a];

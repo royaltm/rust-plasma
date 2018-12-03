@@ -62,7 +62,7 @@ impl Plasma {
     ///
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
-    #[inline(always)]
+    #[inline]
     pub fn render<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>) {
         self.render_part::<B>(buffer, pitch, 0, 0, self.pixel_width as usize, self.pixel_height as usize, wrkspc)
     }
@@ -78,7 +78,7 @@ impl Plasma {
     ///
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
-    #[inline(always)]
+    #[inline]
     pub fn render_part<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize, h: usize,
                                        wrkspc: Option<&mut Vec<u8>>) {
         let pw = self.pixel_width as usize;
@@ -98,17 +98,17 @@ impl Plasma {
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
-    #[inline(always)]
+    #[inline]
     pub fn import_phase_amps(&mut self, source: &[f32]) { self.phase_amps.import_phase_amps(source); }
 
     /// Exports the internal plasma state into the [Vec] of 32bit floats.
-    #[inline(always)]
+    #[inline]
     pub fn export_phase_amps(&self, out: &mut Vec<f32>) { self.phase_amps.export_phase_amps(out); }
 
-    #[inline(always)]
+    #[inline]
     pub fn min_steps(&self) -> f32 { self.config.min_steps() }
 
-    #[inline(always)]
+    #[inline]
     pub fn max_steps(&self) -> f32 { self.config.max_steps() }
 }
 
@@ -201,7 +201,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         }
     }
 
-    #[inline(always)]
+    #[inline]
     fn vd_size(dv: usize) -> usize {
         (dv + LANES - 1) / LANES
     }

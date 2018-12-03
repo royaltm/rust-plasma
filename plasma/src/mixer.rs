@@ -73,7 +73,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         type IntermediateV = [f32s; 6];
         type Mixed = [f32s; 3];
 
-        #[inline(always)]
+        #[inline]
         fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut FnMut(PixelRgb)) {
             let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
             let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
@@ -87,14 +87,14 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         }
     }
 
-    #[inline(always)]
+    #[inline]
     fn compose4(x1: f32s, x2: f32s, y1: f32s, y2: f32s) -> f32s {
         const THIRD: f32s = f32s::splat(1.0/3.0);
         (x1 + y1 * x2 + y2) * THIRD
     }
 
     impl IntermediateCalculator<f32s> for PlasmaLineCalc<f32s> {
-        #[inline(always)]
+        #[inline]
         fn calculate(&self, v: f32s) -> f32s {
             const ZERO: f32s = f32s::splat(0.0);
             if self.normal == ZERO {
@@ -135,7 +135,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         type IntermediateV = [f32; 6];
         type Mixed = [f32; 3];
 
-        #[inline(always)]
+        #[inline]
         fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut FnMut(PixelRgb)) {
             let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
             let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
@@ -150,14 +150,14 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     }
 
 
-    #[inline(always)]
+    #[inline]
     fn compose4(x1: f32, x2: f32, y1: f32, y2: f32) -> f32 {
         const THIRD: f32 = 1.0/3.0;
         (x1 + y1 * x2 + y2) * THIRD
     }
 
     impl IntermediateCalculator<f32> for PlasmaLineCalc<f32> {
-        #[inline(always)]
+        #[inline]
         fn calculate(&self, v: f32) -> f32 {
             if self.normal == 0.0 {
                 0.0
@@ -195,7 +195,7 @@ impl<'a, P, T> ExactSizeIterator for PlasmaMixIter<'a, P, T>
     where PlasmaMixIter<'a, P, T>: Iterator,
           P: PhaseAmpsSelect<'a> + ?Sized
 {
-    #[inline(always)]
+    #[inline]
     fn len(&self) -> usize { self.pa_pair_iter.len() }
 }
 

@@ -14,7 +14,7 @@ pub struct PixelRGB24;
 impl PixelBuffer for PixelRGB24 {
     const PIXEL_BYTES: usize = 3;
 
-    #[inline(always)]
+    #[inline]
     fn put_pixel<'a, I>(writer: &mut I, pixel: PixelRgb)
         where I: Iterator<Item = &'a mut u8>
     {
@@ -30,7 +30,7 @@ pub struct PixelRGBA8;
 impl PixelBuffer for PixelRGBA8 {
     const PIXEL_BYTES: usize = 4;
 
-    #[inline(always)]
+    #[inline]
     fn put_pixel<'a, I>(writer: &mut I, pixel: PixelRgb)
         where I: Iterator<Item = &'a mut u8>
     {
@@ -45,6 +45,6 @@ trait ToColor8 {
 }
 
 impl ToColor8 for f32 {
-    #[inline(always)]
+    #[inline]
     fn to_color_u8clamped(&self) -> u8 { (self.abs().min(1.0) * 255.0) as u8 }
 }

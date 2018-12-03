@@ -29,7 +29,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     /* floor SIMD */
     cfg_if! {if #[cfg(target_feature = "avx")] {
         use std::mem::transmute;
-        #[inline(always)]
+        #[inline]
         pub fn floor(val: f32x8) -> f32x8 {
             unsafe {
                 transmute(_mm256_floor_ps(transmute(val)))
@@ -38,7 +38,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     }
     else if #[cfg(target_feature = "sse4.1")] {
         use std::mem::transmute;
-        #[inline(always)]
+        #[inline]
         pub fn floor(val: f32x8) -> f32x8 {
             unsafe {
                 union U {
@@ -55,7 +55,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         }
     }
     else {
-        #[inline(always)]
+        #[inline]
         pub fn floor(val: f32x8) -> f32x8 {
             unsafe {
                 union U {

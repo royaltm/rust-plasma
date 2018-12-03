@@ -4,7 +4,7 @@ use rand::Rng;
 
 use cfg_if::cfg_if;
 
-use crate::{mixer::*, phase_amp::*, pixel_buffer::*, simd_polyfill::*};
+use crate::{mixer::*, mixers::*, phase_amp::*, pixel_buffer::*, simd_polyfill::*};
 
 const PI2: f32 = 2.0 * PI;
 

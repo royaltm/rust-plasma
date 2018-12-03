@@ -39,8 +39,9 @@ compile_error!("Currently sleef-sys requires x86_64 target architecture to build
 mod simd_polyfill;
 mod color;
 mod mixer;
+mod mixers;
 mod phase_amp;
 mod pixel_buffer;
 mod plasma;
 
-pub use crate::{color::*, mixer::*, phase_amp::*, pixel_buffer::*, plasma::*};
+pub use crate::{color::*, mixer::*, mixers::*, phase_amp::*, pixel_buffer::*, plasma::*};

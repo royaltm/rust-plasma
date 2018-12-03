@@ -31,5 +31,11 @@ ts-doc:
   just web/all
   just web/doc
 
+test:
+  just plasma/test
+
+bench:
+  just plasma/bench
+
 clean:
   cargo clean

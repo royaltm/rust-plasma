@@ -271,33 +271,15 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Range</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f32</span>::<span class="ident">consts</span>::<span class="ident">PI</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f32</span>::<span class="ident">EPSILON</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">ChunksExact</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">f32</span>::{<span class="ident">consts</span>::<span class="ident">PI</span>, <span class="ident">EPSILON</span>},
+          <span class="ident">ops</span>::<span class="ident">Range</span>,
+          <span class="ident">slice</span>::<span class="ident">ChunksExact</span>};
 
 <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">Rng</span>;
-<span class="comment">// use fast_math::sin;</span>
 
-<span class="kw">const</span> <span class="ident">PI2</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">2.0</span><span class="kw-2">*</span><span class="ident">PI</span>;
-<span class="kw">const</span> <span class="ident">PI05</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">0.5</span><span class="kw-2">*</span><span class="ident">PI</span>;
+<span class="kw">const</span> <span class="ident">PI2</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span>;
+<span class="kw">const</span> <span class="ident">PI05</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> <span class="ident">PI</span>;
 <span class="kw">const</span> <span class="ident">MIN_STEPS</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">100.0</span>;
 <span class="kw">const</span> <span class="ident">MAX_STEPS</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">200.0</span>;
 
@@ -312,22 +294,22 @@
 <span class="doccomment">/// Holds parameters of phase and amplitude changes for [PhaseAmpConfig] trait.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PhaseAmpCfg</span> {
-    <span class="ident">min_steps</span>: <span class="ident">f32</span>,
-    <span class="ident">max_steps</span>: <span class="ident">f32</span>,
-    <span class="ident">delta_phase_abs_max</span>: <span class="ident">f32</span>,
-    <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">f32</span>
+    <span class="ident">min_steps</span>:                 <span class="ident">f32</span>,
+    <span class="ident">max_steps</span>:                 <span class="ident">f32</span>,
+    <span class="ident">delta_phase_abs_max</span>:       <span class="ident">f32</span>,
+    <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">f32</span>,
 }
 
 <span class="doccomment">/// Holds a phase and an amplitude along with their animation state.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PhaseAmp</span> {
-    <span class="ident">phase</span>: <span class="ident">f32</span>,
-    <span class="ident">delta_phase</span>: <span class="ident">f32</span>,
-    <span class="ident">amplitude</span>: <span class="ident">f32</span>,
-    <span class="ident">source_amplitude</span>: <span class="ident">f32</span>,
-    <span class="ident">delta_amplitude</span>: <span class="ident">f32</span>,
-    <span class="ident">step_amplitude</span>: <span class="ident">f32</span>,
-    <span class="ident">transition_amplitude</span>: <span class="ident">f32</span>
+    <span class="ident">phase</span>:                <span class="ident">f32</span>,
+    <span class="ident">delta_phase</span>:          <span class="ident">f32</span>,
+    <span class="ident">amplitude</span>:            <span class="ident">f32</span>,
+    <span class="ident">source_amplitude</span>:     <span class="ident">f32</span>,
+    <span class="ident">delta_amplitude</span>:      <span class="ident">f32</span>,
+    <span class="ident">step_amplitude</span>:       <span class="ident">f32</span>,
+    <span class="ident">transition_amplitude</span>: <span class="ident">f32</span>,
 }
 
 <span class="doccomment">/// A trait for querying and updating phase&#39;n&#39;amplitude</span>
@@ -336,7 +318,7 @@
     <span class="kw">fn</span> <span class="ident">amplitude</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span>;
     <span class="kw">fn</span> <span class="ident">set_phase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">phase</span>: <span class="ident">f32</span>);
     <span class="kw">fn</span> <span class="ident">set_amplitude</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amplitude</span>: <span class="ident">f32</span>);
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>) {
         <span class="comment">// out.extend_from_slice(&amp;[self.phase(), self.amplitude()]);</span>
         <span class="ident">out</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>.<span class="ident">phase</span>(), <span class="self">self</span>.<span class="ident">amplitude</span>()]);
@@ -351,7 +333,7 @@
 
 <span class="doccomment">/// A trait that allows selecting a subset of phase&#39;n&#39;amplitude and iterate over pairs of it.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PhaseAmpsSelect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">PairIter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>::<span class="ident">Item</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>::<span class="ident">Item</span>)<span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">PairIter</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>::<span class="ident">Item</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>::<span class="ident">Item</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ExactSizeIterator</span>;
     <span class="kw">type</span> <span class="ident">Item</span>: <span class="ident">PhaseAmpAccess</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
     <span class="doccomment">/// The range should always be bounded.</span>
     <span class="doccomment">/// # Panics</span>
@@ -362,118 +344,107 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PhaseAmpAccess</span> <span class="kw">for</span> <span class="ident">PhaseAmp</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">phase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-        <span class="self">self</span>.<span class="ident">phase</span>
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">phase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">phase</span> }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">set_phase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">phase</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">phase</span>;
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">set_phase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">phase</span>: <span class="ident">f32</span>) { <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">phase</span>; }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">amplitude</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-        <span class="self">self</span>.<span class="ident">amplitude</span>
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">amplitude</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">amplitude</span> }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">set_amplitude</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amplitude</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>.<span class="ident">amplitude</span> <span class="op">=</span> <span class="ident">amplitude</span>;
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">set_amplitude</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amplitude</span>: <span class="ident">f32</span>) { <span class="self">self</span>.<span class="ident">amplitude</span> <span class="op">=</span> <span class="ident">amplitude</span>; }
 }
 
 <span class="kw">impl</span> <span class="ident">PhaseAmpAccess</span> <span class="kw">for</span> [<span class="ident">f32</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">phase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-        <span class="self">self</span>[<span class="number">0</span>]
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">phase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>[<span class="number">0</span>] }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">set_phase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">phase</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">phase</span>;
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">set_phase</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">phase</span>: <span class="ident">f32</span>) { <span class="self">self</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">phase</span>; }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">amplitude</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-        <span class="self">self</span>[<span class="number">1</span>]
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">amplitude</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>[<span class="number">1</span>] }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">set_amplitude</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amplitude</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">amplitude</span>;
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">set_amplitude</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">amplitude</span>: <span class="ident">f32</span>) { <span class="self">self</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">amplitude</span>; }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PhaseAmpsPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">ChunksExact</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">PhaseAmp</span><span class="op">&gt;</span>
+    <span class="ident">iter</span>: <span class="ident">ChunksExact</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">PhaseAmp</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">PhaseAmpsPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>() }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">PhaseAmpsPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PhaseAmp</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PhaseAmp</span>);
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">ref</span> <span class="ident">pa1</span>, <span class="kw-2">ref</span> <span class="ident">pa2</span>]) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">pa1</span>, <span class="ident">pa2</span>)),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">F32PaPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">ChunksExact</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">f32</span><span class="op">&gt;</span>
+    <span class="ident">iter</span>: <span class="ident">ChunksExact</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">f32</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">F32PaPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">len</span>() }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">F32PaPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">f32</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">f32</span>]);
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
             <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">chunk</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">0</span>..<span class="number">2</span>], <span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">2</span>..<span class="number">4</span>])),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>
+            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PhaseAmpsSelect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">PhaseAmp</span>] {
-    <span class="kw">type</span> <span class="ident">PairIter</span> <span class="op">=</span> <span class="ident">PhaseAmpsPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">PhaseAmp</span>;
+    <span class="kw">type</span> <span class="ident">PairIter</span> <span class="op">=</span> <span class="ident">PhaseAmpsPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_pa_pair_iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">PairIter</span> {
-        <span class="ident">PhaseAmpsPairIterator</span> { <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">chunks_exact</span>(<span class="number">2</span>) }
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">into_pa_pair_iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">PairIter</span> { <span class="ident">PhaseAmpsPairIterator</span> { <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">chunks_exact</span>(<span class="number">2</span>) } }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">PhaseAmp</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">range</span>]
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">PhaseAmp</span>] { <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">range</span>] }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PhaseAmpsSelect</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">f32</span>] {
-    <span class="kw">type</span> <span class="ident">PairIter</span> <span class="op">=</span> <span class="ident">F32PaPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> [<span class="ident">f32</span>];
+    <span class="kw">type</span> <span class="ident">PairIter</span> <span class="op">=</span> <span class="ident">F32PaPairIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">into_pa_pair_iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">PairIter</span> {
-        <span class="ident">F32PaPairIterator</span> { <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">chunks_exact</span>(<span class="number">4</span>) }
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">into_pa_pair_iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>::<span class="ident">PairIter</span> { <span class="ident">F32PaPairIterator</span> { <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">chunks_exact</span>(<span class="number">4</span>) } }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">f32</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">range</span>.<span class="ident">start</span><span class="kw-2">*</span><span class="number">2</span>..<span class="ident">range</span>.<span class="ident">end</span><span class="kw-2">*</span><span class="number">2</span>]
-    }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">f32</span>] { <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">range</span>.<span class="ident">start</span> <span class="op">*</span> <span class="number">2</span>..<span class="ident">range</span>.<span class="ident">end</span> <span class="op">*</span> <span class="number">2</span>] }
 }
 
 <span class="kw">impl</span> <span class="ident">PhaseAmpDataExp</span> <span class="kw">for</span> [<span class="ident">PhaseAmp</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">export_phase_amps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>) {
-        <span class="ident">out</span>.<span class="ident">reserve_exact</span>(<span class="number">2</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len</span>());
+        <span class="ident">out</span>.<span class="ident">reserve_exact</span>(<span class="number">2</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">len</span>());
         <span class="kw">for</span> <span class="ident">pa</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
             <span class="ident">pa</span>.<span class="ident">export</span>(<span class="ident">out</span>);
         }
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">import_phase_amps</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>]) {
         <span class="kw">for</span> (<span class="ident">src</span>, <span class="ident">pa</span>) <span class="kw">in</span> <span class="ident">source</span>.<span class="ident">chunks_exact</span>(<span class="number">2</span>).<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">iter_mut</span>()) {
             <span class="ident">pa</span>.<span class="ident">set_phase</span>(<span class="ident">src</span>.<span class="ident">phase</span>());
@@ -484,19 +455,20 @@
 
 <span class="kw">impl</span> <span class="ident">PhaseAmpConfig</span> <span class="kw">for</span> <span class="ident">PhaseAmpCfg</span> {
     <span class="kw">fn</span> <span class="ident">min_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">min_steps</span> }
+
     <span class="kw">fn</span> <span class="ident">max_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">max_steps</span> }
+
     <span class="kw">fn</span> <span class="ident">delta_phase_abs_max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">delta_phase_abs_max</span> }
-    <span class="kw">fn</span> <span class="ident">delta_delta_phase_abs_max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">delta_delta_phase_abs_max</span> }    
+
+    <span class="kw">fn</span> <span class="ident">delta_delta_phase_abs_max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { <span class="self">self</span>.<span class="ident">delta_delta_phase_abs_max</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PhaseAmpCfg</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="ident">PhaseAmpCfg</span> {
-            <span class="ident">min_steps</span>: <span class="ident">MIN_STEPS</span>,
-            <span class="ident">max_steps</span>: <span class="ident">MAX_STEPS</span>,
-            <span class="ident">delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">MIN_STEPS</span>,
-            <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">MAX_STEPS</span> <span class="op">/</span> <span class="number">8.0</span>
-        }
+        <span class="ident">PhaseAmpCfg</span> { <span class="ident">min_steps</span>:                 <span class="ident">MIN_STEPS</span>,
+                      <span class="ident">max_steps</span>:                 <span class="ident">MAX_STEPS</span>,
+                      <span class="ident">delta_phase_abs_max</span>:       <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">MIN_STEPS</span>,
+                      <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">MAX_STEPS</span> <span class="op">/</span> <span class="number">8.0</span>, }
     }
 }
 
@@ -514,19 +486,18 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">min_steps</span>: <span class="ident">f32</span>, <span class="ident">max_steps</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">min_steps</span> <span class="op">&lt;</span> <span class="ident">max_steps</span>, <span class="string">&quot;min steps must be lower than max steps&quot;</span>);
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">min_steps</span> <span class="op">&gt;</span> <span class="number">1.0</span>, <span class="string">&quot;min steps must be larger than 1.0&quot;</span>);
-        <span class="ident">PhaseAmpCfg</span> {
-            <span class="ident">min_steps</span>, <span class="ident">max_steps</span>,
-            <span class="ident">delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">min_steps</span>,
-            <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">max_steps</span> <span class="op">/</span> <span class="number">8.0</span>
-        }
+        <span class="ident">PhaseAmpCfg</span> { <span class="ident">min_steps</span>,
+                      <span class="ident">max_steps</span>,
+                      <span class="ident">delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">min_steps</span>,
+                      <span class="ident">delta_delta_phase_abs_max</span>: <span class="ident">PI05</span> <span class="op">/</span> <span class="ident">max_steps</span> <span class="op">/</span> <span class="number">8.0</span> }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PhaseAmp</span> {
     <span class="doccomment">/// Creates randomized single phase and amplitude pair.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>, <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">PhaseAmpConfig</span>,
-          <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+        <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">PhaseAmpConfig</span>,
+              <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
     {
         <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">0.0</span>, <span class="ident">PI2</span>);
         <span class="kw">let</span> <span class="ident">delta_phase</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="op">-</span><span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>(), <span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>());
@@ -538,27 +509,27 @@
         <span class="kw">let</span> <span class="ident">step_amplitude</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="ident">cfg</span>.<span class="ident">min_steps</span>(), <span class="ident">cfg</span>.<span class="ident">max_steps</span>()).<span class="ident">recip</span>();
         <span class="kw">let</span> <span class="ident">transition_amplitude</span> <span class="op">=</span> <span class="number">0.0</span>;
 
-        <span class="ident">PhaseAmp</span> {
-            <span class="ident">phase</span>, <span class="ident">delta_phase</span>,
-            <span class="ident">amplitude</span>, <span class="ident">source_amplitude</span>, <span class="ident">delta_amplitude</span>, <span class="ident">step_amplitude</span>, <span class="ident">transition_amplitude</span>
-        }
+        <span class="ident">PhaseAmp</span> { <span class="ident">phase</span>, <span class="ident">delta_phase</span>, <span class="ident">amplitude</span>, <span class="ident">source_amplitude</span>, <span class="ident">delta_amplitude</span>, <span class="ident">step_amplitude</span>, <span class="ident">transition_amplitude</span> }
     }
 
     <span class="doccomment">/// Performs a one step update of the phase and amplitude pair animation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>, <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>)
-    <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">PhaseAmpConfig</span>,
-          <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+        <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">PhaseAmpConfig</span>,
+              <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
     {
         <span class="kw">let</span> <span class="ident">delta_phase</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_phase</span>;
         <span class="self">self</span>.<span class="ident">phase</span> <span class="op">+=</span> <span class="ident">delta_phase</span>;
         <span class="kw">let</span> <span class="ident">delta_delta_phase</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_range</span>(<span class="number">0.0</span>, <span class="ident">cfg</span>.<span class="ident">delta_delta_phase_abs_max</span>());
         <span class="self">self</span>.<span class="ident">delta_phase</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">delta_phase</span> {
-            <span class="ident">delta</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&gt;=</span>  <span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">=&gt;</span>  <span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">-</span> <span class="ident">delta_delta_phase</span>,
+            <span class="ident">delta</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&gt;=</span> <span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">=&gt;</span> <span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">-</span> <span class="ident">delta_delta_phase</span>,
             <span class="ident">delta</span> <span class="kw">if</span> <span class="ident">delta</span> <span class="op">&lt;=</span> <span class="op">-</span><span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">=&gt;</span> <span class="op">-</span><span class="ident">cfg</span>.<span class="ident">delta_phase_abs_max</span>() <span class="op">+</span> <span class="ident">delta_delta_phase</span>,
-            <span class="ident">delta</span> <span class="op">=&gt;</span> <span class="ident">delta</span> <span class="op">+</span> <span class="kw">match</span> <span class="ident">rng</span>.<span class="ident">gen_bool</span>(<span class="number">0.5</span>) {
-                <span class="bool-val">true</span>  <span class="op">=&gt;</span>  <span class="ident">delta_delta_phase</span>,
-                <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="op">-</span><span class="ident">delta_delta_phase</span>
-            }
+            <span class="ident">delta</span> <span class="op">=&gt;</span> {
+                <span class="ident">delta</span>
+                <span class="op">+</span> <span class="kw">match</span> <span class="ident">rng</span>.<span class="ident">gen_bool</span>(<span class="number">0.5</span>) {
+                    <span class="bool-val">true</span> <span class="op">=&gt;</span> <span class="ident">delta_delta_phase</span>,
+                    <span class="bool-val">false</span> <span class="op">=&gt;</span> <span class="op">-</span><span class="ident">delta_delta_phase</span>,
+                }
+            },
         };
         <span class="self">self</span>.<span class="ident">transition_amplitude</span> <span class="op">+=</span> <span class="self">self</span>.<span class="ident">step_amplitude</span>;
         <span class="self">self</span>.<span class="ident">amplitude</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">source_amplitude</span> <span class="op">+</span> <span class="ident">transform</span>(<span class="self">self</span>.<span class="ident">transition_amplitude</span>) <span class="op">*</span> <span class="self">self</span>.<span class="ident">delta_amplitude</span>;
@@ -572,10 +543,7 @@
     }
 }
 
-
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">transform</span>(<span class="ident">val</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
-    (<span class="ident">PI05</span> <span class="op">*</span> <span class="ident">val</span>).<span class="ident">sin</span>().<span class="ident">powi</span>(<span class="number">4</span>)
-}
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">transform</span>(<span class="ident">val</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> { (<span class="ident">PI05</span> <span class="op">*</span> <span class="ident">val</span>).<span class="ident">sin</span>().<span class="ident">powi</span>(<span class="number">4</span>) }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "plasma";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

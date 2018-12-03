@@ -3,8 +3,8 @@
 //! # Example
 //!
 //! ```
-//! extern create rand;
-//! extern create plasma;
+//! extern crate rand;
+//! extern crate plasma;
 //!
 //! use plasma::*;
 //! fn main() {
@@ -19,8 +19,8 @@
 //!
 //!     let mut buffer_rgb24 = vec![0u8; plasma_width as usize * plasma_height as usize * 3];
 //!     let pitch = plasma_width as usize * 3;
-//!     plasma.render::<PixelBufRGB24>(&buffer_rgb24, pitch);
-//!     plasma.update();
+//!     plasma.render::<PixelBufRGB24>(&mut buffer_rgb24, pitch, None);
+//!     plasma.update(&mut rng);
 //! }
 //! ```
 // #![allow(unused_variables)]

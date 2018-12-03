@@ -9,7 +9,7 @@ use crate::phase_amp::*;
 pub trait IntermediateCalculator<T> {
     /// Computes an intermediate data for a given angle.
     ///
-    /// The input value is given in radians in the range: `[0; 2PI)`.
+    /// The input value is given in radians in the range: `[0, 2PI)`.
     /// The output will be stored in the array of given types as defined by [Mixer::IntermediateH]
     /// or [Mixer::IntermediateV]. The type should be a `f32` or a packed simd `f32x8` if a
     /// "use-simd" crate feature is enabled.

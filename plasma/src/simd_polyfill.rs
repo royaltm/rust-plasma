@@ -1,4 +1,5 @@
-//! This module defines some SIMD constants and provides a floor() implementaiton for packed_simd
+//! This module defines some SIMD constants and provides a missing floor() implementaiton for
+//! packed_simd
 use cfg_if::cfg_if;
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {

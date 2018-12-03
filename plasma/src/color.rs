@@ -1,10 +1,14 @@
-//! Defines PixelRgb with optional SIMD implementation selected by a "use-simd" feature.
+//! Contains a [PixelRgb] with optional SIMD implementation selected by a "use-simd" feature.
 use cfg_if::cfg_if;
 use derive_more::*;
 use std::ptr;
 
 macro_rules! define_pixel_rgb {
     ($ty:ty, $tuple:ty) => {
+        /// A struct representing one or more pixels in the linear RGB color space.
+        ///
+        /// If a "use-simd" feature is enabled this class is being implemented for SIMD `f32x8` instead of `f32`.
+        /// In that case the single instance holds a value of 8 pixels at once instead of a one.
         #[derive(Debug, Copy, Clone, Default, PartialEq,
             Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign)]
         pub struct PixelRgb {
@@ -14,27 +18,44 @@ macro_rules! define_pixel_rgb {
         }
 
         impl PixelRgb {
+            /// Creates an instance of [PixelRgb] from color components.
             #[inline]
             pub fn new(r: $ty, g: $ty, b: $ty) -> PixelRgb {
                 PixelRgb {r, g, b}
             }
         }
 
+        /// An iterator of [PixelRgb] color components.
+        ///
+        /// The iterator is being created with a [PixelRgb::iter_rgb_values] method.
+        ///
+        /// If a "use-simd" feature is enabled the iterator provides a color component values for all 8 pixels.
+        /// In this instance the order will be `[r0, g0, b0, r1, g1, b1, ..., r7, g7, b7]`.
+        #[derive(Clone)]
         pub struct RgbIter {
             rgb: [$tuple; RgbIter::LEN],
             offs: usize
         }
 
         impl RgbIter {
+            /// The number of components of each pixel.
             const LEN: usize = 3;
         }
 
+        /// An iterator of [PixelRgb] color components plus an alpha component.
+        ///
+        /// The iterator is being created with a [PixelRgb::iter_rgba_values] method.
+        ///
+        /// If a "use-simd" feature is enabled the iterator provides a color component values for all 8 pixels.
+        /// In this instance the order will be `[r0, g0, b0, alpha, r1, g1, b1, alpha, ..., r7, g7, b7, alpha]`.
+        #[derive(Clone)]
         pub struct RgbaIter {
             rgba: [$tuple; RgbaIter::LEN],
             offs: usize
         }
 
         impl RgbaIter {
+            /// The number of components of each pixel.
             const LEN: usize = 4;
         }
     };
@@ -46,6 +67,12 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 
     macro_rules! rgb_iterator_impl {
         ($name:ident, $prop:ident) => {
+
+            impl ExactSizeIterator for $name {
+                #[inline]
+                fn len(&self) -> usize { LANES * $name::LEN - self.offs }
+            }
+
             impl Iterator for $name {
                 type Item = f32;
 
@@ -62,6 +89,12 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
                         },
                         _ => None
                     }
+                }
+
+                #[inline]
+                fn size_hint(&self) -> (usize, Option<usize>) {
+                    let len = self.len();
+                    (len, Some(len))
                 }
             }
 
@@ -81,9 +114,9 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         }
 
         #[inline]
-        pub fn iter_rgba_values(self, a: f32) -> RgbaIter {
+        pub fn iter_rgba_values(self, alpha: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
-            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), f32s::splat(a).into()];
+            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), f32s::splat(alpha).into()];
             RgbaIter { rgba, offs: 0 }
         }
 
@@ -134,6 +167,11 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 
     macro_rules! rgb_iterator_impl {
         ($name:ident, $prop:ident) => {
+            impl ExactSizeIterator for $name {
+                #[inline]
+                fn len(&self) -> usize { $name::LEN - self.offs }
+            }
+
             impl Iterator for $name {
                 type Item = f32;
 
@@ -147,6 +185,12 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
                         _ => None
                     }
                 }
+
+                #[inline]
+                fn size_hint(&self) -> (usize, Option<usize>) {
+                    let len = self.len();
+                    (len, Some(len))
+                }
             }
         }
     }
@@ -156,6 +200,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     rgb_iterator_impl!(RgbaIter, rgba);
 
     impl PixelRgb {
+        /// Creates a [RgbIter] from this instance of [PixelRgb].
         #[inline]
         pub fn iter_rgb_values(self) -> RgbIter {
             let PixelRgb { r, g, b } = self;
@@ -163,10 +208,11 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             RgbIter { rgb, offs: 0 }
         }
 
+        /// Creates a [RgbaIter] from this instance of [PixelRgb].
         #[inline]
-        pub fn iter_rgba_values(self, a: f32) -> RgbaIter {
+        pub fn iter_rgba_values(self, alpha: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
-            let rgba = [r, g, b, a];
+            let rgba = [r, g, b, alpha];
             RgbaIter { rgba, offs: 0 }
         }
 

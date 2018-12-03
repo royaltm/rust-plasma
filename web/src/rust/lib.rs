@@ -44,7 +44,7 @@ impl PlasmaHandle {
         let mut rng = OsRng::new().map_err(|e| js_sys::Error::new(e.msg))?;
         let cfg = PhaseAmpCfg::new(min_steps, max_steps);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
-        let data = vec![0; width as usize * height as usize * PixelRGBA8::PIXEL_BYTES];
+        let data = vec![0; width as usize * height as usize * PixelBufRGBA8::PIXEL_BYTES];
         let wrkspc = Vec::new();
         Ok(PlasmaHandle { plasma, rng, data, area: Area { x: 0, y: 0, w: width as usize, h: height as usize }, wrkspc })
     }
@@ -55,7 +55,7 @@ impl PlasmaHandle {
             panic!("invalid area provided");
         }
         self.area = Area { x, y, w, h };
-        self.data.resize(w * h * PixelRGBA8::PIXEL_BYTES, 0u8);
+        self.data.resize(w * h * PixelBufRGBA8::PIXEL_BYTES, 0u8);
     }
 
     pub fn width(&self) -> u32 { self.plasma.pixel_width }
@@ -64,18 +64,18 @@ impl PlasmaHandle {
 
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = PixelRGBA8::PIXEL_BYTES * w;
-        self.plasma.render_part::<PixelRGBA8>(&mut self.data, pitch, x, y, w, h, Some(&mut self.wrkspc));
+        let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
+        self.plasma.render_part::<PixelBufRGBA8>(&mut self.data, pitch, x, y, w, h, Some(&mut self.wrkspc));
     }
 
     #[wasm_bindgen(js_name=renderPhaseAmps)]
     pub fn render_phase_amps(&mut self, phase_amps: &[f32]) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = PixelRGBA8::PIXEL_BYTES * w;
+        let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
         let mixer = PlasmaMixer::new();
-        render_part::<PixelRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer,
+        render_part::<PixelBufRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer,
                                                                       &mut self.data,
                                                                       pitch,
                                                                       pw,

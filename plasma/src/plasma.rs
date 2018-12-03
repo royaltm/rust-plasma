@@ -168,14 +168,14 @@ pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, p
     let (vxps, vyps) = prepare_workspace::<M>(wrkspc, dx, dy);
     /* precalculate horizontal tables */
     {
-        let mixiter_x = L::compose_x_iter(phase_amps);
+        let mixiter_x = L::compose_h_iter(phase_amps);
         assert_eq!(M::intermediate_h_len(), mixiter_x.len());
         for (i, calc) in mixiter_x.enumerate() {
             prepare_composition_line(i, x, wr, &calc, vxps);
         }
     }
     {
-        let mixiter_y = L::compose_y_iter(phase_amps);
+        let mixiter_y = L::compose_v_iter(phase_amps);
         assert_eq!(M::intermediate_v_len(), mixiter_y.len());
         for (i, calc) in mixiter_y.enumerate() {
             prepare_composition_line(i, y, hr, &calc, vyps);

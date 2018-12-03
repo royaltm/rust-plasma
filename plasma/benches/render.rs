@@ -35,7 +35,7 @@ macro_rules! detected_feature_print {
 #[bench]
 fn bench_render(ben: &mut Bencher) {
     use plasma::*;
-    type PBuf = PixelRGB24;
+    type PBuf = PixelBufRGB24;
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {

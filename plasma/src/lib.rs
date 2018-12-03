@@ -19,7 +19,7 @@
 //!
 //!     let mut buffer_rgb24 = vec![0u8; plasma_width as usize * plasma_height as usize * 3];
 //!     let pitch = plasma_width as usize * 3;
-//!     plasma.render::<PixelRGB24>(&buffer_rgb24, pitch);
+//!     plasma.render::<PixelBufRGB24>(&buffer_rgb24, pitch);
 //!     plasma.update();
 //! }
 //! ```

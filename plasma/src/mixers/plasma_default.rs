@@ -4,9 +4,11 @@ use std::marker::PhantomData;
 
 use crate::{color::*, mixer::*, phase_amp::*};
 
+/// A default implementation of a [Mixer] is provided for this struct.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct PlasmaMixer<T>(PhantomData<T>);
 
+/// Provides a default implementation of a [IntermediateCalculator].
 pub struct PlasmaLineCalc<T> {
     amplitude1: T,
     phase1:     T,
@@ -15,6 +17,7 @@ pub struct PlasmaLineCalc<T> {
     normal:     T,
 }
 
+/// Provides a default implementation of an iterator of [PlasmaLineCalc].
 pub struct PlasmaMixIter<'a, P, T>
     where P: PhaseAmpsSelect<'a> + ?Sized
 {
@@ -22,6 +25,7 @@ pub struct PlasmaMixIter<'a, P, T>
     calc_val:     PhantomData<T>,
 }
 
+/// Provides a default implementation of a [IntermediateCalculatorProducer].
 pub struct PlasmaLineCalcProducer<'a, P: 'a, T>(PhantomData<T>, PhantomData<&'a P>) where P: PhaseAmpsSelect<'a> + ?Sized;
 
 impl<T> PlasmaMixer<T> {
@@ -40,18 +44,18 @@ impl<'a, P, T> IntermediateCalculatorProducer<'a, P, T> for PlasmaLineCalcProduc
     where P: PhaseAmpsSelect<'a> + ?Sized,
           PlasmaLineCalc<T>: IntermediateCalculator<T>,
           PlasmaMixIter<'a, P, T>: Iterator<Item = PlasmaLineCalc<T>>,
-          PlasmaMixer<T>: Mixer<T>,
           T: Sized + Default + Copy
 {
-    type CalcIter = PlasmaMixIter<'a, P, T>;
-    type LineCalc = PlasmaLineCalc<T>;
-    type MixerType = PlasmaMixer<T>;
+    type CalcIterH = PlasmaMixIter<'a, P, T>;
+    type CalcIterV = PlasmaMixIter<'a, P, T>;
+    type LineCalcH = PlasmaLineCalc<T>;
+    type LineCalcV = PlasmaLineCalc<T>;
 
-    fn compose_x_iter(pa: &'a P) -> Self::CalcIter {
+    fn compose_h_iter(pa: &'a P) -> Self::CalcIterH {
         PlasmaMixIter { pa_pair_iter: pa.select(0..12).into_pa_pair_iter(), calc_val: PhantomData }
     }
 
-    fn compose_y_iter(pa: &'a P) -> Self::CalcIter {
+    fn compose_v_iter(pa: &'a P) -> Self::CalcIterV {
         PlasmaMixIter { pa_pair_iter: pa.select(12..24).into_pa_pair_iter(), calc_val: PhantomData }
     }
 }
@@ -61,7 +65,6 @@ macro_rules! plasma_mixer_impl {
         impl Mixer<$float> for PlasmaMixer<$float> {
             type IntermediateH = [$float; 6];
             type IntermediateV = [$float; 6];
-            type Mixed = [$float; 3];
 
             #[inline]
             fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut FnMut(PixelRgb)) {
@@ -128,7 +131,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 } else {
 
     #[inline]
-    pub const fn identity<T>(x: T) -> T { x }
+    const fn identity<T>(x: T) -> T { x }
     plasma_mixer_impl!(f32, identity);
 
 }}

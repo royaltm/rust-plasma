@@ -4,14 +4,14 @@ use crate::color::PixelRgb;
 pub trait PixelBuffer {
     /// Specifies how many bytes a single pixel occupies.
     const PIXEL_BYTES: usize;
-    /// Puts bytes from `pixel` into the provided `buffer` using provided writer.
+    /// Puts bytes from a `pixel` into the provided `buffer` using a provided writer.
     fn put_pixel<'a, I: Iterator<Item = &'a mut u8>>(writer: &mut I, pixel: PixelRgb);
 }
 
-/// Implements [PixelBuffer] for RGB24 buffer (3 bytes/pixel: red, green, blue).
-pub struct PixelRGB24;
+/// A [PixelBuffer] tool for a RGB24 buffer (3 bytes/pixel: red, green, blue).
+pub struct PixelBufRGB24;
 
-impl PixelBuffer for PixelRGB24 {
+impl PixelBuffer for PixelBufRGB24 {
     const PIXEL_BYTES: usize = 3;
 
     #[inline]
@@ -24,10 +24,10 @@ impl PixelBuffer for PixelRGB24 {
     }
 }
 
-/// Implements [PixelBuffer] for RGBA8 buffer (4 bytes/pixel: red, green, blue, alpha).
-pub struct PixelRGBA8;
+/// A [PixelBuffer] tool for a RGBA8 buffer (4 bytes/pixel: red, green, blue, alpha).
+pub struct PixelBufRGBA8;
 
-impl PixelBuffer for PixelRGBA8 {
+impl PixelBuffer for PixelBufRGBA8 {
     const PIXEL_BYTES: usize = 4;
 
     #[inline]
@@ -40,7 +40,8 @@ impl PixelBuffer for PixelRGBA8 {
     }
 }
 
-trait ToColor8 {
+/// Provides a method of converting color part from a `f32` type to a `u8`.
+pub trait ToColor8 {
     fn to_color_u8clamped(&self) -> u8;
 }
 

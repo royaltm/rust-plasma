@@ -45,6 +45,8 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A [Plasma] struct and tools for rendering animated eye-candy pixels.</span>
 <span class="doccomment">//!</span>
@@ -55,6 +57,7 @@
 <span class="doccomment">//! extern crate plasma;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! use plasma::*;</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! fn main() {</span>
 <span class="doccomment">//!     let min_steps = 80.0f32;</span>
 <span class="doccomment">//!     let max_steps = 200.0f32;</span>
@@ -62,12 +65,13 @@
 <span class="doccomment">//!     let plasma_height = 200u32;</span>
 <span class="doccomment">//!     let mut rng = rand::thread_rng();</span>
 <span class="doccomment">//!     let cfg = PhaseAmpCfg::new(min_steps, max_steps);</span>
+<span class="doccomment">//!     let mixer = PlasmaMixer::new();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &amp;mut rng);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     let mut buffer_rgb24 = vec![0u8; plasma_width as usize * plasma_height as usize * 3];</span>
 <span class="doccomment">//!     let pitch = plasma_width as usize * 3;</span>
-<span class="doccomment">//!     plasma.render::&lt;PixelBufRGB24&gt;(&amp;mut buffer_rgb24, pitch, None);</span>
+<span class="doccomment">//!     plasma.render::&lt;PixelBufRGB24, PlasmaICP, _&gt;(&amp;mixer, &amp;mut buffer_rgb24, pitch, None);</span>
 <span class="doccomment">//!     plasma.update(&amp;mut rng);</span>
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>

@@ -5,3 +5,4 @@ target
 *.dll
 *.lnk
 /ghp
+/tmp

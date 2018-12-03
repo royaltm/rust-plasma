@@ -24,7 +24,7 @@
         "excludeExternals": true,
         "excludeNotExported": false,
         "externalPattern": "**/*node*",
-        "exclude": ["**/src/ts/+(*_loader|worker|webpack.d).ts"],
+        "exclude": ["**/src/ts/+(*_loader|worker).ts"],
         "ignoreCompilerErrors": true,
         "includeDeclarations": true,
         "mode": "modules",

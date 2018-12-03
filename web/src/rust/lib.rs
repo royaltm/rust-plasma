@@ -8,6 +8,8 @@ use wasm_bindgen::{Clamped, JsCast};
 use web_sys::{ImageData, Window, WorkerGlobalScope};
 // use js_sys::JsCast;
 
+type PlasmaICPExtPa<'a> = PlasmaInterCalcProducer<'a, [f32], f32>;
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
@@ -29,6 +31,7 @@ pub struct PlasmaHandle {
     data:   Vec<u8>,
     area:   Area,
     wrkspc: Vec<u8>,
+    mixer:  PlasmaMixer<f32>,
 }
 
 #[wasm_bindgen]
@@ -46,7 +49,13 @@ impl PlasmaHandle {
         let plasma = Plasma::new(width, height, cfg, &mut rng);
         let data = vec![0; width as usize * height as usize * PixelBufRGBA8::PIXEL_BYTES];
         let wrkspc = Vec::new();
-        Ok(PlasmaHandle { plasma, rng, data, area: Area { x: 0, y: 0, w: width as usize, h: height as usize }, wrkspc })
+        let mixer = PlasmaMixer::new();
+        Ok(PlasmaHandle { plasma,
+                          rng,
+                          data,
+                          area: Area { x: 0, y: 0, w: width as usize, h: height as usize },
+                          wrkspc,
+                          mixer })
     }
 
     #[wasm_bindgen(js_name=setArea)]
@@ -65,7 +74,14 @@ impl PlasmaHandle {
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
         let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
-        self.plasma.render_part::<PixelBufRGBA8>(&mut self.data, pitch, x, y, w, h, Some(&mut self.wrkspc));
+        self.plasma.render_part::<PixelBufRGBA8, PlasmaICP, _>(&self.mixer,
+                                                               &mut self.data,
+                                                               pitch,
+                                                               x,
+                                                               y,
+                                                               w,
+                                                               h,
+                                                               Some(&mut self.wrkspc));
     }
 
     #[wasm_bindgen(js_name=renderPhaseAmps)]
@@ -74,18 +90,17 @@ impl PlasmaHandle {
         let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
-        let mixer = PlasmaMixer::new();
-        render_part::<PixelBufRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer,
-                                                                         &mut self.data,
-                                                                         pitch,
-                                                                         pw,
-                                                                         ph,
-                                                                         phase_amps,
-                                                                         x,
-                                                                         y,
-                                                                         w,
-                                                                         h,
-                                                                         Some(&mut self.wrkspc))
+        render_part::<PixelBufRGBA8, PlasmaICPExtPa, _, _>(&self.mixer,
+                                                           &mut self.data,
+                                                           pitch,
+                                                           pw,
+                                                           ph,
+                                                           phase_amps,
+                                                           x,
+                                                           y,
+                                                           w,
+                                                           h,
+                                                           Some(&mut self.wrkspc))
     }
 
     pub fn update(&mut self) { self.plasma.update(&mut self.rng); }

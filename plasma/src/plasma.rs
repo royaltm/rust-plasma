@@ -4,7 +4,7 @@ use rand::Rng;
 
 use cfg_if::cfg_if;
 
-use crate::{mixer::*, mixers::*, phase_amp::*, pixel_buffer::*, simd_polyfill::*};
+use crate::{mixer::*, phase_amp::*, pixel_buffer::*, simd_polyfill::*};
 
 const PI2: f32 = 2.0 * PI;
 
@@ -12,11 +12,17 @@ type PhaseAmpsT = [PhaseAmp; 24];
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
     use packed_simd::Cast;
-    type Xf32 = f32s;
+
+    pub type Xf32 = f32s;
 }
 else {
-    type Xf32 = f32;
+    /// All the intermediate calculations are performed on this type.
+    pub type Xf32 = f32;
 }}
+
+/// A convenient trait alias for plasma render methods.
+pub trait ICProducer<'a>: IntermediateCalculatorProducer<'a, [PhaseAmp], Xf32> {}
+impl<'a, T> ICProducer<'a> for T where T: IntermediateCalculatorProducer<'a, [PhaseAmp], Xf32> {}
 
 /// The struct that holds the meta information about current plasma state
 #[derive(Debug, Clone, PartialEq)]
@@ -27,7 +33,6 @@ pub struct Plasma {
     pub pixel_height: u32,
     config: PhaseAmpCfg,
     phase_amps: PhaseAmpsT,
-    mixer: PlasmaMixer<Xf32>,
 }
 
 impl Plasma {
@@ -40,8 +45,7 @@ impl Plasma {
         for p in phase_amps.iter_mut() {
             *p = PhaseAmp::new(&config, rng);
         }
-        let mixer = PlasmaMixer::new();
-        Plasma { pixel_width, pixel_height, config, phase_amps, mixer }
+        Plasma { pixel_width, pixel_height, config, phase_amps }
     }
 
     /// Animates the plasma by modifying the internal [PhaseAmp] variables.
@@ -63,8 +67,19 @@ impl Plasma {
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     #[inline]
-    pub fn render<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>) {
-        self.render_part::<B>(buffer, pitch, 0, 0, self.pixel_width as usize, self.pixel_height as usize, wrkspc)
+    pub fn render<'a, B, L, M>(&'a self, mixer: &M, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>)
+        where B: PixelBuffer,
+              L: ICProducer<'a>,
+              M: Mixer<Xf32>
+    {
+        self.render_part::<B, L, M>(mixer,
+                                    buffer,
+                                    pitch,
+                                    0,
+                                    0,
+                                    self.pixel_width as usize,
+                                    self.pixel_height as usize,
+                                    wrkspc)
     }
 
     /// Renders the part of the plasma into the provided `buffer`.
@@ -79,22 +94,16 @@ impl Plasma {
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     #[inline]
-    pub fn render_part<B: PixelBuffer>(&self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize, h: usize,
-                                       wrkspc: Option<&mut Vec<u8>>) {
+    pub fn render_part<'a, B, L, M>(&'a self, mixer: &M, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize,
+                                    h: usize, wrkspc: Option<&mut Vec<u8>>)
+        where B: PixelBuffer,
+              L: ICProducer<'a>,
+              M: Mixer<Xf32>
+    {
         let pw = self.pixel_width as usize;
         let ph = self.pixel_height as usize;
         let phase_amps = &self.phase_amps[..];
-        render_part::<B, PlasmaLineCalcProducer<_, _>, _, _>(&self.mixer,
-                                                             buffer,
-                                                             pitch,
-                                                             pw,
-                                                             ph,
-                                                             phase_amps,
-                                                             x,
-                                                             y,
-                                                             w,
-                                                             h,
-                                                             wrkspc)
+        render_part::<B, L, M, _>(mixer, buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
@@ -136,8 +145,8 @@ impl Plasma {
 pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P,
                                    x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
     where B: PixelBuffer,
-          M: Mixer<Xf32>,
           L: IntermediateCalculatorProducer<'a, P, Xf32>,
+          M: Mixer<Xf32>,
           P: PhaseAmpsSelect<'a> + ?Sized
 {
     if x >= pw {

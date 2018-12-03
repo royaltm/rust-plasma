@@ -251,8 +251,8 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 mod tests {
     use crate::color::*;
 
-macro_rules! create_tests {
-    ($ty:ty, $splat:path) => {
+    macro_rules! create_tests {
+        ($ty:ty, $splat:path) => {
         #[test]
         fn it_works() {
             assert_eq!(PixelRgb::from_hsv($splat(0.0), $splat(0.0), $splat(0.0)),
@@ -274,10 +274,10 @@ macro_rules! create_tests {
             assert_eq!(PixelRgb::from_hsv($splat(-0.5), $splat(1.0), $splat(1.0)),
                        PixelRgb::from_hsv($splat(1.5), $splat(1.0), $splat(1.0)));
         }
+    };
     }
-}
 
-cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
+    cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
         create_tests!(f32s, f32s::splat);
 
         #[test]
@@ -285,7 +285,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             let pixel = PixelRgb::new(f32s::splat(0.0), f32s::splat(0.5), f32s::splat(1.0));
             let rgb: Vec<f32> = pixel.iter_rgb_values().collect();
             assert_eq!(rgb, vec![
-                0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 
+                0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0,
                 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0 ]);
             let rgba: Vec<f32> = pixel.iter_rgba_values(0.25).collect();
             assert_eq!(rgba, vec![

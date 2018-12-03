@@ -26,7 +26,7 @@ pub struct PlasmaMixIter<'a, P, T>
 }
 
 /// Provides a default implementation of a [IntermediateCalculatorProducer].
-pub struct PlasmaLineCalcProducer<'a, P: 'a, T>(PhantomData<T>, PhantomData<&'a P>) where P: PhaseAmpsSelect<'a> + ?Sized;
+pub struct PlasmaInterCalcProducer<'a, P: 'a, T>(PhantomData<T>, PhantomData<&'a P>) where P: PhaseAmpsSelect<'a> + ?Sized;
 
 impl<T> PlasmaMixer<T> {
     pub fn new() -> Self { PlasmaMixer(PhantomData) }
@@ -40,7 +40,7 @@ impl<'a, P, T> ExactSizeIterator for PlasmaMixIter<'a, P, T>
     fn len(&self) -> usize { self.pa_pair_iter.len() }
 }
 
-impl<'a, P, T> IntermediateCalculatorProducer<'a, P, T> for PlasmaLineCalcProducer<'a, P, T>
+impl<'a, P, T> IntermediateCalculatorProducer<'a, P, T> for PlasmaInterCalcProducer<'a, P, T>
     where P: PhaseAmpsSelect<'a> + ?Sized,
           PlasmaLineCalc<T>: IntermediateCalculator<T>,
           PlasmaMixIter<'a, P, T>: Iterator<Item = PlasmaLineCalc<T>>,
@@ -62,6 +62,9 @@ impl<'a, P, T> IntermediateCalculatorProducer<'a, P, T> for PlasmaLineCalcProduc
 
 macro_rules! plasma_mixer_impl {
     ($float:ty, $splat:path) => {
+        /// A convenient type to be used with [Plasma.render].
+        pub type PlasmaICP<'a> = PlasmaInterCalcProducer<'a, [PhaseAmp], $float>;
+
         impl Mixer<$float> for PlasmaMixer<$float> {
             type IntermediateH = [$float; 6];
             type IntermediateV = [$float; 6];

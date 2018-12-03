@@ -188,6 +188,7 @@ fn run() -> Result<(), String> {
     let mut rng = rand::thread_rng();
     let cfg = PhaseAmpCfg::new(MIN_STEPS, MAX_STEPS);
     let mut plasma = Arc::new(Plasma::new(plasma_width, plasma_height, cfg, &mut rng));
+    let mixer = PlasmaMixer::new();
 
     let mut pool = Pool::new(max(2, min(1, sdl2::cpuinfo::cpu_count() as u32)));
     let mut workspaces: Vec<Vec<u8>> = std::iter::repeat_with(Vec::new).take(pool.thread_count() as usize).collect();
@@ -258,13 +259,14 @@ fn run() -> Result<(), String> {
                                let h = min(segmh, plasma_height as usize - y);
                                let plasma = Arc::clone(&plasma);
                                scope.execute(move || {
-                                        plasma.render_part::<PixelBufRGB24>(chunk,
-                                                                            pitch,
-                                                                            0,
-                                                                            y,
-                                                                            plasma_width as usize,
-                                                                            h,
-                                                                            Some(wrkspc));
+                                        plasma.render_part::<PixelBufRGB24, PlasmaICP, _>(&mixer,
+                                                                                          chunk,
+                                                                                          pitch,
+                                                                                          0,
+                                                                                          y,
+                                                                                          plasma_width as usize,
+                                                                                          h,
+                                                                                          Some(wrkspc));
                                     });
                            }
                        })

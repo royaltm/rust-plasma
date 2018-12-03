@@ -6,9 +6,11 @@ RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,
 */
 #![feature(test)]
 
-extern crate plasma;
-extern crate rand;
 extern crate test;
+
+use plasma;
+use rand;
+
 use test::{black_box, Bencher};
 
 macro_rules! target_feature_print {
@@ -35,6 +37,7 @@ macro_rules! detected_feature_print {
 #[bench]
 fn bench_render(ben: &mut Bencher) {
     use plasma::*;
+
     type PBuf = PixelBufRGB24;
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
@@ -74,12 +77,12 @@ fn bench_render(ben: &mut Bencher) {
     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &mut rng);
     let pitch: usize = PBuf::PIXEL_BYTES * plasma_width as usize;
     let mut buffer_rgb24: Vec<u8> = vec![0; pitch * plasma_height as usize];
-
+    let mixer = PlasmaMixer::new();
     let mut workspc = Vec::new();
     ben.iter(|| {
            for _ in 0..10 {
                let buffer: &mut [u8] = &mut buffer_rgb24;
-               plasma.render::<PBuf>(buffer, pitch, Some(&mut workspc));
+               plasma.render::<PBuf, PlasmaICP, _>(&mixer, buffer, pitch, Some(&mut workspc));
                plasma.update(&mut rng);
                black_box(buffer);
            }

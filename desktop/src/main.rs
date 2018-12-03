@@ -258,13 +258,13 @@ fn run() -> Result<(), String> {
                                let h = min(segmh, plasma_height as usize - y);
                                let plasma = Arc::clone(&plasma);
                                scope.execute(move || {
-                                        plasma.render_part::<PixelRGB24>(chunk,
-                                                                         pitch,
-                                                                         0,
-                                                                         y,
-                                                                         plasma_width as usize,
-                                                                         h,
-                                                                         Some(wrkspc));
+                                        plasma.render_part::<PixelBufRGB24>(chunk,
+                                                                            pitch,
+                                                                            0,
+                                                                            y,
+                                                                            plasma_width as usize,
+                                                                            h,
+                                                                            Some(wrkspc));
                                     });
                            }
                        })

@@ -76,16 +76,16 @@ impl PlasmaHandle {
         let ph = self.plasma.pixel_height as usize;
         let mixer = PlasmaMixer::new();
         render_part::<PixelBufRGBA8, PlasmaLineCalcProducer<_, _>, _, _>(&mixer,
-                                                                      &mut self.data,
-                                                                      pitch,
-                                                                      pw,
-                                                                      ph,
-                                                                      phase_amps,
-                                                                      x,
-                                                                      y,
-                                                                      w,
-                                                                      h,
-                                                                      Some(&mut self.wrkspc))
+                                                                         &mut self.data,
+                                                                         pitch,
+                                                                         pw,
+                                                                         ph,
+                                                                         phase_amps,
+                                                                         x,
+                                                                         y,
+                                                                         w,
+                                                                         h,
+                                                                         Some(&mut self.wrkspc))
     }
 
     pub fn update(&mut self) { self.plasma.update(&mut self.rng); }

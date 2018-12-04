@@ -3,9 +3,10 @@ use crate::{color::*, mixer::*, phase_amp::*, simd_polyfill::*};
 use derive_more::*;
 use std::marker::PhantomData;
 
-/// A convenient type to be used with [Plasma.render] or [Plasma.render_part].
+/// A convenient type to be used with [crate::plasma::Plasma::render] or
+/// [crate::plasma::Plasma::render_part].
 pub type PlasmaICP<'a> = PlasmaInterCalcProducer<'a, [PhaseAmp]>;
-/// A convenient type to be used with [render_part].
+/// A convenient type to be used with [crate::plasma::render_part].
 pub type PlasmaICPExtPa<'a> = PlasmaInterCalcProducer<'a, [f32]>;
 
 /// A default implementation of a [Mixer] is provided for this struct.

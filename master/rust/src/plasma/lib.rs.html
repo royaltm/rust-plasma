@@ -69,8 +69,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//!     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &amp;mut rng);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!     let mut buffer_rgb24 = vec![0u8; plasma_width as usize * plasma_height as usize * 3];</span>
-<span class="doccomment">//!     let pitch = plasma_width as usize * 3;</span>
+<span class="doccomment">//!     let pitch = plasma_width as usize * PixelBufRGB24::PIXEL_BYTES;</span>
+<span class="doccomment">//!     let mut buffer_rgb24 = vec![0u8; pitch * plasma_height as usize];</span>
 <span class="doccomment">//!     plasma.render::&lt;PixelBufRGB24, PlasmaICP, _&gt;(&amp;mixer, &amp;mut buffer_rgb24, pitch, None);</span>
 <span class="doccomment">//!     plasma.update(&amp;mut rng);</span>
 <span class="doccomment">//! }</span>

@@ -18,7 +18,10 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     #[allow(non_camel_case_types)]
     pub type f32tuple = [f32;f32s::lanes()];
 
+    pub type Flt = f32s;
     pub const LANES: usize = f32s::lanes();
+    #[inline]
+    pub const fn splat(v: f32) -> Flt { Flt::splat(v) }
 
     macro_rules! simd_new_consecutive {
         // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3, $v+4, $v+5, $v+6, $v+7,
@@ -73,5 +76,11 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
     }}
 }
 else {
+    /// All the intermediate calculations are performed on this type.
+    pub type Flt = f32;
+    /// Number of SIMD lanes, if no SIMD types are used this equals to 1.
     pub const LANES: usize = 1;
+    /// A function to wrap float value primitives for SIMD enabled calculations
+    #[inline]
+    pub const fn splat(v: f32) -> Flt { v }
 }}

@@ -116,7 +116,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         #[inline]
         pub fn iter_rgba_values(self, alpha: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
-            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), f32s::splat(alpha).into()];
+            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), splat(alpha).into()];
             RgbaIter { rgba, offs: 0 }
         }
 
@@ -125,32 +125,32 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
             const FALSE: m32s = m32s::splat(false);
 
             let c = val * sat;
-            let h = (hue - (floor(hue / f32s::splat(2.0)) * f32s::splat(2.0))) * f32s::splat(3.0);
-            let x = c * (f32s::splat(1.0) - (h % f32s::splat(2.0) - f32s::splat(1.0)).abs());
+            let h = (hue - (floor(hue / splat(2.0)) * splat(2.0))) * splat(3.0);
+            let x = c * (splat(1.0) - (h % splat(2.0) - splat(1.0)).abs());
             let m = val - c;
 
             let (mut r, mut g, mut b) = (m, m, m);
 
-            let less = h.lt(f32s::splat(1.0));
+            let less = h.lt(splat(1.0));
             if less.any() {
                 r = less.select(c+m, r); g = less.select(x+m, g);
             }
-            let less2 = h.lt(f32s::splat(2.0));
+            let less2 = h.lt(splat(2.0));
             let less = less.select(FALSE, less2);
             if less.any() {
                 r = less.select(x+m, r); g = less.select(c+m, g);
             }
-            let less3 = h.lt(f32s::splat(3.0));
+            let less3 = h.lt(splat(3.0));
             let less = less2.select(FALSE, less3);
             if less.any() {
                 g = less.select(c+m, g); b = less.select(x+m, b);
             }
-            let less4 = h.lt(f32s::splat(4.0));
+            let less4 = h.lt(splat(4.0));
             let less = less3.select(FALSE, less4);
             if less.any() {
                 g = less.select(x+m, g); b = less.select(c+m, b);
             }
-            let less5 = h.lt(f32s::splat(5.0));
+            let less5 = h.lt(splat(5.0));
             let less = less4.select(FALSE, less5);
             if less.any() {
                 r = less.select(x+m, r); b = less.select(c+m, b);
@@ -249,40 +249,43 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
 
 #[cfg(test)]
 mod tests {
-    use crate::color::*;
+    use crate::{color::*, simd_polyfill::*};
 
-    macro_rules! create_tests {
-        ($ty:ty, $splat:path) => {
-        #[test]
-        fn it_works() {
-            assert_eq!(PixelRgb::from_hsv($splat(0.0), $splat(0.0), $splat(0.0)),
-                       PixelRgb { r: $splat(0.0), g: $splat(0.0), b: $splat(0.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(0.0), $splat(0.0), $splat(1.0)),
-                       PixelRgb { r: $splat(1.0), g: $splat(1.0), b: $splat(1.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(0.0), $splat(1.0), $splat(1.0)),
-                       PixelRgb { r: $splat(1.0), g: $splat(0.0), b: $splat(0.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(2.0), $splat(1.0), $splat(1.0)),
-                       PixelRgb { r: $splat(1.0), g: $splat(0.0), b: $splat(0.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(1.0), $splat(1.0), $splat(1.0)),
-                       PixelRgb { r: $splat(0.0), g: $splat(1.0), b: $splat(1.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(1.0), $splat(1.0), $splat(2.0)),
-                       PixelRgb { r: $splat(0.0), g: $splat(2.0), b: $splat(2.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(1.0), $splat(0.5), $splat(0.5)),
-                       PixelRgb { r: $splat(0.25), g: $splat(0.5), b: $splat(0.5) });
-            assert_eq!(PixelRgb::from_hsv($splat(-1.0), $splat(1.0), $splat(1.0)),
-                       PixelRgb { r: $splat(0.0), g: $splat(1.0), b: $splat(1.0) });
-            assert_eq!(PixelRgb::from_hsv($splat(-0.5), $splat(1.0), $splat(1.0)),
-                       PixelRgb::from_hsv($splat(1.5), $splat(1.0), $splat(1.0)));
-        }
-    };
+    #[test]
+    fn it_works() {
+        assert_eq!(PixelRgb::from_hsv(splat(0.0), splat(0.0), splat(0.0)), PixelRgb { r: splat(0.0),
+                                                                                      g: splat(0.0),
+                                                                                      b: splat(0.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(0.0), splat(0.0), splat(1.0)), PixelRgb { r: splat(1.0),
+                                                                                      g: splat(1.0),
+                                                                                      b: splat(1.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(0.0), splat(1.0), splat(1.0)), PixelRgb { r: splat(1.0),
+                                                                                      g: splat(0.0),
+                                                                                      b: splat(0.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(2.0), splat(1.0), splat(1.0)), PixelRgb { r: splat(1.0),
+                                                                                      g: splat(0.0),
+                                                                                      b: splat(0.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(1.0), splat(1.0), splat(1.0)), PixelRgb { r: splat(0.0),
+                                                                                      g: splat(1.0),
+                                                                                      b: splat(1.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(1.0), splat(1.0), splat(2.0)), PixelRgb { r: splat(0.0),
+                                                                                      g: splat(2.0),
+                                                                                      b: splat(2.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(1.0), splat(0.5), splat(0.5)), PixelRgb { r: splat(0.25),
+                                                                                      g: splat(0.5),
+                                                                                      b: splat(0.5), });
+        assert_eq!(PixelRgb::from_hsv(splat(-1.0), splat(1.0), splat(1.0)), PixelRgb { r: splat(0.0),
+                                                                                       g: splat(1.0),
+                                                                                       b: splat(1.0), });
+        assert_eq!(PixelRgb::from_hsv(splat(-0.5), splat(1.0), splat(1.0)),
+                   PixelRgb::from_hsv(splat(1.5), splat(1.0), splat(1.0)));
     }
 
     cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
-        create_tests!(f32s, f32s::splat);
 
         #[test]
         fn iterator_works() {
-            let pixel = PixelRgb::new(f32s::splat(0.0), f32s::splat(0.5), f32s::splat(1.0));
+            let pixel = PixelRgb::new(splat(0.0), splat(0.5), splat(1.0));
             let rgb: Vec<f32> = pixel.iter_rgb_values().collect();
             assert_eq!(rgb, vec![
                 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0,
@@ -292,10 +295,9 @@ mod tests {
                 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25,
                 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25, 0.0, 0.5, 1.0, 0.25 ]);
         }
+
     }
     else {
-        const fn identity<T>(v: T) -> T { v }
-        create_tests!(f32, identity);
 
         #[test]
         fn iterator_works() {

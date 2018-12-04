@@ -116,6 +116,9 @@ impl<'a> Iterator for PhaseAmpsPairIterator<'a> {
             _ => None,
         }
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
 }
 
 pub struct F32PaPairIterator<'a> {
@@ -137,6 +140,9 @@ impl<'a> Iterator for F32PaPairIterator<'a> {
             _ => None,
         }
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
 }
 
 impl<'a> PhaseAmpsSelect<'a> for [PhaseAmp] {

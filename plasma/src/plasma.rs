@@ -10,19 +10,9 @@ const PI2: f32 = 2.0 * PI;
 
 type PhaseAmpsT = [PhaseAmp; 24];
 
-cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
-    use packed_simd::Cast;
-
-    pub type Xf32 = f32s;
-}
-else {
-    /// All the intermediate calculations are performed on this type.
-    pub type Xf32 = f32;
-}}
-
 /// A convenient trait alias for plasma render methods.
-pub trait ICProducer<'a>: IntermediateCalculatorProducer<'a, [PhaseAmp], Xf32> {}
-impl<'a, T> ICProducer<'a> for T where T: IntermediateCalculatorProducer<'a, [PhaseAmp], Xf32> {}
+pub trait ICProducer<'a>: IntermediateCalculatorProducer<'a, [PhaseAmp], Flt> {}
+impl<'a, T> ICProducer<'a> for T where T: IntermediateCalculatorProducer<'a, [PhaseAmp], Flt> {}
 
 /// The struct that holds the meta information about current plasma state
 #[derive(Debug, Clone, PartialEq)]
@@ -70,7 +60,7 @@ impl Plasma {
     pub fn render<'a, B, L, M>(&'a self, mixer: &M, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>)
         where B: PixelBuffer,
               L: ICProducer<'a>,
-              M: Mixer<Xf32>
+              M: Mixer<Flt>
     {
         self.render_part::<B, L, M>(mixer,
                                     buffer,
@@ -98,7 +88,7 @@ impl Plasma {
                                     h: usize, wrkspc: Option<&mut Vec<u8>>)
         where B: PixelBuffer,
               L: ICProducer<'a>,
-              M: Mixer<Xf32>
+              M: Mixer<Flt>
     {
         let pw = self.pixel_width as usize;
         let ph = self.pixel_height as usize;
@@ -145,8 +135,8 @@ impl Plasma {
 pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P,
                                    x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
     where B: PixelBuffer,
-          L: IntermediateCalculatorProducer<'a, P, Xf32>,
-          M: Mixer<Xf32>,
+          L: IntermediateCalculatorProducer<'a, P, Flt>,
+          M: Mixer<Flt>,
           P: PhaseAmpsSelect<'a> + ?Sized
 {
     if x >= pw {
@@ -198,11 +188,12 @@ pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, p
 
 cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
     use std::borrow::Borrow;
+    use packed_simd::Cast;
 
     fn prepare_composition_line<C, D>(index: usize, x0: usize, wr: f32, calc: &C, out: &mut [D])
     where C: IntermediateCalculator<f32s>, D: BorrowMut<[f32s]>
     {
-        let wr = f32s::splat(wr);
+        let wr = splat(wr);
         for (i, op) in out.iter_mut().enumerate() {
             let x = (i * LANES + x0) as u32;
             let xs: f32s = simd_new_consecutive!(u32s, x).cast();
@@ -239,7 +230,7 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         for (i, &ys) in vyp.borrow().iter().enumerate() {
             let ys: f32tuple = ys.into();
             for (&y, vyp) in ys.iter().zip(vypl.iter_mut()) {
-                vyp.borrow_mut()[i] = f32s::splat(y);
+                vyp.borrow_mut()[i] = splat(y);
             }
         }
         let line_end = B::PIXEL_BYTES * dx;

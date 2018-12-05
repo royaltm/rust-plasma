@@ -59,14 +59,20 @@ pub trait PhaseAmpDataExp {
 
 /// A trait that allows selecting a subset of phase'n'amplitude and iterate over pairs of it.
 pub trait PhaseAmpsSelect<'a> {
-    type PairIter: Iterator<Item = (&'a Self::Item, &'a Self::Item)> + ExactSizeIterator;
     type Item: PhaseAmpAccess + ?Sized + 'a;
+    type IterOne: Iterator<Item = &'a Self::Item> + ExactSizeIterator;
+    type IterPair: Iterator<Item = (&'a Self::Item, &'a Self::Item)> + ExactSizeIterator;
+    type IterTriple: Iterator<Item = (&'a Self::Item, &'a Self::Item, &'a Self::Item)> + ExactSizeIterator;
+    type IterQuad: Iterator<Item = (&'a Self::Item, &'a Self::Item, &'a Self::Item, &'a Self::Item)> + ExactSizeIterator;
     /// The range should always be bounded.
     /// # Panics
     ///
     /// __Panics__ if range exceeds the underlying data boundaries.
     fn select(&self, range: Range<usize>) -> &Self;
-    fn into_pa_pair_iter(&'a self) -> Self::PairIter;
+    fn iter_phase_amps(&'a self) -> Self::IterOne;
+    fn iter_pa_pairs(&'a self) -> Self::IterPair;
+    fn iter_pa_triples(&'a self) -> Self::IterTriple;
+    fn iter_pa_quads(&'a self) -> Self::IterQuad;
 }
 
 impl PhaseAmpAccess for PhaseAmp {
@@ -97,60 +103,109 @@ impl PhaseAmpAccess for [f32] {
     fn set_amplitude(&mut self, amplitude: f32) { self[1] = amplitude; }
 }
 
-pub struct PhaseAmpsPairIterator<'a> {
-    iter: ChunksExact<'a, PhaseAmp>,
+macro_rules! reversed_tuple_args {
+    ([] $($reversed:expr),*) => (($($reversed),*));
+    ([$first:expr $(, $rest:expr)*] $($reversed:expr),*) => (reversed_tuple_args!([$($rest),*] $first $(,$reversed)*));
+    ($($t:expr),*) => (reversed_tuple_args!([ $($t),* ]));
 }
 
-impl<'a> ExactSizeIterator for PhaseAmpsPairIterator<'a> {
-    #[inline]
-    fn len(&self) -> usize { self.iter.len() }
-}
-
-impl<'a> Iterator for PhaseAmpsPairIterator<'a> {
-    type Item = (&'a PhaseAmp, &'a PhaseAmp);
-
-    #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.iter.next() {
-            Some(&[ref pa1, ref pa2]) => Some((pa1, pa2)),
-            _ => None,
+macro_rules! phase_amp_iterators_impl {
+    ([],($_t:ty): ($_v:ident)) => {};
+    ([$name:ident $(, $names:ident)*],($patype:ty $(, $patypes:ty)*): ($pavar:ident $(, $pavars:ident)*)) => {
+        phase_amp_iterators_impl!($name, ($patype $(,$patypes)*) : ($pavar $(,$pavars)*));
+        phase_amp_iterators_impl!{
+            [$($names),*], ($($patypes),*) : ($($pavars),*)
         }
-    }
-
-    #[inline]
-    fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
-}
-
-pub struct F32PaPairIterator<'a> {
-    iter: ChunksExact<'a, f32>,
-}
-
-impl<'a> ExactSizeIterator for F32PaPairIterator<'a> {
-    #[inline]
-    fn len(&self) -> usize { self.iter.len() }
-}
-
-impl<'a> Iterator for F32PaPairIterator<'a> {
-    type Item = (&'a [f32], &'a [f32]);
-
-    #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.iter.next() {
-            Some(ref chunk) => Some((&chunk[0..2], &chunk[2..4])),
-            _ => None,
+    };
+    ($name:ident,($patype:ty $(, $patypes:ty)*): ($($pavars:ident),*)) => {
+        pub struct $name<'a> {
+            iter: ChunksExact<'a, $patype>,
         }
-    }
 
-    #[inline]
-    fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
+        impl<'a> ExactSizeIterator for $name<'a> {
+            #[inline]
+            fn len(&self) -> usize { self.iter.len() }
+        }
+
+        impl<'a> Iterator for $name<'a> {
+            type Item = (&'a $patype $(,&'a $patypes)*);
+
+            #[inline]
+            fn next(&mut self) -> Option<Self::Item> {
+                match self.iter.next() {
+                    Some([$($pavars),*]) => Some(($($pavars),*)),
+                    _ => None,
+                }
+            }
+
+            #[inline]
+            fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
+        }
+
+    };
+}
+
+phase_amp_iterators_impl! {
+    [PhaseAmpsQuadIter, PhaseAmpsTripleIter, PhaseAmpsPairIter],
+    (PhaseAmp, PhaseAmp, PhaseAmp, PhaseAmp): (pa4, pa3, pa2, pa1)
+}
+
+macro_rules! f32pa_iterators_impl {
+    ([],(): ()) => {};
+    ([$name:ident $(, $names:ident)*],($patype:ty $(, $patypes:ty)*): ($pavar:expr $(, $pavars:expr)*)) => {
+        f32pa_iterators_impl!($name, ($patype $(,$patypes)*) : ($pavar $(,$pavars)*));
+        f32pa_iterators_impl!{
+            [$($names),*], ($($patypes),*) : ($($pavars),*)
+        }
+    };
+    ($name:ident,($patype:ty $(, $patypes:ty)*): ($($pavars:expr),*)) => {
+        pub struct $name<'a> {
+            iter: ChunksExact<'a, $patype>,
+        }
+
+        impl<'a> ExactSizeIterator for $name<'a> {
+            #[inline]
+            fn len(&self) -> usize { self.iter.len() }
+        }
+
+        impl<'a> Iterator for $name<'a> {
+            type Item = (&'a [$patype] $(,&'a [$patypes])*);
+
+            #[inline]
+            fn next(&mut self) -> Option<Self::Item> {
+                match self.iter.next() {
+                    Some(ref chunk) => Some(reversed_tuple_args!($(&chunk[$pavars]),*)),
+                    _ => None,
+                }
+            }
+
+            #[inline]
+            fn size_hint(&self) -> (usize, Option<usize>) { self.iter.size_hint() }
+        }
+
+    };
+}
+
+f32pa_iterators_impl! {
+    [F32PaQuadIter, F32PaTripleIter, F32PaPairIter, F32PaIter],
+    (f32, f32, f32, f32): (6..8, 4..6, 2..4, 0..2)
 }
 
 impl<'a> PhaseAmpsSelect<'a> for [PhaseAmp] {
     type Item = PhaseAmp;
-    type PairIter = PhaseAmpsPairIterator<'a>;
+    type IterOne = std::slice::Iter<'a, PhaseAmp>;
+    type IterPair = PhaseAmpsPairIter<'a>;
+    type IterTriple = PhaseAmpsTripleIter<'a>;
+    type IterQuad = PhaseAmpsQuadIter<'a>;
 
     #[inline]
-    fn into_pa_pair_iter(&'a self) -> Self::PairIter { PhaseAmpsPairIterator { iter: self.chunks_exact(2) } }
+    fn iter_phase_amps(&'a self) -> Self::IterOne { self.iter() }
+    #[inline]
+    fn iter_pa_pairs(&'a self) -> Self::IterPair { PhaseAmpsPairIter { iter: self.chunks_exact(2) } }
+    #[inline]
+    fn iter_pa_triples(&'a self) -> Self::IterTriple { PhaseAmpsTripleIter { iter: self.chunks_exact(3) } }
+    #[inline]
+    fn iter_pa_quads(&'a self) -> Self::IterQuad { PhaseAmpsQuadIter { iter: self.chunks_exact(4) } }
 
     #[inline]
     fn select(&self, range: Range<usize>) -> &[PhaseAmp] { &self[range] }
@@ -158,10 +213,19 @@ impl<'a> PhaseAmpsSelect<'a> for [PhaseAmp] {
 
 impl<'a> PhaseAmpsSelect<'a> for [f32] {
     type Item = [f32];
-    type PairIter = F32PaPairIterator<'a>;
+    type IterOne = F32PaIter<'a>;
+    type IterPair = F32PaPairIter<'a>;
+    type IterTriple = F32PaTripleIter<'a>;
+    type IterQuad = F32PaQuadIter<'a>;
 
     #[inline]
-    fn into_pa_pair_iter(&'a self) -> Self::PairIter { F32PaPairIterator { iter: self.chunks_exact(4) } }
+    fn iter_phase_amps(&'a self) -> Self::IterOne { F32PaIter { iter: self.chunks_exact(2) } }
+    #[inline]
+    fn iter_pa_pairs(&'a self) -> Self::IterPair { F32PaPairIter { iter: self.chunks_exact(4) } }
+    #[inline]
+    fn iter_pa_triples(&'a self) -> Self::IterTriple { F32PaTripleIter { iter: self.chunks_exact(6) } }
+    #[inline]
+    fn iter_pa_quads(&'a self) -> Self::IterQuad { F32PaQuadIter { iter: self.chunks_exact(8) } }
 
     #[inline]
     fn select(&self, range: Range<usize>) -> &[f32] { &self[range.start * 2..range.end * 2] }
@@ -277,3 +341,60 @@ impl PhaseAmp {
 
 #[inline]
 fn transform(val: f32) -> f32 { (PI05 * val).sin().powi(4) }
+
+#[cfg(test)]
+mod tests {
+    use crate::phase_amp::*;
+
+    #[test]
+    fn it_works() {
+        let pa = [PhaseAmp { phase: 1.0, amplitude: 1.5, ..Default::default() },
+                  PhaseAmp { phase: 2.0, amplitude: 2.5, ..Default::default() },
+                  PhaseAmp { phase: 3.0, amplitude: 3.5, ..Default::default() },
+                  PhaseAmp { phase: 4.0, amplitude: 4.5, ..Default::default() },
+                  PhaseAmp { phase: 5.0, amplitude: 5.5, ..Default::default() },
+                  PhaseAmp { phase: 6.0, amplitude: 6.5, ..Default::default() }];
+
+        test_iterators(pa.as_ref());
+
+        let mut paexp: Vec<f32> = Vec::new();
+        pa.export_phase_amps(&mut paexp);
+
+        assert_eq!(paexp, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5]);
+
+        test_iterators(paexp.as_slice());
+
+        let mut pa: [PhaseAmp; 6] = Default::default();
+        pa.import_phase_amps(paexp.as_slice());
+
+        test_iterators(pa.as_ref());
+
+        fn test_iterators<'a, P: PhaseAmpsSelect<'a> + ?Sized>(pa: &'a P) {
+            let res: Vec<(f32, f32)> = pa.iter_phase_amps().map(|pa| (pa.amplitude(), pa.phase())).collect();
+            assert_eq!(res, [(1.5, 1.0), (2.5, 2.0), (3.5, 3.0), (4.5, 4.0), (5.5, 5.0), (6.5, 6.0)]);
+            let res: Vec<(f32, f32, f32, f32)> =
+                pa.iter_pa_pairs().map(|(pa1, pa2)| (pa1.amplitude(), pa1.phase(), pa2.amplitude(), pa2.phase())).collect();
+            assert_eq!(res, [(1.5, 1.0, 2.5, 2.0), (3.5, 3.0, 4.5, 4.0), (5.5, 5.0, 6.5, 6.0)]);
+            let res: Vec<(f32, f32, f32, f32, f32, f32)> =
+                pa.iter_pa_triples()
+                  .map(|(pa1, pa2, pa3)| {
+                      (pa1.amplitude(), pa1.phase(), pa2.amplitude(), pa2.phase(), pa3.amplitude(), pa3.phase())
+                  })
+                  .collect();
+            assert_eq!(res, [(1.5, 1.0, 2.5, 2.0, 3.5, 3.0), (4.5, 4.0, 5.5, 5.0, 6.5, 6.0)]);
+            let res: Vec<(f32, f32, f32, f32, f32, f32, f32, f32)> = pa.iter_pa_quads()
+                                                                       .map(|(pa1, pa2, pa3, pa4)| {
+                                                                           (pa1.amplitude(),
+                                                                            pa1.phase(),
+                                                                            pa2.amplitude(),
+                                                                            pa2.phase(),
+                                                                            pa3.amplitude(),
+                                                                            pa3.phase(),
+                                                                            pa4.amplitude(),
+                                                                            pa4.phase())
+                                                                       })
+                                                                       .collect();
+            assert_eq!(res, [(1.5, 1.0, 2.5, 2.0, 3.5, 3.0, 4.5, 4.0)]);
+        }
+    }
+}

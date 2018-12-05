@@ -28,6 +28,7 @@
 // #![allow(unused_variables)]
 // #![allow(unused_imports)]
 // #![allow(dead_code)]
+// #![feature(trace_macros)]
 #[cfg(all(not(any(target_arch = "x86", target_arch = "x86_64")), feature = "use-simd"))]
 compile_error!("Currently use-simd feature requires x86 or x86_64 target architecture.");
 

@@ -24,7 +24,7 @@ pub struct PlasmaLineCalc {
 
 /// Provides a default implementation of an iterator of [PlasmaLineCalc].
 pub struct PlasmaMixIter<'a, P: PhaseAmpsSelect<'a> + ?Sized> {
-    pa_pair_iter: <P as PhaseAmpsSelect<'a>>::PairIter,
+    pa_pair_iter: <P as PhaseAmpsSelect<'a>>::IterPair,
 }
 
 /// Provides a default implementation of a [IntermediateCalculatorProducer].
@@ -63,11 +63,9 @@ impl<'a, P> IntermediateCalculatorProducer<'a, P, Flt> for PlasmaInterCalcProduc
     type LineCalcH = PlasmaLineCalc;
     type LineCalcV = PlasmaLineCalc;
 
-    fn compose_h_iter(pa: &'a P) -> Self::CalcIterH { PlasmaMixIter { pa_pair_iter: pa.select(0..12).into_pa_pair_iter() } }
+    fn compose_h_iter(pa: &'a P) -> Self::CalcIterH { PlasmaMixIter { pa_pair_iter: pa.select(0..12).iter_pa_pairs() } }
 
-    fn compose_v_iter(pa: &'a P) -> Self::CalcIterV {
-        PlasmaMixIter { pa_pair_iter: pa.select(12..24).into_pa_pair_iter() }
-    }
+    fn compose_v_iter(pa: &'a P) -> Self::CalcIterV { PlasmaMixIter { pa_pair_iter: pa.select(12..24).iter_pa_pairs() } }
 }
 
 impl Mixer<Flt> for PlasmaMixer {

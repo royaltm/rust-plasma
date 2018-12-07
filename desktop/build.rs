@@ -4,7 +4,7 @@ use std::{env, path::PathBuf};
 extern crate winres;
 
 #[cfg(windows)]
-const SDL2_WINDOWS_DIR: &'static str = "sdl-2.0.8-windows";
+const SDL2_WINDOWS_DIR: &'static str = "sdl-2.0.9-windows";
 
 fn main() {
     #[cfg(windows)]

@@ -18,7 +18,9 @@ onmessage = (event) => {
         if (imageData.data.byteLength === 0) {
             imageData = plasma.imageData();
         }
-        createImageBitmap(imageData).then(imageBitmap => {
+        // A workaround for Chrome/Opera. Since version 70 it can't create image bitmaps from memory shared with wasm.
+        let img = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width , imageData.height);
+        createImageBitmap(img).then(imageBitmap => {
             worker.postMessage(imageBitmap, [imageBitmap]);
         }, (err: any) => {
             console.error(err);

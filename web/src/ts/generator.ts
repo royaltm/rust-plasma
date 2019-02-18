@@ -190,6 +190,8 @@ export class PlasmaGenerator extends EventTarget implements BitmapGenerator {
             if (imageData.data.byteLength === 0) {
                 imageData = this.imageData = plasma.imageData();
             }
+            // A workaround for Chrome/Opera. Since version 70 it can't create image bitmaps from memory shared with wasm.
+            imageData = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width , imageData.height);
             createImageBitmap(imageData).then(bitmap => {
                 let { width, height } = bitmap;
                 let detail: BitmapDetail = {x: 0, y: 0, width, height, bitmap};

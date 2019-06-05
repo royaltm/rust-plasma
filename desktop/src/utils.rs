@@ -2,17 +2,17 @@
 use std::{borrow::Cow, error::Error, ptr, rc::Rc};
 
 use sdl2::{get_error,
-           messagebox::{show_simple_message_box, MESSAGEBOX_ERROR, MESSAGEBOX_INFORMATION},
+           messagebox::{ show_simple_message_box, MessageBoxFlag },
            video::{Window, WindowContext},
            VideoSubsystem};
 use sdl2_sys::SDL_Window;
 
 pub fn alert(text: Cow<str>) {
-    show_simple_message_box(MESSAGEBOX_ERROR, "Plasma", &text, None).expect("to show message box");
+    show_simple_message_box(MessageBoxFlag::ERROR, "Plasma", &text, None).expect("to show message box");
 }
 
 pub fn info(text: Cow<str>) {
-    show_simple_message_box(MESSAGEBOX_INFORMATION, "Plasma", &text, None).expect("to show message box");
+    show_simple_message_box(MessageBoxFlag::INFORMATION, "Plasma", &text, None).expect("to show message box");
 }
 
 #[cfg(not(windows))]

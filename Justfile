@@ -1,5 +1,5 @@
-ghp_branch='gh-pages'
-index_redirect_html='<html><head><meta http-equiv="refresh" content="0; url=plasma/index.html"></head><body><a href="plasma/index.html">Redirect</a></body></html>'
+ghp_branch:='gh-pages'
+index_redirect_html:='<html><head><meta http-equiv="refresh" content="0; url=plasma/index.html"></head><body><a href="plasma/index.html">Redirect</a></body></html>'
 
 # Checkout github pages branch into ghp directory
 co-ghp:

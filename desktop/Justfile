@@ -1,7 +1,7 @@
-name = 'plasma-demo.exe'
-target_dir = '../target/release/'
-rustflags = env_var_or_default('RUSTFLAGS', "")
-features = env_var_or_default('FEATURES', "")
+name := 'plasma-demo.exe'
+target_dir := '../target/release/'
+rustflags := env_var_or_default('RUSTFLAGS', "")
+features := env_var_or_default('FEATURES', "")
 
 
 clean:

@@ -1,7 +1,7 @@
-name = 'plasma_web'
-target_dir = 'target/wasm32-unknown-unknown/release/'
-features = env_var_or_default('FEATURES', "")
-node_env = env_var_or_default('NODE_ENV', "production")
+name := 'plasma_web'
+target_dir := 'target/wasm32-unknown-unknown/release/'
+features := env_var_or_default('FEATURES', "")
+node_env := env_var_or_default('NODE_ENV', "production")
 
 # build and optimize wasm files
 all: wasm opt

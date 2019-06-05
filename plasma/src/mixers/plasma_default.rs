@@ -73,7 +73,7 @@ impl Mixer<Flt> for PlasmaMixer {
     type IntermediateV = [Flt; 6];
 
     #[inline]
-    fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut FnMut(PixelRgb)) {
+    fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut dyn FnMut(PixelRgb)) {
         let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
         let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
         let sat0 = compose4(vxp[4], vxp[5], vyp[4], vyp[5]);

@@ -27,7 +27,7 @@ build:
 
 # take only what we need and create some polyfills in js
 bindgen:
-    wasm-bindgen --typescript --remove-name-section --out-dir . ../{{target_dir}}{{name}}.wasm
+    wasm-bindgen --typescript --remove-name-section --remove-producers-section --out-dir . ../{{target_dir}}{{name}}.wasm
 
 # make the binary *even smaller* if you installed `wasm-opt`
 opt:

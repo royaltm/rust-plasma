@@ -1,7 +1,7 @@
 Plasma
 ======
 
-Eye-candy pixels twisted by sinuses: http://yeondir.com/plasma-demo/
+Eye-candy pixels twisted by sinuses: https://yeondir.com/plasma-demo/
 
 ![plasma](plasma.jpg "Plasma-demo")
 

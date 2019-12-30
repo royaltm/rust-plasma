@@ -167,7 +167,7 @@ macro_rules! f32pa_iterators_impl {
             #[inline]
             fn len(&self) -> usize { self.iter.len() }
         }
-
+        #[allow(unused_parens)]
         impl<'a> Iterator for $name<'a> {
             type Item = (&'a [$patype] $(,&'a [$patypes])*);
 
@@ -330,7 +330,7 @@ impl PhaseAmp {
         self.transition_amplitude += self.step_amplitude;
         self.amplitude = self.source_amplitude + transform(self.transition_amplitude) * self.delta_amplitude;
         if self.transition_amplitude > 1.0 - EPSILON {
-            self.source_amplitude = self.source_amplitude + transform(1.0) * self.delta_amplitude;;
+            self.source_amplitude = self.source_amplitude + transform(1.0) * self.delta_amplitude;
             let target_amplitude = rng.gen_range(0.0, 1.0);
             self.delta_amplitude = target_amplitude - self.source_amplitude;
             self.step_amplitude = rng.gen_range(cfg.min_steps(), cfg.max_steps()).recip();

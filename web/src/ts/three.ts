@@ -2,6 +2,7 @@
  * @module plasma
  */
  /**/
+import { Texture } from "three";
 import { BitmapDetail } from './generator';
 import { BaseRenderer } from './renderer';
 
@@ -22,14 +23,14 @@ declare class OffscreenCanvas {
  */
 export class TextureRenderer extends BaseRenderer {
     /** The target Texture. */
-    target: THREE.Texture;
+    target: Texture;
     protected bitmap: ImageBitmap;
     protected canvas: OffscreenCanvas;
     protected ctx: CanvasRenderingContext2D;
    /**
     * Creates a new Texture renderer instance.
     */
-    constructor(target: THREE.Texture) {
+    constructor(target: Texture) {
         super();
         this.target = target;
         this.bitmap = null;

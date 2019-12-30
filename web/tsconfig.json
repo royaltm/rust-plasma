@@ -3,8 +3,8 @@
         "alwaysStrict": true,
         "sourceMap": true,
         "lib": [
-          "es2015",
-          "dom"
+            "es2015",
+            "dom"
         ],
         "listEmittedFiles": true,
         "listFiles": false,
@@ -12,6 +12,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "suppressImplicitAnyIndexErrors": true,
+        "moduleResolution": "node",
         "module": "esNext",
         "target": "es6"
     },

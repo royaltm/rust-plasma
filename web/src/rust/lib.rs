@@ -39,15 +39,15 @@ pub struct PlasmaHandle {
 #[wasm_bindgen]
 impl PlasmaHandle {
     #[wasm_bindgen(constructor)]
-    pub fn constructor(width: u32, height: u32, min_steps: f32, max_steps: f32) -> Result<PlasmaHandle, JsValue> {
-        if min_steps <= 1.0 {
+    pub fn constructor(width: u32, height: u32, min_steps: u32, max_steps: u32) -> Result<PlasmaHandle, JsValue> {
+        if min_steps <= 1 {
             return Err(js_sys::Error::new("steps should be larger than 1").into());
         }
         if max_steps <= min_steps {
             return Err(js_sys::Error::new("max steps should be larger than min steps").into());
         }
         let mut rng = OsRng::new().map_err(|e| js_sys::Error::new(e.msg))?;
-        let cfg = PhaseAmpCfg::new(min_steps, max_steps);
+        let cfg = PhaseAmpCfg::new(min_steps as f32, max_steps as f32);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
         let data = vec![0; width as usize * height as usize * PixelBufRGBA8::PIXEL_BYTES];
         let wrkspc = Vec::new();

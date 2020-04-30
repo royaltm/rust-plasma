@@ -28,7 +28,7 @@ module.exports = [{
   plugins: [
     prod && new CleanWebpackPlugin(),
     // new AssetsPlugin({fullPath: false}),
-  ],
+  ].filter(Boolean),
   target: "webworker",
   mode: prod ? 'production' : 'development'
 },
@@ -68,7 +68,7 @@ module.exports = [{
     //   TextDecoder: ['text-encoding', 'TextDecoder'],
     //   TextEncoder: ['text-encoding', 'TextEncoder']
     // })
-  ].filter(Boolean),
+  ],
   target: "web",
   mode: prod ? 'production' : 'development'
 }];

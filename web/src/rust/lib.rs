@@ -46,7 +46,7 @@ impl PlasmaHandle {
         if max_steps <= min_steps {
             return Err(js_sys::Error::new("max steps should be larger than min steps").into());
         }
-        let mut rng = OsRng::new().map_err(|e| js_sys::Error::new(e.msg))?;
+        let mut rng = OsRng;
         let cfg = PhaseAmpCfg::new(min_steps as f32, max_steps as f32);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
         let data = vec![0; width as usize * height as usize * PixelBufRGBA8::PIXEL_BYTES];

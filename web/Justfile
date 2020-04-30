@@ -23,7 +23,7 @@ wasm: build bindgen
 
 # build wasm files
 build:
-    cargo +nightly build --lib --release --package plasma-web --features={{features}}
+    cargo build --lib --release --package plasma-web --features={{features}}
 
 # take only what we need and create some polyfills in js
 bindgen:

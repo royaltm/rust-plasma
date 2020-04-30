@@ -27,15 +27,18 @@ use-sleef = ["use-simd", "packed_simd/sleef-sys"]
 use-simd = ["packed_simd"]
 
 [dependencies]
-lazy_static = "^1.2"
 cfg-if = "^0.1"
-derive_more = "^0.13"
+derive_more = "^0.99"
 
 [dependencies.packed_simd]
-version = "^0.3.1"
+version = "^0.3.3"
 optional = true
 features = [] # "sleef-sys", "coresimd"
 
 [dependencies.rand]
-version = "^0.6"
+version = "^0.7"
 default-features = false
+
+[dev-dependencies.rand]
+version = "^0.7"
+default-features = true

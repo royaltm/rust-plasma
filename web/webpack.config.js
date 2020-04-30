@@ -2,7 +2,7 @@ const prod = process.env.NODE_ENV === 'production'
 const path = require('path');
 const webpack = require('webpack');
 // const AssetsPlugin = require('assets-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const dist = path.resolve(__dirname, "dist");
 const favicon = path.resolve(__dirname, "..", "desktop", "plasma.ico");
@@ -57,7 +57,7 @@ module.exports = [{
     new webpack.DefinePlugin({
       _WORKER_PATH_LOCATION_: JSON.stringify("worker.js"),
     }),
-    prod && new CleanWebpackPlugin([dist]),
+    prod && new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       favicon: favicon,
       template: path.resolve(__dirname, "./src/index.html")

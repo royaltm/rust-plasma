@@ -2,7 +2,7 @@ const prod = process.env.NODE_ENV === 'production'
 const path = require('path');
 const webpack = require('webpack');
 // const AssetsPlugin = require('assets-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+// const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const dist = path.resolve(__dirname, "dist");
 const favicon = path.resolve(__dirname, "..", "desktop", "plasma.ico");
@@ -26,7 +26,7 @@ module.exports = [{
     extensions: [ '.ts', '.js', '.wasm' ]
   },
   plugins: [
-    prod && new CleanWebpackPlugin(),
+    // prod && new CleanWebpackPlugin(),
     // new AssetsPlugin({fullPath: false}),
   ].filter(Boolean),
   target: "webworker",

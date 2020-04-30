@@ -26,6 +26,7 @@ module.exports = [{
     extensions: [ '.ts', '.js', '.wasm' ]
   },
   plugins: [
+    prod && new CleanWebpackPlugin(),
     // new AssetsPlugin({fullPath: false}),
   ],
   target: "webworker",
@@ -57,7 +58,6 @@ module.exports = [{
     new webpack.DefinePlugin({
       _WORKER_PATH_LOCATION_: JSON.stringify("worker.js"),
     }),
-    prod && new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       favicon: favicon,
       template: path.resolve(__dirname, "./src/index.html")

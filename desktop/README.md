@@ -51,14 +51,14 @@ From MSYS2 console, for a `x86_64` toolchain type:
 
 ```sh
 cd plasma/desktop
-RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.8-windows/x86_64/gnu-mingw" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.12-windows/x86_64/gnu-mingw" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
 ```
 
 and for a `i686` toolchain type:
 
 ```sh
 cd plasma/desktop
-RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.8-windows/i686/gnu-mingw" cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.12-windows/i686/gnu-mingw" cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
 ```
 
 

@@ -10,7 +10,7 @@ How to implement
 
 ```toml
 [dependencies]
-rand = "0.6.0-pre.1"
+rand = "0.7"
 
 [dependencies.plasma]
 git = "https://github.com/royaltm/rust-plasma.git"

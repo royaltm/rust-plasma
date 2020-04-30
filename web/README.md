@@ -7,8 +7,8 @@ This is a demo of how to run plasma with webassembly. See [TypeScript API docs](
 Prerequisites
 -------------
 
-1. `rustup target add wasm32-unknown-unknown --toolchain nightly`
-2. `cargo +nightly install wasm-bindgen-cli`
+1. `rustup target add wasm32-unknown-unknown`
+2. `cargo install wasm-bindgen-cli`
 3. `cargo install just`
 4. optionally get `wasm-opt` from https://github.com/WebAssembly/binaryen
 5. `npm` and `nodejs` from https://nodejs.org/

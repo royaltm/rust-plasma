@@ -10,7 +10,7 @@ publish = false
 readme = "README.md"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 path = "src/rust/lib.rs"
 
 [dependencies]

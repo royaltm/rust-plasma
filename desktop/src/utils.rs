@@ -8,11 +8,13 @@ use sdl2::{get_error,
 use sdl2_sys::SDL_Window;
 
 pub fn alert(text: Cow<str>) {
-    show_simple_message_box(MessageBoxFlag::ERROR, "Plasma", &text, None).expect("to show message box");
+    show_simple_message_box(MessageBoxFlag::ERROR, "Plasma", &text, None)
+    .unwrap_or_else(|_| eprintln!("{}", text));
 }
 
 pub fn info(text: Cow<str>) {
-    show_simple_message_box(MessageBoxFlag::INFORMATION, "Plasma", &text, None).expect("to show message box");
+    show_simple_message_box(MessageBoxFlag::INFORMATION, "Plasma", &text, None)
+    .unwrap_or_else(|_| println!("{}", text));
 }
 
 #[cfg(not(windows))]

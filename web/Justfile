@@ -31,7 +31,7 @@ bindgen:
 
 # make the binary *even smaller* if you installed `wasm-opt`
 opt:
-    wasm-opt -O3 {{name}}_bg.wasm -o {{name}}_bg.wasm
+    wasm-opt -O4 {{name}}_bg.wasm -o {{name}}_bg.wasm
 
 # clean cargo build
 clean:

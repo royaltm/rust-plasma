@@ -7,4 +7,5 @@ plasma_web.js
 plasma_web.d.ts
 plasma_web_bg.js
 plasma_web_bg.d.ts
+plasma_web_bg.wasm.d.ts
 /doc

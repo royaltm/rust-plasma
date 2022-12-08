@@ -40,4 +40,4 @@ If you have a `wasm-opt` installed, try:
 just wasm opt webpack
 ```
 
-Which will result in a optimal wasm file.
+Which will result in an optimized wasm file.

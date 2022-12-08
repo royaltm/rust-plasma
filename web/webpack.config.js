@@ -7,23 +7,35 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const dist = path.resolve(__dirname, "dist");
 const favicon = path.resolve(__dirname, "..", "desktop", "plasma.ico");
 module.exports = [{
+  context: path.join(__dirname, "."),
   entry: "./src/ts/worker_loader.ts",
   output: {
     path: dist,
     filename: "worker.js",
   },
+  experiments: {
+      asyncWebAssembly: true
+  },
   devtool: !prod && 'inline-source-map',
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
+        test: /\.([cm]?ts|tsx)$/,
+        loader: "ts-loader",
         exclude: /node_modules/
       }
     ]
   },
   resolve: {
-    extensions: [ '.ts', '.js', '.wasm' ]
+    // Add `.ts` and `.tsx` as a resolvable extension.
+    extensions: [".ts", ".tsx", ".js", ".wasm"],
+    // Add support for TypeScripts fully qualified ESM imports.
+    extensionAlias: {
+     ".js": [".js", ".ts"],
+     ".cjs": [".cjs", ".cts"],
+     ".mjs": [".mjs", ".mts"]
+    }
   },
   plugins: [
     // prod && new CleanWebpackPlugin(),
@@ -33,6 +45,7 @@ module.exports = [{
   mode: prod ? 'production' : 'development'
 },
 {
+  context: path.join(__dirname, "."),
   entry: "./src/ts/plasma_loader.ts",
   output: {
     path: dist,
@@ -41,18 +54,29 @@ module.exports = [{
     libraryExport: "default",
     library: "plasmaLoader"
   },
+  experiments: {
+      asyncWebAssembly: true
+  },
   devtool: !prod && 'inline-source-map',
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
+        test: /\.([cm]?ts|tsx)$/,
+        loader: "ts-loader",
         exclude: /node_modules/
       }
     ]
   },
   resolve: {
-    extensions: [ '.ts', '.js', '.wasm' ]
+    // Add `.ts` and `.tsx` as a resolvable extension.
+    extensions: [".ts", ".tsx", ".js", ".wasm"],
+    // Add support for TypeScripts fully qualified ESM imports.
+    extensionAlias: {
+     ".js": [".js", ".ts"],
+     ".cjs": [".cjs", ".cts"],
+     ".mjs": [".mjs", ".mts"]
+    }
   },
   plugins: [
     new webpack.DefinePlugin({

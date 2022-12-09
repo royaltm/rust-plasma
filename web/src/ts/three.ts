@@ -2,35 +2,24 @@
  * @module plasma
  */
  /**/
-import { Texture } from "three";
+import * as THREE from "three";
 import { BitmapDetail } from './generator';
 import { BaseRenderer } from './renderer';
-
-// missing from typescript dom declarations
-declare class OffscreenCanvas {
-    height: number;
-    width: number;
-    constructor(width: number, height: number);
-    getContext(contextType: "2d"|"bitmaprenderer", contextAttributes?: {alpha: boolean}): CanvasRenderingContext2D|ImageBitmapRenderingContext;
-    toBlob(type: string, encoderOptions?: number): Promise<Blob>;
-    transferToImageBitmap(): ImageBitmap;
-}
-
 /**
- * A renderer for a [[THREE.Texture]].
+ * A renderer for a {@link three!Texture | THREE.Texture}.
  *
- * Attach an instance of a [[BitmapGenerator]] with a [[TextureRenderer.attach]] method.
+ * Attach an instance of a {@link BitmapGenerator} with a {@link TextureRenderer.attach} method.
  */
 export class TextureRenderer extends BaseRenderer {
     /** The target Texture. */
-    target: Texture;
+    target: THREE.Texture;
     protected bitmap: ImageBitmap;
     protected canvas: OffscreenCanvas;
-    protected ctx: CanvasRenderingContext2D;
+    protected ctx: OffscreenCanvasRenderingContext2D;
    /**
     * Creates a new Texture renderer instance.
     */
-    constructor(target: Texture) {
+    constructor(target: THREE.Texture) {
         super();
         this.target = target;
         this.bitmap = null;
@@ -71,7 +60,7 @@ export class TextureRenderer extends BaseRenderer {
                 let { canvas, ctx } = this;
                 if (canvas == null || canvas.width !== width || canvas.height !== height) {
                     canvas = this.canvas = new OffscreenCanvas(width, height);
-                    ctx = this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+                    ctx = this.ctx = canvas.getContext("2d");// as CanvasRenderingContext2D;
                 }
                 ctx.drawImage(bitmap, x, y);
                 bitmap.close();

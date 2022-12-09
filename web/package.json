@@ -17,6 +17,7 @@
     "serve": "webpack-dev-server --open"
   },
   "devDependencies": {
+    "@types/offscreencanvas": "^2019.7.0",
     "@types/three": "^0.146.0",
     "html-webpack-plugin": "^5.5.0",
     "three": "^0.147.0",

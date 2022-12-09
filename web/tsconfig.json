@@ -21,20 +21,46 @@
         "*.d.ts"
     ],
     "exclude": [],
+    "typeRoots": ["./node_modules/@types"],
     "typedocOptions": {
-        "excludeExternals": true,
-        "excludeNotExported": false,
-        "externalPattern": "**/*node*",
-        "exclude": ["**/src/ts/+(*_loader|worker).ts"],
-        "ignoreCompilerErrors": true,
-        "includeDeclarations": true,
-        "mode": "modules",
-        "module": "commonjs",
-        "name": "plasma-web",
+        "entryPointStrategy": "expand",
+        "entryPoints": [
+            "./src/ts/plasma.ts",
+            "./plasma_web.d.ts",
+            "./plasma_web_bg.wasm.d.ts"
+        ],
+        "externalPattern": [],
         "out": "doc",
+        "exclude": ["./src/ts/+(*_loader|worker).ts"],
+        "externalPattern": "**/*node*",
+        "excludeExternals": true,
+        "excludePrivate": true,
+        "excludeProtected": false,
+        "excludeNotDocumented": false,
+        "name": "plasma-web",
+        "titleLink": "https://royaltm.github.io/rust-plasma/master/ts/index.html",
         "readme": "README.me",
-        "target": "ES5",
         "theme": "default",
-        "sourcefile-url-prefix": "https://github.com/royaltm/rust-plasma/blob/master/web/"
+        "darkHighlightTheme": "dark-plus",
+        "hideGenerator": true,
+        "githubPages": false,
+        "treatWarningsAsErrors": false,
+        "gitRevision": "master",
+        "sourceLinkTemplate": "https://github.com/royaltm/rust-plasma/blob/{gitRevision}/{path}#L{line}",
+        "disableSources": false,
+        "navigationLinks": {
+            "Home": "https://royaltm.github.io/rust-plasma/",
+            "GitHub": "https://github.com/royaltm/rust-plasma"
+        },
+        "externalSymbolLinkMappings": {
+            // used by `class X extends Texture {}`
+            "@types/three": {
+                "Texture": "https://threejs.org/docs/index.html#api/en/textures/Texture"
+            },
+            // used by {@link three!Texture}
+            "three": {
+                "Texture": "https://threejs.org/docs/index.html#api/en/textures/Texture"
+            }
+        }
     }
 }

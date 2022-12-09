@@ -5,7 +5,7 @@
 import { BitmapDetail } from './generator';
 import { BaseRenderer } from './renderer';
 
-/** Options passed to a [[CanvasRenderer]] constructor. */
+/** Options passed to a {@link CanvasRenderer} constructor. */
 export interface CanvasRendererOptions {
     /** Target pixel width of the rendered image. */
     width?: number,
@@ -21,7 +21,7 @@ export const DefaultCanvasRendererOptions: CanvasRendererOptions = {
 /**
  * A renderer for a HTMLCanvasElement.
  *
- * Attach an instance of a [[BitmapGenerator]] with a [[CanvasRenderer.attach]] method.
+ * Attach an instance of a {@link BitmapGenerator} with a {@link CanvasRenderer.attach} method.
  */
 export class CanvasRenderer extends BaseRenderer implements CanvasRendererOptions {
     /** Target image width in pixels. */

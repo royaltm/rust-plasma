@@ -4,7 +4,7 @@
  /**/
  import { PlasmaHandle } from '../../plasma_web';
 
- /** Options passed to a [[PlasmaGenerator]] constructor. */
+ /** Options passed to a {@link PlasmaGenerator} constructor. */
  export interface PlasmaGeneratorOptions {
     /**
      *  A least possible count of radnom animation steps between phase and amplitude transitions.
@@ -70,7 +70,7 @@ interface WorkerPlasmaSetup {
  *
  *  Add an event listener to listen to a "ready" and a "bitmap" events.
  * 
- *  May be attached to a [[CanvasRenderer]].
+ *  May be attached to a {@link CanvasRenderer}.
  */
 export interface BitmapGenerator extends EventTarget {
     /** Readiness of the generator to render the next frame. */
@@ -79,7 +79,7 @@ export interface BitmapGenerator extends EventTarget {
      *  Requests the next bitmap rendition.
      *
      *  A "bitmap" custom event with a property `detail`
-     *  of the [[BitmapDetail]] type is being emitted.
+     *  of the {@link BitmapDetail} type is being emitted.
      *
      *  There may be more than one event per single rendition
      *  if the data comes from multiple workers.

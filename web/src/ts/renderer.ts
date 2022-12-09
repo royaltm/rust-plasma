@@ -7,9 +7,9 @@ import { BitmapGenerator } from './generator';
 /**
  *  A base renderer class.
  *
- *  Attach an instance of a [[BitmapGenerator]] with a [[BaseRenderer.attach]] method.
+ *  Attach an instance of a {@link BitmapGenerator} with a {@link BaseRenderer.attach} method.
  *
- *  Implementors must provide [[BaseRenderer.readyHandler]] and [[BaseRenderer.bitmapHandler]] as
+ *  Implementors must provide {@link BaseRenderer.readyHandler} and {@link BaseRenderer.bitmapHandler} as
  *  methods bound to this instance.
  */
 export abstract class BaseRenderer {

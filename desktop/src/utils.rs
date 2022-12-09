@@ -1,10 +1,14 @@
-#![allow(unused_macros)]
+#![allow(unused_macros,unused_imports)]
 use std::{borrow::Cow, error::Error, ptr, rc::Rc};
 
-use sdl2::{get_error,
-           messagebox::{ show_simple_message_box, MessageBoxFlag },
+use sdl2::{messagebox::{ show_simple_message_box, MessageBoxFlag },
            video::{Window, WindowContext},
            VideoSubsystem};
+
+#[cfg(windows)]
+use sdl2::get_error;
+
+#[cfg(windows)]
 use sdl2_sys::SDL_Window;
 
 pub fn alert(text: Cow<str>) {
@@ -39,6 +43,7 @@ pub fn set_dpi_awareness() -> Result<(), String> {
     }
 }
 
+#[allow(unused_variables)]
 pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result<(Window, Rc<WindowContext>), String> {
     #[cfg(windows)]
     {
@@ -61,6 +66,7 @@ pub fn create_preview_window(vs: &VideoSubsystem, parent_handle: &str) -> Result
     }
 }
 
+#[allow(unused_variables)]
 pub fn create_wallpaper_window(vs: &VideoSubsystem) -> Result<Window, String> {
     #[cfg(windows)]
     {

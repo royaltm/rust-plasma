@@ -132,7 +132,7 @@ cargo build --release
 Features
 --------
 
-* `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86` or `x86_64` architectures.
+* `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86`, `x86_64` or `aarch64` architectures.
 * `bundled` - compile a bundled SDL2 library.
 * `static-link` - compile with a static SDL2 library. Not available with "msvc" toolchain.
 * `use-pkgconfig` - search for SDL2 library in the system using pkgconfig.

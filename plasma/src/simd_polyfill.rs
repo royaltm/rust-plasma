@@ -75,6 +75,54 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         }
     }}
 }
+else if #[cfg(all(target_arch = "aarch64", feature = "use-simd"))] {
+    use packed_simd::{m32x4, u32x4, f32x4};
+    use core::ops::Sub;
+
+    #[allow(non_camel_case_types)]
+    pub type m32s = m32x4;
+    #[allow(non_camel_case_types)]
+    pub type u32s = u32x4;
+    #[allow(non_camel_case_types)]
+    pub type f32s = f32x4;
+    #[allow(non_camel_case_types)]
+    pub type f32tuple = [f32;f32s::lanes()];
+
+    pub type Flt = f32s;
+    pub const LANES: usize = f32s::lanes();
+    #[inline]
+    pub const fn splat(v: f32) -> Flt { Flt::splat(v) }
+
+    macro_rules! simd_new_consecutive {
+        ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3));
+    }
+    /* floor SIMD */
+    cfg_if! {if #[cfg(target_feature = "neon")] {
+        use std::mem::transmute;
+        #[inline]
+        pub fn floor(val: f32x4) -> f32x4 {
+            unsafe {
+                transmute(core::arch::aarch64::vrndnq_f32(transmute(val.sub(splat(0.5)))))
+            }
+        }
+    }
+    else {
+        #[inline]
+        pub fn floor(val: f32x4) -> f32x4 {
+            unsafe {
+                union U {
+                    vec: f32x4,
+                    scalars: [f32; 4]
+                }
+                let mut scalars = U { vec: val }.scalars;
+                for i in &mut scalars {
+                    *i = (*i).floor();
+                }
+                U { scalars }.vec
+            }
+        }
+    }}
+}
 else {
     /// All the intermediate calculations are performed on this type.
     pub type Flt = f32;

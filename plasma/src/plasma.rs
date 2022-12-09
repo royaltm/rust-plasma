@@ -186,7 +186,7 @@ pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, p
     }
 }
 
-cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
+cfg_if! {if #[cfg(feature = "use-simd")] {
     use std::borrow::Borrow;
     use packed_simd::Cast;
 

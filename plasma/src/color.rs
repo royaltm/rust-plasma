@@ -61,7 +61,7 @@ macro_rules! define_pixel_rgb {
     };
 }
 
-cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
+cfg_if! {if #[cfg(feature = "use-simd")] {
     use std::ops::Not;
     use crate::simd_polyfill::*;
 
@@ -281,7 +281,7 @@ mod tests {
                    PixelRgb::from_hsv(splat(1.5), splat(1.0), splat(1.0)));
     }
 
-    cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature = "use-simd"))] {
+    cfg_if! {if #[cfg(feature = "use-simd")] {
 
         #[test]
         fn iterator_works() {

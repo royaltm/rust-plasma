@@ -239,7 +239,14 @@ define_target_features! {
     target_feature_sse4_2: "sse4.2",
     target_feature_sse4a: "sse4a",
     target_feature_avx: "avx",
-    target_feature_avx2: "avx2"
+    target_feature_avx2: "avx2",
+    target_feature_frintts: "frintts",
+    target_feature_fcma: "fcma",
+    target_feature_neon: "neon",
+    target_feature_sha: "sha",
+    target_feature_sha2: "sha2",
+    target_feature_sha3: "sha3",
+    target_feature_sm4: "sm4"
 }
 
 macro_rules! define_features {
@@ -266,7 +273,8 @@ define_features! {
     features_use_simd: "use-simd",
     features_use_sleef: "use-sleef",
     features_static_link: "static-link",
-    features_use_pkgconfig: "use-pkgconfig"
+    features_use_pkgconfig: "use-pkgconfig",
+    features_use_bundled: "bundled"
 }
 
 #[cfg(all(target_family = "windows", target_env = "gnu"))]

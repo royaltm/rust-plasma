@@ -225,7 +225,7 @@ fn run() -> Result<(), String> {
                             canvas.window_mut().set_fullscreen(ft)?;
                         },
                         Event::KeyDown { keycode: Some(Keycode::F1), .. } => {
-                            info(ABOUT_INFO.into());
+                            info(format!("{}\n\nSDL: {} {}", ABOUT_INFO, sdl2::version::version(), sdl2::version::revision()).into());
                         },
                         Event::KeyDown { keycode: Some(Keycode::Escape), .. }
                         | Event::Window { win_event: WindowEvent::Close, .. }

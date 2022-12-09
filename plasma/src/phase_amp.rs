@@ -295,14 +295,14 @@ impl PhaseAmp {
         where C: PhaseAmpConfig,
               R: Rng + ?Sized
     {
-        let phase = rng.gen_range(0.0, PI2);
-        let delta_phase = rng.gen_range(-cfg.delta_phase_abs_max(), cfg.delta_phase_abs_max());
+        let phase = rng.gen_range(0.0..PI2);
+        let delta_phase = rng.gen_range(-cfg.delta_phase_abs_max()..cfg.delta_phase_abs_max());
 
-        let amplitude = rng.gen_range(0.0, 1.0);
+        let amplitude = rng.gen_range(0.0..1.0);
         let source_amplitude = amplitude;
-        let target_amplitude = rng.gen_range(0.0, 1.0);
+        let target_amplitude = rng.gen_range(0.0..1.0);
         let delta_amplitude = target_amplitude - source_amplitude;
-        let step_amplitude = rng.gen_range(cfg.min_steps(), cfg.max_steps()).recip();
+        let step_amplitude = rng.gen_range(cfg.min_steps()..cfg.max_steps()).recip();
         let transition_amplitude = 0.0;
 
         PhaseAmp { phase, delta_phase, amplitude, source_amplitude, delta_amplitude, step_amplitude, transition_amplitude }
@@ -315,7 +315,7 @@ impl PhaseAmp {
     {
         let delta_phase = self.delta_phase;
         self.phase += delta_phase;
-        let delta_delta_phase = rng.gen_range(0.0, cfg.delta_delta_phase_abs_max());
+        let delta_delta_phase = rng.gen_range(0.0..cfg.delta_delta_phase_abs_max());
         self.delta_phase = match delta_phase {
             delta if delta >= cfg.delta_phase_abs_max() => cfg.delta_phase_abs_max() - delta_delta_phase,
             delta if delta <= -cfg.delta_phase_abs_max() => -cfg.delta_phase_abs_max() + delta_delta_phase,
@@ -331,9 +331,9 @@ impl PhaseAmp {
         self.amplitude = self.source_amplitude + transform(self.transition_amplitude) * self.delta_amplitude;
         if self.transition_amplitude > 1.0 - EPSILON {
             self.source_amplitude = self.source_amplitude + transform(1.0) * self.delta_amplitude;
-            let target_amplitude = rng.gen_range(0.0, 1.0);
+            let target_amplitude = rng.gen_range(0.0..1.0);
             self.delta_amplitude = target_amplitude - self.source_amplitude;
-            self.step_amplitude = rng.gen_range(cfg.min_steps(), cfg.max_steps()).recip();
+            self.step_amplitude = rng.gen_range(cfg.min_steps()..cfg.max_steps()).recip();
             self.transition_amplitude = 0.0;
         }
     }

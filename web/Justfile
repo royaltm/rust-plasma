@@ -41,6 +41,7 @@ clean:
     rm -f {{name}}_bg.js
     rm -f {{name}}_bg.d.ts
     rm -f {{name}}_bg.wasm
+    rm -f {{name}}_bg.wasm.d.ts
 
 # remove all compiled files from static
 distclean: clean

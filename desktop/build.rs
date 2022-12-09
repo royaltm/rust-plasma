@@ -1,3 +1,4 @@
+#[cfg(windows)]
 use std::{env, path::PathBuf};
 
 #[cfg(windows)]

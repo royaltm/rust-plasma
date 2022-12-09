@@ -49,6 +49,8 @@ Then somwehere in the code:
 Features
 --------
 
+** Due to `sleef-sys` not being maintained for more than 4 years now, `use-sleef` feature is no longer available. **
+
 * `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86` or `x86_64` architectures.
 * `use-sleef` - enables `use-simd` and also includes SLEEF Vectorized Math Library [sleef-sys](https://crates.io/crates/sleef-sys). Currently this does not build on windows with a "gnu" toolchain. Also available only for a `x86_64` architecture.
 
@@ -57,16 +59,16 @@ To compile with [SLEEF](https://sleef.org) you'll need to have a [LLVM](http://r
 Example:
 
 ```
-RUSTFLAGS='-C target-cpu=native' cargo build --release --features=use-sleef
+RUSTFLAGS='-C target-cpu=native' cargo build --release --features=use-simd
 ```
 
 Benchmarking
 ------------
 
 ```
-cargo bench --bench render --features=rand/std -- --nocapture
+cargo +nightly bench --bench render --features=rand/std -- --nocapture
 ```
 
 ```
-RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,use-sleef -- --nocapture
+RUSTFLAGS='-C target-cpu=native' cargo +nightly bench --bench render --features=rand/std,use-simd -- --nocapture
 ```

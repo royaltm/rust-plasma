@@ -1,5 +1,5 @@
 name := 'plasma-demo.exe'
-sdl_windows := 'sdl-2.0.12-windows'
+sdl_windows := 'sdl-2.26.1-windows'
 target_dir := '../target/release/'
 rustflags := env_var_or_default('RUSTFLAGS', "")
 features := env_var_or_default('FEATURES', "")

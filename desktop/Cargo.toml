@@ -19,7 +19,7 @@ default = []
 bundled = ["sdl2/bundled"]
 static-link = ["sdl2/static-link"]
 use-pkgconfig = ["sdl2/use-pkgconfig"]
-use-sleef = ["use-simd", "plasma/use-sleef"]
+# use-sleef = ["use-simd", "plasma/use-sleef"]
 use-simd = ["plasma/use-simd"]
 
 [dependencies]

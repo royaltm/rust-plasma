@@ -10,10 +10,10 @@ co-ghp:
   git remote add -t {{ghp_branch}} -f origin git@github.com:royaltm/rust-plasma.git && \
   git checkout {{ghp_branch}}
 
-# generate documentation
+# Generate Rust and TS documentation
 doc: cargo-doc ts-doc
 
-# generate documentation and udpate github pages directory
+# Udpate github pages directory content
 update-ghp: doc
   rm -rf web/dist
   just web/webpack
@@ -24,11 +24,11 @@ update-ghp: doc
   rm -vf "{{ghp_dir}}/"*.{wasm,js}
   rsync -rvah --include '*.js' --include '*.wasm' --exclude '*' web/dist/ "{{ghp_dir}}"
 
-# generate Rust documentation
+# Generate Rust documentation
 cargo-doc:
   cargo +nightly doc --no-deps -p plasma
 
-# generate TypeScript documentation
+# Generate TypeScript documentation
 ts-doc:
   just web/all
   just web/doc

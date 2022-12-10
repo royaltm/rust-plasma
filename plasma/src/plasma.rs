@@ -288,7 +288,7 @@ else {
 // 3. returned slice is aligned to type T.
 // 4. T must not implement drop (e.g. primitives)
 // 5. values in slice may be uninitialized
-unsafe fn make_temporary_slice_mut<'a, T>(vec: &'a mut Vec<u8>, len: usize) -> &'a mut [T] {
+unsafe fn make_temporary_slice_mut<'a, T: Copy>(vec: &'a mut Vec<u8>, len: usize) -> &'a mut [T] {
     use std::{mem, slice};
     assert!(!mem::needs_drop::<T>(), "only non droppable types please");
     vec.clear();

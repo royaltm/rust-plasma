@@ -79,8 +79,8 @@
 // #![allow(unused_imports)]
 // #![allow(dead_code)]
 // #![feature(trace_macros)]
-</span><span class="attr">#[cfg(all(not(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>)), feature = <span class="string">&quot;use-simd&quot;</span>))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;Currently use-simd feature requires x86 or x86_64 target architecture.&quot;</span>);
+</span><span class="attr">#[cfg(all(not(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>)), feature = <span class="string">&quot;use-simd&quot;</span>))]
+</span><span class="macro">compile_error!</span>(<span class="string">&quot;Currently use-simd feature requires x86, x86_64 or aarch64 target architecture.&quot;</span>);
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;use-sleef&quot;</span>, target_family = <span class="string">&quot;windows&quot;</span>, target_env = <span class="string">&quot;gnu&quot;</span>))]
 </span><span class="macro">compile_error!</span>(<span class="string">&quot;Currently sleef-sys does not build sane binaries with a \&quot;gnu\&quot; chaintool on windows.&quot;</span>);

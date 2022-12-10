@@ -490,7 +490,7 @@
     }
 }
 
-<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), feature = <span class="string">&quot;use-simd&quot;</span>))] </span>{
+<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
     <span class="kw">use </span>std::borrow::Borrow;
     <span class="kw">use </span>packed_simd::Cast;
 
@@ -592,7 +592,7 @@
 // 3. returned slice is aligned to type T.
 // 4. T must not implement drop (e.g. primitives)
 // 5. values in slice may be uninitialized
-</span><span class="kw">unsafe fn </span>make_temporary_slice_mut&lt;<span class="lifetime">&#39;a</span>, T&gt;(vec: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;, len: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T] {
+</span><span class="kw">unsafe fn </span>make_temporary_slice_mut&lt;<span class="lifetime">&#39;a</span>, T: Copy&gt;(vec: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;, len: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T] {
     <span class="kw">use </span>std::{mem, slice};
     <span class="macro">assert!</span>(!mem::needs_drop::&lt;T&gt;(), <span class="string">&quot;only non droppable types please&quot;</span>);
     vec.clear();

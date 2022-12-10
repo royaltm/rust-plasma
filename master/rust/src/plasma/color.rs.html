@@ -372,7 +372,7 @@
     };
 }
 
-<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), feature = <span class="string">&quot;use-simd&quot;</span>))] </span>{
+<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
     <span class="kw">use </span>std::ops::Not;
     <span class="kw">use </span><span class="kw">crate</span>::simd_polyfill::<span class="kw-2">*</span>;
 
@@ -592,7 +592,7 @@
                    PixelRgb::from_hsv(splat(<span class="number">1.5</span>), splat(<span class="number">1.0</span>), splat(<span class="number">1.0</span>)));
     }
 
-    <span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), feature = <span class="string">&quot;use-simd&quot;</span>))] </span>{
+    <span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>iterator_works() {

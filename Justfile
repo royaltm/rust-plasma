@@ -40,4 +40,13 @@ bench:
   just plasma/bench
 
 clean:
-  cargo clean
+  just desktop/clean
+
+# Compile and run desktop plasma
+run:
+  just desktop/run
+
+# Compile and run desktop plasma with SIMD
+run-simd:
+  just desktop/run-simd
+  

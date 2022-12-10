@@ -8,3 +8,6 @@ bench:
   RUSTFLAGS='-C target-cpu=native' cargo +nightly bench --bench render --features=rand/std -- --nocapture
   cargo +nightly bench --bench render --features=rand/std,use-simd -- --nocapture
   RUSTFLAGS='-C target-cpu=native' cargo +nightly bench --bench render --features=rand/std,use-simd -- --nocapture
+
+clean:
+  cargo clean

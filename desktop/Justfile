@@ -1,9 +1,9 @@
-name := 'plasma-demo.exe'
+project_name := 'plasma-demo'
+artefact_name := if "{{os_family()}}" == "windows" { "{{project_name}}.exe" } else { "{{project_name}}" }
 sdl_windows := 'sdl-2.26.1-windows'
 target_dir := '../target/release/'
 rustflags := env_var_or_default('RUSTFLAGS', "")
 features := env_var_or_default('FEATURES', "")
-
 
 clean:
   cargo clean
@@ -13,10 +13,16 @@ distclean: clean
   rm -f Plasma.{exe,scr} Plasma32.{exe,scr}
 
 run:
-  cargo run --release --features={{features}}
+  RUSTFLAGS="{{rustflags}}" cargo run --release --features={{features}}
+
+run-simd:
+  RUSTFLAGS="-C target-cpu=native {{rustflags}}" cargo +nightly run --release --features="use-simd,{{features}}"
 
 build:
-  cargo build --release --features={{features}}
+  RUSTFLAGS="{{rustflags}}" cargo build --release --features={{features}}
+
+build-simd:
+  RUSTFLAGS="-C target-cpu=native {{rustflags}}" cargo +nightly build --release --features="use-simd,{{features}}"
 
 static:
   if [ "$MINGW_CHOST" = "i686-w64-mingw32" ]; \
@@ -24,15 +30,18 @@ static:
   elif [ "$MINGW_CHOST" = "x86_64-w64-mingw32" ]; \
     then just mingw-static; \
   else \
-    cargo build --features=static-link,use-pkgconfig,{{features}} --release; \
+    RUSTFLAGS="{{rustflags}}" cargo build --features=static-link,use-pkgconfig,{{features}} --release; \
   fi
 
+[windows]
 mingw-static:
   RUSTFLAGS="-C link-args=-s -L native=$(pwd -W)/{{sdl_windows}}/x86_64/gnu-mingw {{rustflags}}" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link,{{features}} --release
 
+[windows]
 mingw-static32:
   RUSTFLAGS="-C link-args=-s -L native=$(pwd -W)/{{sdl_windows}}/i686/gnu-mingw {{rustflags}}" cargo +nightly-i686-pc-windows-gnu build --features=static-link,{{features}} --release
 
+[windows]
 install:
   if [ "$MINGW_CHOST" = "i686-w64-mingw32" ]; \
     then just mingw-install32; \
@@ -42,10 +51,12 @@ install:
     @echo "Unsupported"; \
   fi
 
+[windows]
 mingw-install: mingw-static
-  install -T {{target_dir}}{{name}} Plasma.exe
-  install -T {{target_dir}}{{name}} Plasma.scr
+  install -T {{target_dir}}{{artefact_name}} Plasma.exe
+  install -T {{target_dir}}{{artefact_name}} Plasma.scr
 
+[windows]
 mingw-install32: mingw-static32
-  install -T {{target_dir}}{{name}} Plasma32.exe
-  install -T {{target_dir}}{{name}} Plasma32.scr
+  install -T {{target_dir}}{{artefact_name}} Plasma32.exe
+  install -T {{target_dir}}{{artefact_name}} Plasma32.scr

@@ -36,8 +36,8 @@ version = "0.3"
 features = ["winuser", "winerror", "shellscalingapi"]
 
 [target.'cfg(windows)'.build-dependencies]
-winres = "0.1"
+winresource = "0.1"
 
-[package.metadata.winres]
+[package.metadata.winresource]
 ProductName = "Plasma eye-candy"
 LegalCopyright = "Copyright © 2018-2022 Rafał Michalski. This program comes with ABSOLUTELY NO WARRANTY."

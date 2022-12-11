@@ -1,20 +1,28 @@
-#[cfg(windows)]
 use std::{env, path::PathBuf};
 
-#[cfg(windows)]
-extern crate winres;
+extern crate winresource;
 
-#[cfg(windows)]
 const SDL2_WINDOWS_DIR: &'static str = "sdl-2.26.1-windows";
 
 fn main() {
-    #[cfg(windows)]
-    {
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
         let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
-        let mut res = winres::WindowsResource::new();
-        res.set_icon("plasma.ico");
-        res.compile().unwrap();
+        {
+            let mut res = winresource::WindowsResource::new();
+            if let Ok(path) = env::var("MSYSTEM_PREFIX") {
+                if let Some(toolkit_path) = PathBuf::from(path).join("bin").to_str() {
+                    res.set_toolkit_path(toolkit_path);
+                }
+            }
+            if let Ok(path) = env::var("WINRES_TOOLKIT_PATH").as_ref() {
+                res.set_toolkit_path(path);
+            }
+            res.set_icon("plasma.ico");
+            if let Err(err) = res.compile() {
+                println!("cargo:warning=winresource failed: {}", err);
+            }
+        }
 
         if cfg!(all(not(feature = "static-link"), not(feature = "use-pkgconfig"), not(feature = "bundled"))) {
             let mut lib_dir = manifest_dir.clone();

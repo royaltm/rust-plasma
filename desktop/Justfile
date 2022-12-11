@@ -1,5 +1,5 @@
 project_name := 'plasma-demo'
-artefact_name := if "{{os_family()}}" == "windows" { "{{project_name}}.exe" } else { "{{project_name}}" }
+artefact_name := if os_family() == "windows" { project_name + ".exe" } else { project_name }
 sdl_windows := 'sdl-2.26.1-windows'
 target_dir := '../target/release/'
 rustflags := env_var_or_default('RUSTFLAGS', "")

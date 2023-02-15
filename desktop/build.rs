@@ -1,13 +1,12 @@
 use std::{env, path::PathBuf};
 
-extern crate winresource;
-
 const SDL2_WINDOWS_DIR: &'static str = "sdl-2.26.1-windows";
 
 fn main() {
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {
         let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
+	#[cfg(windows)]
         {
             let mut res = winresource::WindowsResource::new();
             if let Ok(path) = env::var("MSYSTEM_PREFIX") {

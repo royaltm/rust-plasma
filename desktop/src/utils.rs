@@ -1,4 +1,4 @@
-#![allow(unused_macros,unused_imports)]
+#![allow(unexpected_cfgs,unused_macros,unused_imports)]
 use std::{borrow::Cow, error::Error, ptr, rc::Rc};
 
 use sdl2::{messagebox::{ show_simple_message_box, MessageBoxFlag },
@@ -144,7 +144,7 @@ fn create_window_from_handle_win32(video_subsystem: &VideoSubsystem, handle: HWN
         Err(get_error())
     }
     else {
-        Ok(unsafe { Window::from_ll(video_subsystem.clone(), sdl_window) })
+        Ok(unsafe { Window::from_ll(video_subsystem.clone(), sdl_window, std::ptr::null_mut()) })
     }
 }
 
@@ -277,7 +277,7 @@ macro_rules! define_features {
 
 define_features! {
     features_use_simd: "use-simd",
-    features_use_sleef: "use-sleef",
+    // features_use_sleef: "use-sleef",
     features_static_link: "static-link",
     features_use_pkgconfig: "use-pkgconfig",
     features_use_bundled: "bundled"

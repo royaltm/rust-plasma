@@ -1,9 +1,9 @@
 [package]
 name = "plasma-demo"
 description = "Plasma screen saver"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Rafał Michalski <royal@yeondir.com>"]
-edition = "2018"
+edition = "2021"
 license = "GPL-3.0-or-later"
 homepage = "https://royaltm.github.io/rust-plasma/"
 repository = "https://github.com/royaltm/rust-plasma"
@@ -23,10 +23,11 @@ use-pkgconfig = ["sdl2/use-pkgconfig"]
 use-simd = ["plasma/use-simd"]
 
 [dependencies]
-sdl2 = "0.35"
-sdl2-sys = "0.35"
+sdl2 = "0.37"
+sdl2-sys = "0.37"
 rand = "^0.8"
-scoped_threadpool = "0.1"
+# scoped_threadpool = "0.1"
+yastl = "0.1"
 
 [dependencies.plasma]
 path = "../plasma"
@@ -40,4 +41,4 @@ winresource = "0.1"
 
 [package.metadata.winresource]
 ProductName = "Plasma eye-candy"
-LegalCopyright = "Copyright © 2018-2022 Rafał Michalski. This program comes with ABSOLUTELY NO WARRANTY."
+LegalCopyright = "Copyright © 2018-2024 Rafał Michalski. This program comes with ABSOLUTELY NO WARRANTY."

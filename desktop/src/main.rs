@@ -10,7 +10,7 @@ use std::{cmp::{max, min},
           rc::Rc,
           sync::Arc};
 
-use scoped_threadpool::Pool;
+use yastl::Pool;
 use sdl2::{event::{Event, WindowEvent},
            keyboard::Keycode,
            pixels::PixelFormatEnum,
@@ -56,7 +56,7 @@ macro_rules! program_name {
 static ABOUT_INFO: &'static str = concat!(program_name!(),
                                           " v",
                                           env!("CARGO_PKG_VERSION"),
-                                          " Copyright © 2018 ",
+                                          " Copyright © 2018-2024 ",
                                           env!("CARGO_PKG_AUTHORS"),
                                           "\n",
                                           target_env_info!(),
@@ -193,8 +193,9 @@ fn run() -> Result<(), String> {
     let mut plasma = Arc::new(Plasma::new(plasma_width, plasma_height, cfg, &mut rng));
     let mixer = PlasmaMixerT::new();
 
-    let mut pool = Pool::new(max(2, min(1, sdl2::cpuinfo::cpu_count() as u32)));
-    let mut workspaces: Vec<Vec<u8>> = std::iter::repeat_with(Vec::new).take(pool.thread_count() as usize).collect();
+    let thread_count = min(4, max(2, sdl2::cpuinfo::cpu_count())) as usize;
+    let pool = Pool::new(thread_count);
+    let mut workspaces: Vec<Vec<u8>> = std::iter::repeat_with(Vec::new).take(thread_count).collect();
 
     let mut app_state = AppState::Active;
 
@@ -252,8 +253,8 @@ fn run() -> Result<(), String> {
 
         // render plasma
         texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-                   let count = pool.thread_count();
-                   let segmh = (plasma_height + count - 1) as usize / count as usize;
+                   let count = thread_count;
+                   let segmh = (plasma_height as usize + count - 1) / count;
                    pool.scoped(|scope| {
                            for (i, (chunk, wrkspc)) in
                                buffer.chunks_mut(segmh * pitch).zip(workspaces.iter_mut()).enumerate()
@@ -298,6 +299,7 @@ fn run() -> Result<(), String> {
         // eprintln!("{}", 1.0 / elapsed);
         // start = now;
     }
+    pool.shutdown();
     // eprintln!("time to quit");
     Ok(())
 }

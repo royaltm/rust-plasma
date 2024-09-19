@@ -42,6 +42,10 @@ mingw-static32:
   RUSTFLAGS="-C link-args=-s -L native=$(pwd -W)/{{sdl_windows}}/i686/gnu-mingw {{rustflags}}" cargo +nightly-i686-pc-windows-gnu build --features=static-link,{{features}} --release
 
 [windows]
+mingw-static-simd:
+  RUSTFLAGS="-C target-cpu=native -C link-args=-s -L native=$(pwd -W)/{{sdl_windows}}/x86_64/gnu-mingw {{rustflags}}" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link,use-simd,{{features}} --release
+
+[windows]
 install:
   if [ "$MINGW_CHOST" = "i686-w64-mingw32" ]; \
     then just mingw-install32; \
@@ -50,6 +54,11 @@ install:
   else \
     @echo "Unsupported"; \
   fi
+
+[windows]
+mingw-install-simd: mingw-static-simd
+  install -T {{target_dir}}{{artefact_name}} Plasma.exe
+  install -T {{target_dir}}{{artefact_name}} Plasma.scr
 
 [windows]
 mingw-install: mingw-static

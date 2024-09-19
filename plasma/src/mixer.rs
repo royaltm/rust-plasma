@@ -1,7 +1,6 @@
 //! A pixel mixer module.
+use core::borrow::{Borrow, BorrowMut};
 use crate::color::PixelRgb;
-use std::borrow::{Borrow, BorrowMut};
-
 use crate::phase_amp::*;
 
 /// Implementations of this trait should compute the vertical and horizontal intermediate data for a

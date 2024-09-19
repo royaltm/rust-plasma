@@ -1,8 +1,8 @@
 [package]
 name = "plasma"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Rafał Michalski <royal@yeondir.com>"]
-edition = "2018"
+edition = "2021"
 license = "GPL-3.0-or-later"
 homepage = "https://royaltm.github.io/rust-plasma/"
 repository = "https://github.com/royaltm/rust-plasma"
@@ -26,17 +26,21 @@ required-features = ["rand/std"]
 [features]
 default = []
 # use-sleef = ["use-simd", "packed_simd/sleef-sys"]
-use-simd = ["packed_simd"]
+use-simd = [] #["packed_simd"]
 
 [dependencies]
 cfg-if = "^1.0"
-derive_more = "^0.99"
 
-[dependencies.packed_simd]
-package = "packed_simd_2"
-version = "^0.3.8"
-optional = true
-features = [] # "sleef-sys", "coresimd"
+[dependencies.derive_more]
+version = "^1.0"
+default-features = false
+features = ["full"]
+
+# [dependencies.packed_simd]
+# package = "packed_simd_2"
+# version = "^0.3.8"
+# optional = true
+# features = [] # "sleef-sys", "coresimd"
 
 [dependencies.rand]
 version = "^0.8"

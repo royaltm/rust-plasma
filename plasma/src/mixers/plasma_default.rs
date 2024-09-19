@@ -1,6 +1,6 @@
 //! Default plasma mixer
 use crate::{color::*, mixer::*, phase_amp::*, simd_polyfill::*};
-use derive_more::*;
+use derive_more::{Debug, Constructor};
 use std::marker::PhantomData;
 
 /// A convenient type to be used with [crate::plasma::Plasma::render] or
@@ -36,11 +36,11 @@ impl<'a, P> Iterator for PlasmaMixIter<'a, P> where P: PhaseAmpsSelect<'a> + ?Si
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.pa_pair_iter.next() {
-            Some((pa1, pa2)) => Some(PlasmaLineCalc { amplitude1: splat(pa1.amplitude()),
-                                                      phase1:     splat(pa1.phase()),
-                                                      amplitude2: splat(pa2.amplitude()),
-                                                      phase2:     splat(pa2.phase()),
-                                                      normal:     splat(pa1.amplitude() + pa2.amplitude()), }),
+            Some((pa1, pa2)) => Some(PlasmaLineCalc { amplitude1: Flt::sc_splat(pa1.amplitude()),
+                                                      phase1:     Flt::sc_splat(pa1.phase()),
+                                                      amplitude2: Flt::sc_splat(pa2.amplitude()),
+                                                      phase2:     Flt::sc_splat(pa2.phase()),
+                                                      normal:     Flt::sc_splat(pa1.amplitude() + pa2.amplitude()), }),
             None => None,
         }
     }
@@ -77,25 +77,25 @@ impl Mixer<Flt> for PlasmaMixer {
         let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
         let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
         let sat0 = compose4(vxp[4], vxp[5], vyp[4], vyp[5]);
-        let hue0 = splat(1.0) - hue0 * splat(1.5);
-        let hue1 = hue1 * splat(3.0);
-        let sat0 = (sat0 * splat(1.5)).abs().min(splat(1.0));
-        let rgb0 = PixelRgb::from_hsv(hue0, splat(1.0), splat(1.0));
-        let rgb1 = PixelRgb::from_hsv(hue1, sat0, splat(1.0));
+        let hue0 = Flt::sc_splat(1.0) - hue0 * Flt::sc_splat(1.5);
+        let hue1 = hue1 * Flt::sc_splat(3.0);
+        let sat0 = (sat0 * Flt::sc_splat(1.5)).abs().sc_min(Flt::sc_splat(1.0));
+        let rgb0 = PixelRgb::from_hsv(hue0, Flt::sc_splat(1.0), Flt::sc_splat(1.0));
+        let rgb1 = PixelRgb::from_hsv(hue1, sat0, Flt::sc_splat(1.0));
         next_pixel(rgb0 - rgb1);
     }
 }
 
 #[inline]
 fn compose4(x1: Flt, x2: Flt, y1: Flt, y2: Flt) -> Flt {
-    const THIRD: Flt = splat(1.0 / 3.0);
+    const THIRD: Flt = csplat(1.0 / 3.0);
     (x1 + y1 * x2 + y2) * THIRD
 }
 
 impl IntermediateCalculator<Flt> for PlasmaLineCalc {
     #[inline]
     fn calculate(&self, v: Flt) -> Flt {
-        const ZERO: Flt = splat(0.0);
+        const ZERO: Flt = csplat(0.0);
         if self.normal == ZERO {
             ZERO
         }

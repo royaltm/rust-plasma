@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, cmp::min, f32::consts::PI};
+use core::{borrow::BorrowMut, cmp::min, f32::consts::PI};
 
 use rand::Rng;
 
@@ -181,21 +181,21 @@ pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, p
         }
     }
     /* render lines */
-    for (lines, vyp) in buffer.chunks_mut(LANES * pitch).zip(vyps.iter()) {
+    for (lines, vyp) in buffer.chunks_mut(Flt::LANES * pitch).zip(vyps.iter()) {
         gen_lines::<B, _>(mixer, vyp, vxps, lines, pitch, dx);
     }
 }
 
 cfg_if! {if #[cfg(feature = "use-simd")] {
-    use std::borrow::Borrow;
-    use packed_simd::Cast;
+    use core::borrow::Borrow;
+    use core::simd::prelude::SimdUint;
 
     fn prepare_composition_line<C, D>(index: usize, x0: usize, wr: f32, calc: &C, out: &mut [D])
     where C: IntermediateCalculator<f32s>, D: BorrowMut<[f32s]>
     {
-        let wr = splat(wr);
+        let wr = Flt::splat(wr);
         for (i, op) in out.iter_mut().enumerate() {
-            let x = (i * LANES + x0) as u32;
+            let x = (i * Flt::LANES + x0) as u32;
             let xs: f32s = simd_new_consecutive!(u32s, x).cast();
             op.borrow_mut()[index] = calc.calculate(xs * wr);
         }
@@ -203,7 +203,7 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
 
     #[inline]
     fn vd_size(dv: usize) -> usize {
-        (dv + LANES - 1) / LANES
+        (dv + Flt::LANES - 1) / Flt::LANES
     }
 
     fn prepare_workspace<M>(tmp: &mut Vec<u8>, dx: usize, dy: usize) -> (&mut [M::IntermediateH], &mut [M::IntermediateV])
@@ -226,11 +226,11 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
     where B: PixelBuffer, M: Mixer<f32s>, M::IntermediateV: Borrow<[f32s]> + BorrowMut<[f32s]>
     {
         /* splat each y */
-        let mut vypl: [M::IntermediateV; LANES] = Default::default();
+        let mut vypl: [M::IntermediateV; Flt::LANES] = Default::default();
         for (i, &ys) in vyp.borrow().iter().enumerate() {
             let ys: f32tuple = ys.into();
             for (&y, vyp) in ys.iter().zip(vypl.iter_mut()) {
-                vyp.borrow_mut()[i] = splat(y);
+                vyp.borrow_mut()[i] = Flt::splat(y);
             }
         }
         let line_end = B::PIXEL_BYTES * dx;

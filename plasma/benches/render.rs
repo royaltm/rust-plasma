@@ -4,8 +4,9 @@ RUSTFLAGS='-C target-cpu=generic' cargo bench --bench render --features=rand/std
 RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,use-simd -- --nocapture
 RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,use-sleef -- --nocapture
 */
+#![allow(unexpected_cfgs)]
 #![feature(test)]
-#![feature(stdsimd)]
+#![feature(portable_simd)]
 extern crate test;
 
 use plasma;

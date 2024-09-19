@@ -1,6 +1,10 @@
 //! Contains a [PixelRgb] with optional SIMD implementation selected by a "use-simd" feature.
 use cfg_if::cfg_if;
-use derive_more::*;
+use derive_more::{
+    Debug, Neg,
+    Add, Sub, Mul, Div, Rem,
+    AddAssign, SubAssign, MulAssign, DivAssign, RemAssign
+};
 use std::ptr;
 
 macro_rules! define_pixel_rgb {
@@ -70,7 +74,7 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
 
             impl ExactSizeIterator for $name {
                 #[inline]
-                fn len(&self) -> usize { LANES * $name::LEN - self.offs }
+                fn len(&self) -> usize { Flt::LANES * $name::LEN - self.offs }
             }
 
             impl Iterator for $name {
@@ -78,7 +82,7 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
 
                 #[inline]
                 fn next(&mut self) -> Option<f32> {
-                    const SIZE: usize = LANES * $name::LEN;
+                    const SIZE: usize = Flt::LANES * $name::LEN;
                     match self.offs {
                         offs if offs < SIZE => {
                             self.offs += 1;
@@ -116,42 +120,43 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
         #[inline]
         pub fn iter_rgba_values(self, alpha: f32) -> RgbaIter {
             let PixelRgb { r, g, b } = self;
-            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), splat(alpha).into()];
+            let rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), Flt::splat(alpha).into()];
             RgbaIter { rgba, offs: 0 }
         }
 
         #[inline]
         pub fn from_hsv(hue: f32s, sat: f32s, val: f32s) -> PixelRgb {
-            const FALSE: m32s = m32s::splat(false);
+            let mfalse = m32s::splat(false);
 
             let c = val * sat;
-            let h = (hue - (floor(hue / splat(2.0)) * splat(2.0))) * splat(3.0);
-            let x = c * (splat(1.0) - (h % splat(2.0) - splat(1.0)).abs());
+            // let h = (hue - (floor(hue / Flt::splat(2.0)) * Flt::splat(2.0))) * Flt::splat(3.0);
+            let h = (hue - ((hue / Flt::splat(2.0)).floor() * Flt::splat(2.0))) * Flt::splat(3.0);
+            let x = c * (Flt::splat(1.0) - (h % Flt::splat(2.0) - Flt::splat(1.0)).abs());
             let m = val - c;
 
             let (mut r, mut g, mut b) = (m, m, m);
 
-            let less = h.lt(splat(1.0));
+            let less = h.simd_lt(Flt::splat(1.0));
             if less.any() {
                 r = less.select(c+m, r); g = less.select(x+m, g);
             }
-            let less2 = h.lt(splat(2.0));
-            let less = less.select(FALSE, less2);
+            let less2 = h.simd_lt(Flt::splat(2.0));
+            let less = less.select_mask(mfalse, less2);
             if less.any() {
                 r = less.select(x+m, r); g = less.select(c+m, g);
             }
-            let less3 = h.lt(splat(3.0));
-            let less = less2.select(FALSE, less3);
+            let less3 = h.simd_lt(Flt::splat(3.0));
+            let less = less2.select_mask(mfalse, less3);
             if less.any() {
                 g = less.select(c+m, g); b = less.select(x+m, b);
             }
-            let less4 = h.lt(splat(4.0));
-            let less = less3.select(FALSE, less4);
+            let less4 = h.simd_lt(Flt::splat(4.0));
+            let less = less3.select_mask(mfalse, less4);
             if less.any() {
                 g = less.select(x+m, g); b = less.select(c+m, b);
             }
-            let less5 = h.lt(splat(5.0));
-            let less = less4.select(FALSE, less5);
+            let less5 = h.simd_lt(Flt::splat(5.0));
+            let less = less4.select_mask(mfalse, less5);
             if less.any() {
                 r = less.select(x+m, r); b = less.select(c+m, b);
             }
@@ -250,6 +255,8 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
 #[cfg(test)]
 mod tests {
     use crate::{color::*, simd_polyfill::*};
+
+    fn splat(v: f32) -> Flt { Flt::sc_splat(v) }
 
     #[test]
     fn it_works() {

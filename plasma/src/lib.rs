@@ -29,14 +29,14 @@
 // #![allow(unused_imports)]
 // #![allow(dead_code)]
 // #![feature(trace_macros)]
+#![cfg_attr(feature = "use-simd", feature(portable_simd))]
 #[cfg(all(not(any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")), feature = "use-simd"))]
 compile_error!("Currently use-simd feature requires x86, x86_64 or aarch64 target architecture.");
+// #[cfg(all(feature = "use-sleef", target_family = "windows", target_env = "gnu"))]
+// compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" chaintool on windows.");
 
-#[cfg(all(feature = "use-sleef", target_family = "windows", target_env = "gnu"))]
-compile_error!("Currently sleef-sys does not build sane binaries with a \"gnu\" chaintool on windows.");
-
-#[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
-compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
+// #[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
+// compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
 
 #[macro_use]
 mod simd_polyfill;

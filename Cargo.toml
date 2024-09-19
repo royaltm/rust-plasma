@@ -4,5 +4,6 @@ panic = 'abort'
 opt-level = 3
 
 [workspace]
+resolver = "2"
 members = ["desktop", "plasma", "web"]
 # default-members = ["desktop"]

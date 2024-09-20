@@ -5,7 +5,6 @@ use derive_more::{
     Add, Sub, Mul, Div, Rem,
     AddAssign, SubAssign, MulAssign, DivAssign, RemAssign
 };
-use std::ptr;
 
 macro_rules! define_pixel_rgb {
     ($ty:ty, $tuple:ty) => {
@@ -66,9 +65,9 @@ macro_rules! define_pixel_rgb {
 }
 
 cfg_if! {if #[cfg(feature = "use-simd")] {
-    use std::ops::Not;
+    use core::ptr;
+    use core::ops::Not;
     use crate::simd_polyfill::*;
-
     macro_rules! rgb_iterator_impl {
         ($name:ident, $prop:ident) => {
 
@@ -169,6 +168,8 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
     }
 
 } else {
+    #[cfg(not(feature = "std"))]
+    use crate::m_polyfill::*;
 
     macro_rules! rgb_iterator_impl {
         ($name:ident, $prop:ident) => {
@@ -182,10 +183,10 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
 
                 #[inline]
                 fn next(&mut self) -> Option<f32> {
-                    match self.offs {
-                        offs if offs < $name::LEN => {
+                    match self.$prop.get(self.offs) {
+                        Some(v) => {
                             self.offs += 1;
-                            Some(unsafe { ptr::read(self.$prop.as_ptr().add(offs)) })
+                            Some(*v)
                         },
                         _ => None
                     }

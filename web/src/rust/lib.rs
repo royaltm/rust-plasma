@@ -33,7 +33,7 @@ pub struct PlasmaHandle {
     data:   Vec<u8>,
     area:   Area,
     wrkspc: Vec<u8>,
-    mixer:  PlasmaMixerT,
+    // mixer:  PlasmaMixerT,
 }
 
 #[wasm_bindgen]
@@ -49,15 +49,16 @@ impl PlasmaHandle {
         let mut rng = OsRng;
         let cfg = PhaseAmpCfg::new(min_steps as f32, max_steps as f32);
         let plasma = Plasma::new(width, height, cfg, &mut rng);
-        let data = vec![0; width as usize * height as usize * PixelBufRGBA8::PIXEL_BYTES];
+        let data = vec![0; width as usize * height as usize * PixelBufRGBA32::PIXEL_BYTES];
         let wrkspc = Vec::new();
-        let mixer = PlasmaMixerT::new();
+        // let mixer = PlasmaMixerT::new();
         Ok(PlasmaHandle { plasma,
                           rng,
                           data,
                           area: Area { x: 0, y: 0, w: width as usize, h: height as usize },
                           wrkspc,
-                          mixer })
+                          // mixer
+        })
     }
 
     #[wasm_bindgen(js_name=setArea)]
@@ -66,7 +67,7 @@ impl PlasmaHandle {
             panic!("invalid area provided");
         }
         self.area = Area { x, y, w, h };
-        self.data.resize(w * h * PixelBufRGBA8::PIXEL_BYTES, 0u8);
+        self.data.resize(w * h * PixelBufRGBA32::PIXEL_BYTES, 0u8);
     }
 
     pub fn width(&self) -> u32 { self.plasma.pixel_width }
@@ -75,8 +76,8 @@ impl PlasmaHandle {
 
     pub fn render(&mut self) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
-        self.plasma.render_part::<PixelBufRGBA8, PlasmaICPT, _>(&self.mixer,
+        let pitch: usize = PixelBufRGBA32::PIXEL_BYTES * w;
+        self.plasma.render_part::<PixelBufRGBA32, PlasmaICPT, PlasmaMixerT>(
                                                                 &mut self.data,
                                                                 pitch,
                                                                 x,
@@ -89,10 +90,10 @@ impl PlasmaHandle {
     #[wasm_bindgen(js_name=renderPhaseAmps)]
     pub fn render_phase_amps(&mut self, phase_amps: &[f32]) {
         let Area { x, y, w, h } = self.area;
-        let pitch: usize = PixelBufRGBA8::PIXEL_BYTES * w;
+        let pitch: usize = PixelBufRGBA32::PIXEL_BYTES * w;
         let pw = self.plasma.pixel_width as usize;
         let ph = self.plasma.pixel_height as usize;
-        render_part::<PixelBufRGBA8, PlasmaICPTExtPa, _, _>(&self.mixer,
+        render_part::<PixelBufRGBA32, PlasmaICPTExtPa, PlasmaMixerT, _>(
                                                             &mut self.data,
                                                             pitch,
                                                             pw,

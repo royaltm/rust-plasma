@@ -24,12 +24,15 @@ path = "benches/export.rs"
 required-features = ["rand/std"]
 
 [features]
-default = []
+default = ["std"]
+std = []
 # use-sleef = ["use-simd", "packed_simd/sleef-sys"]
-use-simd = [] #["packed_simd"]
+use-simd = ["std"] #["packed_simd"]
 
 [dependencies]
 cfg-if = "^1.0"
+libm = { version = "0.2.8", optional = true }
+micromath = { version = "2.1", optional = true }
 
 [dependencies.derive_more]
 version = "^1.0"

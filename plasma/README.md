@@ -19,9 +19,6 @@ git = "https://github.com/royaltm/rust-plasma.git"
 `main.rs`:
 
 ```rust
-extern create rand;
-extern create plasma;
-
 use plasma::*;
 ```
 
@@ -39,9 +36,9 @@ Then somwehere in the code:
     loop {
       let buffer_rgb24: &mut [u8] = get_image_buffer_from_somwhere();
       let pitch: usize = get_how_many_bytes_per_line();
-      plasma.render::<PixelRGB24>(buffer_rgb24, pitch);
+      plasma.render::<PixelBufRGB24, PlasmaICP, PlasmaMixer>(buffer_rgb24, pitch, None);
       display_buffer_on_screen();
-      plasma.update();
+      plasma.update(&mut rng);
     }
 ```
 
@@ -71,4 +68,23 @@ cargo +nightly bench --bench render --features=rand/std -- --nocapture
 
 ```
 RUSTFLAGS='-C target-cpu=native' cargo +nightly bench --bench render --features=rand/std,use-simd -- --nocapture
+```
+
+
+no_std
+------
+
+In `no_std` mode plasma library still depends on the `alloc` crate and in addition requires one of the two additional features, which must be enabled by the depending crate:
+
+`Cargo.toml`:
+
+```toml
+[dependencies]
+rand = "0.7"
+
+[dependencies.plasma]
+version = "0.2"
+git = "https://github.com/royaltm/rust-plasma.git"
+default-features = false
+features = ["libm"] # or "micromath"
 ```

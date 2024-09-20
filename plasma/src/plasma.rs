@@ -1,5 +1,10 @@
-use core::{borrow::BorrowMut, cmp::min, f32::consts::PI};
-
+use core::{
+    borrow::BorrowMut,
+    cmp::min,
+    f32::consts::PI
+};
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 use rand::Rng;
 
 use cfg_if::cfg_if;
@@ -57,13 +62,12 @@ impl Plasma {
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     #[inline]
-    pub fn render<'a, B, L, M>(&'a self, mixer: &M, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>)
+    pub fn render<'a, B, L, M>(&'a self, buffer: &mut [u8], pitch: usize, wrkspc: Option<&mut Vec<u8>>)
         where B: PixelBuffer,
               L: ICProducer<'a>,
               M: Mixer<Flt>
     {
-        self.render_part::<B, L, M>(mixer,
-                                    buffer,
+        self.render_part::<B, L, M>(buffer,
                                     pitch,
                                     0,
                                     0,
@@ -84,7 +88,7 @@ impl Plasma {
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     #[inline]
-    pub fn render_part<'a, B, L, M>(&'a self, mixer: &M, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize,
+    pub fn render_part<'a, B, L, M>(&'a self, buffer: &mut [u8], pitch: usize, x: usize, y: usize, w: usize,
                                     h: usize, wrkspc: Option<&mut Vec<u8>>)
         where B: PixelBuffer,
               L: ICProducer<'a>,
@@ -93,7 +97,7 @@ impl Plasma {
         let pw = self.pixel_width as usize;
         let ph = self.pixel_height as usize;
         let phase_amps = &self.phase_amps[..];
-        render_part::<B, L, M, _>(mixer, buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
+        render_part::<B, L, M, _>(buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
     }
 
     /// Import the internal plasma state from a slice of 32bit floats.
@@ -132,7 +136,7 @@ impl Plasma {
 /// # Panics
 ///
 /// __Panics__ if [PhaseAmpsSelect::select] panics.
-pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P,
+pub fn render_part<'a, B, L, M, P>(buffer: &mut [u8], pitch: usize, pw: usize, ph: usize, phase_amps: &'a P,
                                    x: usize, y: usize, w: usize, h: usize, wrkspc: Option<&mut Vec<u8>>)
     where B: PixelBuffer,
           L: IntermediateCalculatorProducer<'a, P, Flt>,
@@ -182,7 +186,7 @@ pub fn render_part<'a, B, L, M, P>(mixer: &M, buffer: &mut [u8], pitch: usize, p
     }
     /* render lines */
     for (lines, vyp) in buffer.chunks_mut(Flt::LANES * pitch).zip(vyps.iter()) {
-        gen_lines::<B, _>(mixer, vyp, vxps, lines, pitch, dx);
+        gen_lines::<B, M>(vyp, vxps, lines, pitch, dx);
     }
 }
 
@@ -222,7 +226,7 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
         (ax, ay)
     }
 
-    fn gen_lines<B, M>(mixer: &M, vyp: &M::IntermediateV, vxps: &[M::IntermediateH], lines: &mut [u8], pitch: usize, dx: usize)
+    fn gen_lines<B, M>(vyp: &M::IntermediateV, vxps: &[M::IntermediateH], lines: &mut [u8], pitch: usize, dx: usize)
     where B: PixelBuffer, M: Mixer<f32s>, M::IntermediateV: Borrow<[f32s]> + BorrowMut<[f32s]>
     {
         /* splat each y */
@@ -240,7 +244,7 @@ cfg_if! {if #[cfg(feature = "use-simd")] {
                 B::put_pixel(&mut writer, pixel);
             };
             for vxp in vxps.iter() {
-                mixer.mix_pixels(vxp, vyp, &mut next_pixel);
+                M::mix_pixels(vxp, vyp, &mut next_pixel);
             }
         }
     }
@@ -269,7 +273,7 @@ else {
         (ax, ay)
     }
 
-    fn gen_lines<B, M>(mixer: &M, vyp: &M::IntermediateV, vxps: &[M::IntermediateH], line: &mut [u8], _pitch: usize, _dx: usize)
+    fn gen_lines<B, M>(vyp: &M::IntermediateV, vxps: &[M::IntermediateH], line: &mut [u8], _pitch: usize, _dx: usize)
     where B: PixelBuffer, M: Mixer<f32>
     {
         let mut writer = line.iter_mut();
@@ -278,7 +282,7 @@ else {
         };
 
         for vxp in vxps.iter() {
-            mixer.mix_pixels(vxp, vyp, &mut next_pixel);
+            M::mix_pixels(vxp, vyp, &mut next_pixel);
         }
     }
 }}
@@ -289,7 +293,7 @@ else {
 // 4. T must not implement drop (e.g. primitives)
 // 5. values in slice may be uninitialized
 unsafe fn make_temporary_slice_mut<'a, T: Copy>(vec: &'a mut Vec<u8>, len: usize) -> &'a mut [T] {
-    use std::{mem, slice};
+    use core::{mem, slice};
     assert!(!mem::needs_drop::<T>(), "only non droppable types please");
     vec.clear();
     let bytelen = len * mem::size_of::<T>() + mem::align_of::<T>() - 1;

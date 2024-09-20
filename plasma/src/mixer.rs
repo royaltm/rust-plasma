@@ -28,17 +28,17 @@ pub trait Mixer<T: Sized + Default + Copy> {
 
     /// Returns the number of intermediate horizontal values.
     #[inline]
-    fn intermediate_h_len() -> usize { std::mem::size_of::<Self::IntermediateH>() / std::mem::size_of::<T>() }
+    fn intermediate_h_len() -> usize { core::mem::size_of::<Self::IntermediateH>() / core::mem::size_of::<T>() }
 
     /// Returns the number of intermediate vertical values.
     #[inline]
-    fn intermediate_v_len() -> usize { std::mem::size_of::<Self::IntermediateV>() / std::mem::size_of::<T>() }
+    fn intermediate_v_len() -> usize { core::mem::size_of::<Self::IntermediateV>() / core::mem::size_of::<T>() }
 
     /// The implementors should compute a pixel and send it as an instance of [PixelRgb] to the
     /// provided `next_pixel` function.
     ///
     /// The computation should be based on the provided combination of intermediate data.
-    fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut dyn FnMut(PixelRgb));
+    fn mix_pixels(vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut dyn FnMut(PixelRgb));
 }
 
 /// Implementations of this trait should produce an iterator of an [IntermediateCalculator] tool.

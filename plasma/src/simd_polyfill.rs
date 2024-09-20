@@ -52,6 +52,8 @@ cfg_if! {if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), feature 
         // ($name:ident, $v:expr) => ($name::new($v, $v+1, $v+2, $v+3));
     }
 
+    pub(crate) use simd_new_consecutive;
+
     // /* floor SIMD */
     // cfg_if! {if #[cfg(target_feature = "avx")] {
     //     use std::mem::transmute;
@@ -126,6 +128,8 @@ else if #[cfg(all(target_arch = "aarch64", feature = "use-simd"))] {
     macro_rules! simd_new_consecutive {
         ($name:ident, $v:expr) => ($name::from_array([$v, $v+1, $v+2, $v+3]));
     }
+
+    pub(crate) use simd_new_consecutive;
 
     // /* floor SIMD */
     // cfg_if! {if #[cfg(target_feature = "neon")] {

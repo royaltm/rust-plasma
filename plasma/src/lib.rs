@@ -29,6 +29,7 @@
 // #![allow(unused_imports)]
 // #![allow(dead_code)]
 // #![feature(trace_macros)]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(feature = "use-simd", feature(portable_simd))]
 #[cfg(all(not(any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")), feature = "use-simd"))]
 compile_error!("Currently use-simd feature requires x86, x86_64 or aarch64 target architecture.");
@@ -38,13 +39,17 @@ compile_error!("Currently use-simd feature requires x86, x86_64 or aarch64 targe
 // #[cfg(all(feature = "use-sleef", not(target_arch = "x86_64")))]
 // compile_error!("Currently sleef-sys requires x86_64 target architecture to build.");
 
-#[macro_use]
-mod simd_polyfill;
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
 mod color;
+#[cfg(not(feature = "std"))]
+mod m_polyfill;
 mod mixer;
 mod mixers;
 mod phase_amp;
 mod pixel_buffer;
 mod plasma;
+mod simd_polyfill;
 
 pub use crate::{color::*, mixer::*, mixers::*, phase_amp::*, pixel_buffer::*, plasma::*};

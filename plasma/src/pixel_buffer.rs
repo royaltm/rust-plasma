@@ -1,4 +1,6 @@
 use crate::color::PixelRgb;
+#[cfg(not(feature = "std"))]
+use crate::m_polyfill::*;
 
 /// The trait for putting pixels into byte buffers.
 pub trait PixelBuffer {
@@ -24,10 +26,10 @@ impl PixelBuffer for PixelBufRGB24 {
     }
 }
 
-/// A [PixelBuffer] tool for a RGBA8 buffer (4 bytes/pixel: red, green, blue, alpha).
-pub struct PixelBufRGBA8;
+/// A [PixelBuffer] tool for a RGBA32 buffer (4 bytes/pixel: red, green, blue, alpha).
+pub struct PixelBufRGBA32;
 
-impl PixelBuffer for PixelBufRGBA8 {
+impl PixelBuffer for PixelBufRGBA32 {
     const PIXEL_BYTES: usize = 4;
 
     #[inline]
@@ -40,12 +42,38 @@ impl PixelBuffer for PixelBufRGBA8 {
     }
 }
 
+#[cfg(not(feature = "use-simd"))]
+/// A [PixelBuffer] tool for a RGB16 buffer (5-6-5 bits per color channel: red, green, blue).
+pub struct PixelBufRGB16;
+
+#[cfg(not(feature = "use-simd"))]
+impl PixelBuffer for PixelBufRGB16 {
+    const PIXEL_BYTES: usize = 2;
+
+    #[inline]
+    fn put_pixel<'a, I>(writer: &mut I, pixel: PixelRgb)
+        where I: Iterator<Item = &'a mut u8>
+    {
+        let PixelRgb { r, g, b } = pixel;
+        let [r, g, b] = [r, g, b].map(ToColor8::to_color_u8clamped);
+        let rgb16 = (((r & 0b11111000) as u16) << 8)|
+                    (((g & 0b11111100) as u16) << 3)|
+                    (((b & 0b11111000) as u16) >> 3);
+        for (v, ptr) in rgb16.to_be_bytes().into_iter().zip(writer) {
+            *ptr = v;
+        }
+    }
+}
+
 /// Provides a method of converting color part from a `f32` type to a `u8`.
 pub trait ToColor8 {
-    fn to_color_u8clamped(&self) -> u8;
+    fn to_color_u8clamped(self) -> u8;
 }
 
 impl ToColor8 for f32 {
     #[inline]
-    fn to_color_u8clamped(&self) -> u8 { (self.abs().min(1.0) * 255.0) as u8 }
+    fn to_color_u8clamped(self) -> u8 {
+        // this is saturating conversion
+        (self.abs() * 255.0) as u8
+    }
 }

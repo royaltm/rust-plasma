@@ -9,8 +9,8 @@ RUSTFLAGS='-C target-cpu=native' cargo bench --bench render --features=rand/std,
 #![feature(portable_simd)]
 extern crate test;
 
-use plasma;
 use rand;
+use plasma::{self, PixelBuffer};
 
 use test::{black_box, Bencher};
 
@@ -36,10 +36,26 @@ macro_rules! detected_feature_print {
 }
 
 #[bench]
-fn bench_render(ben: &mut Bencher) {
-    use plasma::*;
+fn bench_render_rgba32(ben: &mut Bencher) {
+    println!("RGBA32");
+    bench_render_buf::<plasma::PixelBufRGBA32>(ben)
+}
 
-    type PBuf = PixelBufRGB24;
+#[bench]
+fn bench_render_rgb24(ben: &mut Bencher) {
+    println!("RGB24");
+    bench_render_buf::<plasma::PixelBufRGB24>(ben)
+}
+
+#[cfg(not(feature = "use-simd"))]
+#[bench]
+fn bench_render_rgb16(ben: &mut Bencher) {
+    println!("RGB16");
+    bench_render_buf::<plasma::PixelBufRGB16>(ben)
+}
+
+fn bench_render_buf<PBuf: PixelBuffer>(ben: &mut Bencher) {
+    use plasma::*;
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
@@ -71,8 +87,8 @@ fn bench_render(ben: &mut Bencher) {
 
     let min_steps = 80.0f32;
     let max_steps = 200.0f32;
-    let plasma_width = 512u32;
-    let plasma_height = 512u32;
+    let plasma_width = 256u32;
+    let plasma_height = 256u32;
     let mut rng = rand::thread_rng();
     let cfg = PhaseAmpCfg::new(min_steps, max_steps);
     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &mut rng);

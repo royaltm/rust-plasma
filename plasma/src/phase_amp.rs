@@ -1,6 +1,12 @@
-use std::{f32::{consts::PI, EPSILON},
-          ops::Range,
-          slice::ChunksExact};
+use core::{
+    f32::{consts::PI, EPSILON},
+    ops::Range,
+    slice::ChunksExact
+};
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+#[cfg(not(feature = "std"))]
+use crate::m_polyfill::*;
 
 use rand::Rng;
 
@@ -193,7 +199,7 @@ f32pa_iterators_impl! {
 
 impl<'a> PhaseAmpsSelect<'a> for [PhaseAmp] {
     type Item = PhaseAmp;
-    type IterOne = std::slice::Iter<'a, PhaseAmp>;
+    type IterOne = core::slice::Iter<'a, PhaseAmp>;
     type IterPair = PhaseAmpsPairIter<'a>;
     type IterTriple = PhaseAmpsTripleIter<'a>;
     type IterQuad = PhaseAmpsQuadIter<'a>;

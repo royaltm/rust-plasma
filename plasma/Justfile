@@ -1,4 +1,7 @@
 test:
+  cargo build
+  cargo build --no-default-features --features=micromath
+  cargo build --no-default-features --features=libm
   cargo +nightly test --features=rand/std
   cargo +nightly test --features=rand/std,use-simd
 

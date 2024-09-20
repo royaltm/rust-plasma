@@ -191,7 +191,7 @@ fn run() -> Result<(), String> {
     let mut rng = rand::thread_rng();
     let cfg = PhaseAmpCfg::new(MIN_STEPS, MAX_STEPS);
     let mut plasma = Arc::new(Plasma::new(plasma_width, plasma_height, cfg, &mut rng));
-    let mixer = PlasmaMixerT::new();
+    // let mixer = PlasmaMixerT::new();
 
     let thread_count = min(4, max(2, sdl2::cpuinfo::cpu_count())) as usize;
     let pool = Pool::new(thread_count);
@@ -263,14 +263,14 @@ fn run() -> Result<(), String> {
                                let h = min(segmh, plasma_height as usize - y);
                                let plasma = Arc::clone(&plasma);
                                scope.execute(move || {
-                                        plasma.render_part::<PixelBufRGB24, PlasmaICPT, _>(&mixer,
-                                                                                           chunk,
-                                                                                           pitch,
-                                                                                           0,
-                                                                                           y,
-                                                                                           plasma_width as usize,
-                                                                                           h,
-                                                                                           Some(wrkspc));
+                                        plasma.render_part::<PixelBufRGB24, PlasmaICPT, PlasmaMixerT>(
+                                            chunk,
+                                            pitch,
+                                            0,
+                                            y,
+                                            plasma_width as usize,
+                                            h,
+                                            Some(wrkspc));
                                     });
                            }
                        })

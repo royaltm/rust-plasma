@@ -1,7 +1,9 @@
 //! Default plasma mixer
-use crate::{color::*, mixer::*, phase_amp::*, simd_polyfill::*};
+use core::marker::PhantomData;
 use derive_more::{Debug, Constructor};
-use std::marker::PhantomData;
+use crate::{color::*, mixer::*, phase_amp::*, simd_polyfill::*};
+#[cfg(not(feature = "std"))]
+use crate::m_polyfill::*;
 
 /// A convenient type to be used with [crate::plasma::Plasma::render] or
 /// [crate::plasma::Plasma::render_part].
@@ -73,7 +75,7 @@ impl Mixer<Flt> for PlasmaMixer {
     type IntermediateV = [Flt; 6];
 
     #[inline]
-    fn mix_pixels(&self, vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut dyn FnMut(PixelRgb)) {
+    fn mix_pixels(vxp: &Self::IntermediateH, vyp: &Self::IntermediateV, next_pixel: &mut dyn FnMut(PixelRgb)) {
         let hue0 = compose4(vxp[0], vxp[1], vyp[0], vyp[1]);
         let hue1 = compose4(vxp[2], vxp[3], vyp[2], vyp[3]);
         let sat0 = compose4(vxp[4], vxp[5], vyp[4], vyp[5]);

@@ -46,18 +46,18 @@ Then somwehere in the code:
 Features
 --------
 
-** Due to `sleef-sys` not being maintained for more than 4 years now, `use-sleef` feature is no longer available. **
+* `std` (default) - compile with `std` library.
+* `use-simd` - specialized implementation with SIMD instructions. Available only for `x86`, `x86_64` or `aarch64` architectures, requires nightly rustc features. A significant CPU optimization boost can be achieved if compiled with advanced `target-cpu` feature flags. Enables `std`.
+* `micromath` - (alternative to `libm`) provides math routines for `no_std`.
+* `libm` - (alternative to `micromath`) provides math routines for `no_std`.
 
-* `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86`, `x86_64` or `aarch64`  architectures.
-* `use-sleef` - enables `use-simd` and also includes SLEEF Vectorized Math Library [sleef-sys](https://crates.io/crates/sleef-sys). Currently this does not build on windows with a "gnu" toolchain. Also available only for a `x86_64` architecture.
-
-To compile with [SLEEF](https://sleef.org) you'll need to have a [LLVM](http://releases.llvm.org/download.html#7.0.0) (clang) compiler and a [CMake](https://cmake.org) installed on the `PATH`. On Windows it's best to use CMake from a MS Visual Studio. Usually found at: `%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin`.
-
-Example:
+SIMD accelerated:
 
 ```
+RUSTFLAGS='-C target-cpu=+avx2' cargo build --release --features=use-simd
 RUSTFLAGS='-C target-cpu=native' cargo build --release --features=use-simd
 ```
+
 
 Benchmarking
 ------------
@@ -74,7 +74,7 @@ RUSTFLAGS='-C target-cpu=native' cargo +nightly bench --bench render --features=
 no_std
 ------
 
-In `no_std` mode plasma library still depends on the `alloc` crate and in addition requires one of the two additional features, which must be enabled by the depending crate:
+In `no_std` mode `plasma` library still depends on the `alloc` crate and in addition requires one of the two math libraries, which must be enabled by the depending crate:
 
 `Cargo.toml`:
 

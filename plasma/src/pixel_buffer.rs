@@ -4,7 +4,7 @@ use crate::m_polyfill::*;
 
 /// The trait for putting pixels into byte buffers.
 pub trait PixelBuffer {
-    /// Specifies how many bytes a single pixel occupies.
+    /// Specifies how many bytes a single plasma pixel occupies.
     const PIXEL_BYTES: usize;
     /// Puts bytes from a `pixel` into the provided `buffer` using a provided writer.
     fn put_pixel<'a, I: Iterator<Item = &'a mut u8>>(writer: &mut I, pixel: PixelRgb);
@@ -43,8 +43,15 @@ impl PixelBuffer for PixelBufRGBA32 {
 }
 
 #[cfg(not(feature = "use-simd"))]
+#[cfg_attr(docsrs, doc(cfg(not(feature = "use-simd"))))]
 /// A [PixelBuffer] tool for a RGB16 buffer (5-6-5 bits per color channel: red, green, blue).
 pub struct PixelBufRGB16;
+
+#[cfg(not(feature = "use-simd"))]
+#[cfg_attr(docsrs, doc(cfg(not(feature = "use-simd"))))]
+/// A [PixelBuffer] tool for a RGB16 x2 buffer (5-6-5 bits per color channel: red, green, blue)
+/// where each plasma pixel is being written to 2 consecutive pixels.
+pub struct PixelBufRGB16x2;
 
 #[cfg(not(feature = "use-simd"))]
 impl PixelBuffer for PixelBufRGB16 {
@@ -60,6 +67,26 @@ impl PixelBuffer for PixelBufRGB16 {
                     (((g & 0b11111100) as u16) << 3)|
                     (((b & 0b11111000) as u16) >> 3);
         for (v, ptr) in rgb16.to_be_bytes().into_iter().zip(writer) {
+            *ptr = v;
+        }
+    }
+}
+
+#[cfg(not(feature = "use-simd"))]
+impl PixelBuffer for PixelBufRGB16x2 {
+    const PIXEL_BYTES: usize = 4;
+
+    #[inline]
+    fn put_pixel<'a, I>(writer: &mut I, pixel: PixelRgb)
+        where I: Iterator<Item = &'a mut u8>
+    {
+        let PixelRgb { r, g, b } = pixel;
+        let [r, g, b] = [r, g, b].map(ToColor8::to_color_u8clamped);
+        let rgb16 = (((r & 0b11111000) as u16) << 8)|
+                    (((g & 0b11111100) as u16) << 3)|
+                    (((b & 0b11111000) as u16) >> 3);
+        let [hi, lo] = rgb16.to_be_bytes();
+        for (v, ptr) in [hi, lo, hi, lo].into_iter().zip(writer) {
             *ptr = v;
         }
     }

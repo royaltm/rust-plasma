@@ -26,7 +26,7 @@ update-ghp: doc
 
 # Generate Rust documentation
 cargo-doc:
-  cargo +nightly doc --no-deps -p plasma
+  RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --no-deps -p plasma
 
 # Generate TypeScript documentation
 ts-doc:

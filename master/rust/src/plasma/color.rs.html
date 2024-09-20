@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\color.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-92ec330caa5a75cd.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../plasma/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\color.rs`."><title>color.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (9c01301c5 2024-09-05)" data-channel="nightly" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -309,16 +310,26 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains a [PixelRgb] with optional SIMD implementation selected by a &quot;use-simd&quot; feature.
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a></pre></div><pre class="rust"><code><span class="doccomment">//! Contains a [PixelRgb] with optional SIMD implementation selected by a "use-simd" feature.
 </span><span class="kw">use </span>cfg_if::cfg_if;
-<span class="kw">use </span>derive_more::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>derive_more::{
+    Debug, Neg,
+    Add, Sub, Mul, Div, Rem,
+    AddAssign, SubAssign, MulAssign, DivAssign, RemAssign
+};
 
-<span class="macro">macro_rules! </span>define_pixel_rgb {
+<span class="macro">macro_rules!</span> define_pixel_rgb {
     (<span class="macro-nonterminal">$ty</span>:ty, <span class="macro-nonterminal">$tuple</span>:ty) =&gt; {
         <span class="doccomment">/// A struct representing one or more pixels in the linear RGB color space.
         ///
-        /// If a &quot;use-simd&quot; feature is enabled this class is being implemented for SIMD `f32x8` instead of `f32`.
+        /// If a "use-simd" feature is enabled this class is being implemented for SIMD `f32x8` instead of `f32`.
         /// In that case the single instance holds a value of 8 pixels at once instead of a one.
         </span><span class="attr">#[derive(Debug, Copy, Clone, Default, PartialEq,
             Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign)]
@@ -340,7 +351,7 @@
         ///
         /// The iterator is being created with a [PixelRgb::iter_rgb_values] method.
         ///
-        /// If a &quot;use-simd&quot; feature is enabled the iterator provides a color component values for all 8 pixels.
+        /// If a "use-simd" feature is enabled the iterator provides a color component values for all 8 pixels.
         /// In this instance the order will be `[r0, g0, b0, r1, g1, b1, ..., r7, g7, b7]`.
         </span><span class="attr">#[derive(Clone)]
         </span><span class="kw">pub struct </span>RgbIter {
@@ -357,7 +368,7 @@
         ///
         /// The iterator is being created with a [PixelRgb::iter_rgba_values] method.
         ///
-        /// If a &quot;use-simd&quot; feature is enabled the iterator provides a color component values for all 8 pixels.
+        /// If a "use-simd" feature is enabled the iterator provides a color component values for all 8 pixels.
         /// In this instance the order will be `[r0, g0, b0, alpha, r1, g1, b1, alpha, ..., r7, g7, b7, alpha]`.
         </span><span class="attr">#[derive(Clone)]
         </span><span class="kw">pub struct </span>RgbaIter {
@@ -372,16 +383,16 @@
     };
 }
 
-<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
-    <span class="kw">use </span>std::ops::Not;
+<span class="macro">cfg_if!</span> {<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"use-simd"</span>)] </span>{
+    <span class="kw">use </span>core::ptr;
+    <span class="kw">use </span>core::ops::Not;
     <span class="kw">use </span><span class="kw">crate</span>::simd_polyfill::<span class="kw-2">*</span>;
-
-    <span class="macro">macro_rules! </span>rgb_iterator_impl {
+    <span class="macro">macro_rules!</span> rgb_iterator_impl {
         (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$prop</span>:ident) =&gt; {
 
             <span class="kw">impl </span>ExactSizeIterator <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
                 <span class="attr">#[inline]
-                </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { LANES * <span class="macro-nonterminal">$name::LEN </span>- <span class="self">self</span>.offs }
+                </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { Flt::LANES * <span class="macro-nonterminal">$name::LEN </span>- <span class="self">self</span>.offs }
             }
 
             <span class="kw">impl </span>Iterator <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
@@ -389,7 +400,7 @@
 
                 <span class="attr">#[inline]
                 </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
-                    <span class="kw">const </span>SIZE: usize = LANES * <span class="macro-nonterminal">$name::LEN</span>;
+                    <span class="kw">const </span>SIZE: usize = Flt::LANES * <span class="macro-nonterminal">$name::LEN</span>;
                     <span class="kw">match </span><span class="self">self</span>.offs {
                         offs <span class="kw">if </span>offs &lt; SIZE =&gt; {
                             <span class="self">self</span>.offs += <span class="number">1</span>;
@@ -427,42 +438,43 @@
         <span class="attr">#[inline]
         </span><span class="kw">pub fn </span>iter_rgba_values(<span class="self">self</span>, alpha: f32) -&gt; RgbaIter {
             <span class="kw">let </span>PixelRgb { r, g, b } = <span class="self">self</span>;
-            <span class="kw">let </span>rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), splat(alpha).into()];
+            <span class="kw">let </span>rgba: [f32tuple; RgbaIter::LEN] = [r.into(), g.into(), b.into(), Flt::splat(alpha).into()];
             RgbaIter { rgba, offs: <span class="number">0 </span>}
         }
 
         <span class="attr">#[inline]
         </span><span class="kw">pub fn </span>from_hsv(hue: f32s, sat: f32s, val: f32s) -&gt; PixelRgb {
-            <span class="kw">const </span>FALSE: m32s = m32s::splat(<span class="bool-val">false</span>);
+            <span class="kw">let </span>mfalse = m32s::splat(<span class="bool-val">false</span>);
 
             <span class="kw">let </span>c = val * sat;
-            <span class="kw">let </span>h = (hue - (floor(hue / splat(<span class="number">2.0</span>)) * splat(<span class="number">2.0</span>))) * splat(<span class="number">3.0</span>);
-            <span class="kw">let </span>x = c * (splat(<span class="number">1.0</span>) - (h % splat(<span class="number">2.0</span>) - splat(<span class="number">1.0</span>)).abs());
+            <span class="comment">// let h = (hue - (floor(hue / Flt::splat(2.0)) * Flt::splat(2.0))) * Flt::splat(3.0);
+            </span><span class="kw">let </span>h = (hue - ((hue / Flt::splat(<span class="number">2.0</span>)).floor() * Flt::splat(<span class="number">2.0</span>))) * Flt::splat(<span class="number">3.0</span>);
+            <span class="kw">let </span>x = c * (Flt::splat(<span class="number">1.0</span>) - (h % Flt::splat(<span class="number">2.0</span>) - Flt::splat(<span class="number">1.0</span>)).abs());
             <span class="kw">let </span>m = val - c;
 
             <span class="kw">let </span>(<span class="kw-2">mut </span>r, <span class="kw-2">mut </span>g, <span class="kw-2">mut </span>b) = (m, m, m);
 
-            <span class="kw">let </span>less = h.lt(splat(<span class="number">1.0</span>));
+            <span class="kw">let </span>less = h.simd_lt(Flt::splat(<span class="number">1.0</span>));
             <span class="kw">if </span>less.any() {
                 r = less.select(c+m, r); g = less.select(x+m, g);
             }
-            <span class="kw">let </span>less2 = h.lt(splat(<span class="number">2.0</span>));
-            <span class="kw">let </span>less = less.select(FALSE, less2);
+            <span class="kw">let </span>less2 = h.simd_lt(Flt::splat(<span class="number">2.0</span>));
+            <span class="kw">let </span>less = less.select_mask(mfalse, less2);
             <span class="kw">if </span>less.any() {
                 r = less.select(x+m, r); g = less.select(c+m, g);
             }
-            <span class="kw">let </span>less3 = h.lt(splat(<span class="number">3.0</span>));
-            <span class="kw">let </span>less = less2.select(FALSE, less3);
+            <span class="kw">let </span>less3 = h.simd_lt(Flt::splat(<span class="number">3.0</span>));
+            <span class="kw">let </span>less = less2.select_mask(mfalse, less3);
             <span class="kw">if </span>less.any() {
                 g = less.select(c+m, g); b = less.select(x+m, b);
             }
-            <span class="kw">let </span>less4 = h.lt(splat(<span class="number">4.0</span>));
-            <span class="kw">let </span>less = less3.select(FALSE, less4);
+            <span class="kw">let </span>less4 = h.simd_lt(Flt::splat(<span class="number">4.0</span>));
+            <span class="kw">let </span>less = less3.select_mask(mfalse, less4);
             <span class="kw">if </span>less.any() {
                 g = less.select(x+m, g); b = less.select(c+m, b);
             }
-            <span class="kw">let </span>less5 = h.lt(splat(<span class="number">5.0</span>));
-            <span class="kw">let </span>less = less4.select(FALSE, less5);
+            <span class="kw">let </span>less5 = h.simd_lt(Flt::splat(<span class="number">5.0</span>));
+            <span class="kw">let </span>less = less4.select_mask(mfalse, less5);
             <span class="kw">if </span>less.any() {
                 r = less.select(x+m, r); b = less.select(c+m, b);
             }
@@ -475,8 +487,10 @@
     }
 
 } <span class="kw">else </span>{
+    <span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::m_polyfill::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules! </span>rgb_iterator_impl {
+    <span class="macro">macro_rules!</span> rgb_iterator_impl {
         (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$prop</span>:ident) =&gt; {
             <span class="kw">impl </span>ExactSizeIterator <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
                 <span class="attr">#[inline]
@@ -488,10 +502,10 @@
 
                 <span class="attr">#[inline]
                 </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
-                    <span class="kw">match </span><span class="self">self</span>.offs {
-                        offs <span class="kw">if </span>offs &lt; <span class="macro-nonterminal">$name::LEN </span>=&gt; {
+                    <span class="kw">match </span><span class="self">self</span>.<span class="macro-nonterminal">$prop</span>.get(<span class="self">self</span>.offs) {
+                        <span class="prelude-val">Some</span>(v) =&gt; {
                             <span class="self">self</span>.offs += <span class="number">1</span>;
-                            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ ptr::read(<span class="self">self</span>.<span class="macro-nonterminal">$prop</span>.as_ptr().add(offs)) })
+                            <span class="prelude-val">Some</span>(<span class="kw-2">*</span>v)
                         },
                         <span class="kw">_ </span>=&gt; <span class="prelude-val">None
                     </span>}
@@ -530,7 +544,7 @@
         <span class="doccomment">/// Creates an instance of a [PixelRgb] from HSV color components.
         ///
         /// `hue` should be in the range: `[0, 2)` and will be normalized.
-        /// `sat` and `val` should be in the range: `[0, 1]` and won&#39;t be normalized.
+        /// `sat` and `val` should be in the range: `[0, 1]` and won't be normalized.
         </span><span class="attr">#[inline]
         </span><span class="kw">pub fn </span>from_hsv(hue: f32, sat: f32, val: f32) -&gt; PixelRgb {
             <span class="kw">let </span>c = val * sat;
@@ -562,6 +576,8 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use crate</span>::{color::<span class="kw-2">*</span>, simd_polyfill::<span class="kw-2">*</span>};
 
+    <span class="kw">fn </span>splat(v: f32) -&gt; Flt { Flt::sc_splat(v) }
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_works() {
         <span class="macro">assert_eq!</span>(PixelRgb::from_hsv(splat(<span class="number">0.0</span>), splat(<span class="number">0.0</span>), splat(<span class="number">0.0</span>)), PixelRgb { r: splat(<span class="number">0.0</span>),
@@ -592,7 +608,7 @@
                    PixelRgb::from_hsv(splat(<span class="number">1.5</span>), splat(<span class="number">1.0</span>), splat(<span class="number">1.0</span>)));
     }
 
-    <span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
+    <span class="macro">cfg_if!</span> {<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"use-simd"</span>)] </span>{
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>iterator_works() {
@@ -620,5 +636,4 @@
         }
     }}
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (01fbc5ae7 2022-12-07)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

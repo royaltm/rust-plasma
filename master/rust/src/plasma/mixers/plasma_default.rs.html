@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\mixers\plasma_default.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>plasma_default.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-92ec330caa5a75cd.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../plasma/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\mixers\plasma_default.rs`."><title>plasma_default.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (9c01301c5 2024-09-05)" data-channel="nightly" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -104,16 +105,19 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Default plasma mixer
-</span><span class="kw">use crate</span>::{color::<span class="kw-2">*</span>, mixer::<span class="kw-2">*</span>, phase_amp::<span class="kw-2">*</span>, simd_polyfill::<span class="kw-2">*</span>};
-<span class="kw">use </span>derive_more::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::marker::PhantomData;
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a></pre></div><pre class="rust"><code><span class="doccomment">//! Default plasma mixer
+</span><span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>derive_more::{Debug, Constructor};
+<span class="kw">use crate</span>::{color::<span class="kw-2">*</span>, mixer::<span class="kw-2">*</span>, phase_amp::<span class="kw-2">*</span>, simd_polyfill::<span class="kw-2">*</span>};
+<span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::m_polyfill::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A convenient type to be used with [crate::plasma::Plasma::render] or
 /// [crate::plasma::Plasma::render_part].
-</span><span class="kw">pub type </span>PlasmaICP&lt;<span class="lifetime">&#39;a</span>&gt; = PlasmaInterCalcProducer&lt;<span class="lifetime">&#39;a</span>, [PhaseAmp]&gt;;
+</span><span class="kw">pub type </span>PlasmaICP&lt;<span class="lifetime">'a</span>&gt; = PlasmaInterCalcProducer&lt;<span class="lifetime">'a</span>, [PhaseAmp]&gt;;
 <span class="doccomment">/// A convenient type to be used with [crate::plasma::render_part].
-</span><span class="kw">pub type </span>PlasmaICPExtPa&lt;<span class="lifetime">&#39;a</span>&gt; = PlasmaInterCalcProducer&lt;<span class="lifetime">&#39;a</span>, [f32]&gt;;
+</span><span class="kw">pub type </span>PlasmaICPExtPa&lt;<span class="lifetime">'a</span>&gt; = PlasmaInterCalcProducer&lt;<span class="lifetime">'a</span>, [f32]&gt;;
 
 <span class="doccomment">/// A default implementation of a [Mixer] is provided for this struct.
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, Constructor)]
@@ -129,24 +133,24 @@
 }
 
 <span class="doccomment">/// Provides a default implementation of an iterator of [PlasmaLineCalc].
-</span><span class="kw">pub struct </span>PlasmaMixIter&lt;<span class="lifetime">&#39;a</span>, P: PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized&gt; {
-    pa_pair_iter: &lt;P <span class="kw">as </span>PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::IterPair,
+</span><span class="kw">pub struct </span>PlasmaMixIter&lt;<span class="lifetime">'a</span>, P: PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized&gt; {
+    pa_pair_iter: &lt;P <span class="kw">as </span>PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt;&gt;::IterPair,
 }
 
 <span class="doccomment">/// Provides a default implementation of a [IntermediateCalculatorProducer].
-</span><span class="kw">pub struct </span>PlasmaInterCalcProducer&lt;<span class="lifetime">&#39;a</span>, P: <span class="lifetime">&#39;a </span>+ PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized&gt;(PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>P&gt;);
+</span><span class="kw">pub struct </span>PlasmaInterCalcProducer&lt;<span class="lifetime">'a</span>, P: <span class="lifetime">'a </span>+ PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized&gt;(PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>P&gt;);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, P&gt; Iterator <span class="kw">for </span>PlasmaMixIter&lt;<span class="lifetime">&#39;a</span>, P&gt; <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, P&gt; Iterator <span class="kw">for </span>PlasmaMixIter&lt;<span class="lifetime">'a</span>, P&gt; <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized
 {
     <span class="kw">type </span>Item = PlasmaLineCalc;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">match </span><span class="self">self</span>.pa_pair_iter.next() {
-            <span class="prelude-val">Some</span>((pa1, pa2)) =&gt; <span class="prelude-val">Some</span>(PlasmaLineCalc { amplitude1: splat(pa1.amplitude()),
-                                                      phase1:     splat(pa1.phase()),
-                                                      amplitude2: splat(pa2.amplitude()),
-                                                      phase2:     splat(pa2.phase()),
-                                                      normal:     splat(pa1.amplitude() + pa2.amplitude()), }),
+            <span class="prelude-val">Some</span>((pa1, pa2)) =&gt; <span class="prelude-val">Some</span>(PlasmaLineCalc { amplitude1: Flt::sc_splat(pa1.amplitude()),
+                                                      phase1:     Flt::sc_splat(pa1.phase()),
+                                                      amplitude2: Flt::sc_splat(pa2.amplitude()),
+                                                      phase2:     Flt::sc_splat(pa2.phase()),
+                                                      normal:     Flt::sc_splat(pa1.amplitude() + pa2.amplitude()), }),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -155,23 +159,23 @@
     </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) { <span class="self">self</span>.pa_pair_iter.size_hint() }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, P&gt; ExactSizeIterator <span class="kw">for </span>PlasmaMixIter&lt;<span class="lifetime">&#39;a</span>, P&gt; <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, P&gt; ExactSizeIterator <span class="kw">for </span>PlasmaMixIter&lt;<span class="lifetime">'a</span>, P&gt; <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized
 {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.pa_pair_iter.len() }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, P&gt; IntermediateCalculatorProducer&lt;<span class="lifetime">&#39;a</span>, P, Flt&gt; <span class="kw">for </span>PlasmaInterCalcProducer&lt;<span class="lifetime">&#39;a</span>, P&gt;
-    <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, P&gt; IntermediateCalculatorProducer&lt;<span class="lifetime">'a</span>, P, Flt&gt; <span class="kw">for </span>PlasmaInterCalcProducer&lt;<span class="lifetime">'a</span>, P&gt;
+    <span class="kw">where </span>P: PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized
 {
-    <span class="kw">type </span>CalcIterH = PlasmaMixIter&lt;<span class="lifetime">&#39;a</span>, P&gt;;
-    <span class="kw">type </span>CalcIterV = PlasmaMixIter&lt;<span class="lifetime">&#39;a</span>, P&gt;;
+    <span class="kw">type </span>CalcIterH = PlasmaMixIter&lt;<span class="lifetime">'a</span>, P&gt;;
+    <span class="kw">type </span>CalcIterV = PlasmaMixIter&lt;<span class="lifetime">'a</span>, P&gt;;
     <span class="kw">type </span>LineCalcH = PlasmaLineCalc;
     <span class="kw">type </span>LineCalcV = PlasmaLineCalc;
 
-    <span class="kw">fn </span>compose_h_iter(pa: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>P) -&gt; <span class="self">Self</span>::CalcIterH { PlasmaMixIter { pa_pair_iter: pa.select(<span class="number">0</span>..<span class="number">12</span>).iter_pa_pairs() } }
+    <span class="kw">fn </span>compose_h_iter(pa: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>P) -&gt; <span class="self">Self</span>::CalcIterH { PlasmaMixIter { pa_pair_iter: pa.select(<span class="number">0</span>..<span class="number">12</span>).iter_pa_pairs() } }
 
-    <span class="kw">fn </span>compose_v_iter(pa: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>P) -&gt; <span class="self">Self</span>::CalcIterV { PlasmaMixIter { pa_pair_iter: pa.select(<span class="number">12</span>..<span class="number">24</span>).iter_pa_pairs() } }
+    <span class="kw">fn </span>compose_v_iter(pa: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>P) -&gt; <span class="self">Self</span>::CalcIterV { PlasmaMixIter { pa_pair_iter: pa.select(<span class="number">12</span>..<span class="number">24</span>).iter_pa_pairs() } }
 }
 
 <span class="kw">impl </span>Mixer&lt;Flt&gt; <span class="kw">for </span>PlasmaMixer {
@@ -179,29 +183,29 @@
     <span class="kw">type </span>IntermediateV = [Flt; <span class="number">6</span>];
 
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>mix_pixels(<span class="kw-2">&amp;</span><span class="self">self</span>, vxp: <span class="kw-2">&amp;</span><span class="self">Self</span>::IntermediateH, vyp: <span class="kw-2">&amp;</span><span class="self">Self</span>::IntermediateV, next_pixel: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(PixelRgb)) {
+    </span><span class="kw">fn </span>mix_pixels(vxp: <span class="kw-2">&amp;</span><span class="self">Self</span>::IntermediateH, vyp: <span class="kw-2">&amp;</span><span class="self">Self</span>::IntermediateV, next_pixel: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(PixelRgb)) {
         <span class="kw">let </span>hue0 = compose4(vxp[<span class="number">0</span>], vxp[<span class="number">1</span>], vyp[<span class="number">0</span>], vyp[<span class="number">1</span>]);
         <span class="kw">let </span>hue1 = compose4(vxp[<span class="number">2</span>], vxp[<span class="number">3</span>], vyp[<span class="number">2</span>], vyp[<span class="number">3</span>]);
         <span class="kw">let </span>sat0 = compose4(vxp[<span class="number">4</span>], vxp[<span class="number">5</span>], vyp[<span class="number">4</span>], vyp[<span class="number">5</span>]);
-        <span class="kw">let </span>hue0 = splat(<span class="number">1.0</span>) - hue0 * splat(<span class="number">1.5</span>);
-        <span class="kw">let </span>hue1 = hue1 * splat(<span class="number">3.0</span>);
-        <span class="kw">let </span>sat0 = (sat0 * splat(<span class="number">1.5</span>)).abs().min(splat(<span class="number">1.0</span>));
-        <span class="kw">let </span>rgb0 = PixelRgb::from_hsv(hue0, splat(<span class="number">1.0</span>), splat(<span class="number">1.0</span>));
-        <span class="kw">let </span>rgb1 = PixelRgb::from_hsv(hue1, sat0, splat(<span class="number">1.0</span>));
+        <span class="kw">let </span>hue0 = Flt::sc_splat(<span class="number">1.0</span>) - hue0 * Flt::sc_splat(<span class="number">1.5</span>);
+        <span class="kw">let </span>hue1 = hue1 * Flt::sc_splat(<span class="number">3.0</span>);
+        <span class="kw">let </span>sat0 = (sat0 * Flt::sc_splat(<span class="number">1.5</span>)).abs().sc_min(Flt::sc_splat(<span class="number">1.0</span>));
+        <span class="kw">let </span>rgb0 = PixelRgb::from_hsv(hue0, Flt::sc_splat(<span class="number">1.0</span>), Flt::sc_splat(<span class="number">1.0</span>));
+        <span class="kw">let </span>rgb1 = PixelRgb::from_hsv(hue1, sat0, Flt::sc_splat(<span class="number">1.0</span>));
         next_pixel(rgb0 - rgb1);
     }
 }
 
 <span class="attr">#[inline]
 </span><span class="kw">fn </span>compose4(x1: Flt, x2: Flt, y1: Flt, y2: Flt) -&gt; Flt {
-    <span class="kw">const </span>THIRD: Flt = splat(<span class="number">1.0 </span>/ <span class="number">3.0</span>);
+    <span class="kw">const </span>THIRD: Flt = csplat(<span class="number">1.0 </span>/ <span class="number">3.0</span>);
     (x1 + y1 * x2 + y2) * THIRD
 }
 
 <span class="kw">impl </span>IntermediateCalculator&lt;Flt&gt; <span class="kw">for </span>PlasmaLineCalc {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>calculate(<span class="kw-2">&amp;</span><span class="self">self</span>, v: Flt) -&gt; Flt {
-        <span class="kw">const </span>ZERO: Flt = splat(<span class="number">0.0</span>);
+        <span class="kw">const </span>ZERO: Flt = csplat(<span class="number">0.0</span>);
         <span class="kw">if </span><span class="self">self</span>.normal == ZERO {
             ZERO
         }
@@ -210,5 +214,4 @@
         }
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (01fbc5ae7 2022-12-07)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

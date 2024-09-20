@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\plasma.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>plasma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-92ec330caa5a75cd.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../plasma/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `plasma\src\plasma.rs`."><title>plasma.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (9c01301c5 2024-09-05)" data-channel="nightly" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -302,8 +303,16 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::BorrowMut, cmp::min, f32::consts::PI};
-
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a></pre></div><pre class="rust"><code><span class="kw">use </span>core::{
+    borrow::BorrowMut,
+    cmp::min,
+    f32::consts::PI
+};
+<span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
+</span><span class="kw">use </span>alloc::vec::Vec;
 <span class="kw">use </span>rand::Rng;
 
 <span class="kw">use </span>cfg_if::cfg_if;
@@ -315,8 +324,8 @@
 <span class="kw">type </span>PhaseAmpsT = [PhaseAmp; <span class="number">24</span>];
 
 <span class="doccomment">/// A convenient trait alias for plasma render methods.
-</span><span class="kw">pub trait </span>ICProducer&lt;<span class="lifetime">&#39;a</span>&gt;: IntermediateCalculatorProducer&lt;<span class="lifetime">&#39;a</span>, [PhaseAmp], Flt&gt; {}
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; ICProducer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>T <span class="kw">where </span>T: IntermediateCalculatorProducer&lt;<span class="lifetime">&#39;a</span>, [PhaseAmp], Flt&gt; {}
+</span><span class="kw">pub trait </span>ICProducer&lt;<span class="lifetime">'a</span>&gt;: IntermediateCalculatorProducer&lt;<span class="lifetime">'a</span>, [PhaseAmp], Flt&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; ICProducer&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>T <span class="kw">where </span>T: IntermediateCalculatorProducer&lt;<span class="lifetime">'a</span>, [PhaseAmp], Flt&gt; {}
 
 <span class="doccomment">/// The struct that holds the meta information about current plasma state
 </span><span class="attr">#[derive(Debug, Clone, PartialEq)]
@@ -361,13 +370,12 @@
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>render&lt;<span class="lifetime">&#39;a</span>, B, L, M&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, mixer: <span class="kw-2">&amp;</span>M, buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, wrkspc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;&gt;)
+    </span><span class="kw">pub fn </span>render&lt;<span class="lifetime">'a</span>, B, L, M&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, wrkspc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;&gt;)
         <span class="kw">where </span>B: PixelBuffer,
-              L: ICProducer&lt;<span class="lifetime">&#39;a</span>&gt;,
+              L: ICProducer&lt;<span class="lifetime">'a</span>&gt;,
               M: Mixer&lt;Flt&gt;
     {
-        <span class="self">self</span>.render_part::&lt;B, L, M&gt;(mixer,
-                                    buffer,
+        <span class="self">self</span>.render_part::&lt;B, L, M&gt;(buffer,
                                     pitch,
                                     <span class="number">0</span>,
                                     <span class="number">0</span>,
@@ -388,16 +396,16 @@
     /// The `wrkspc` is an optional temporary memory scractchpad.
     /// If None is provided the new memory will be allocated.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>render_part&lt;<span class="lifetime">&#39;a</span>, B, L, M&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, mixer: <span class="kw-2">&amp;</span>M, buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, x: usize, y: usize, w: usize,
+    </span><span class="kw">pub fn </span>render_part&lt;<span class="lifetime">'a</span>, B, L, M&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, x: usize, y: usize, w: usize,
                                     h: usize, wrkspc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;&gt;)
         <span class="kw">where </span>B: PixelBuffer,
-              L: ICProducer&lt;<span class="lifetime">&#39;a</span>&gt;,
+              L: ICProducer&lt;<span class="lifetime">'a</span>&gt;,
               M: Mixer&lt;Flt&gt;
     {
         <span class="kw">let </span>pw = <span class="self">self</span>.pixel_width <span class="kw">as </span>usize;
         <span class="kw">let </span>ph = <span class="self">self</span>.pixel_height <span class="kw">as </span>usize;
         <span class="kw">let </span>phase_amps = <span class="kw-2">&amp;</span><span class="self">self</span>.phase_amps[..];
-        render_part::&lt;B, L, M, <span class="kw">_</span>&gt;(mixer, buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
+        render_part::&lt;B, L, M, <span class="kw">_</span>&gt;(buffer, pitch, pw, ph, phase_amps, x, y, w, h, wrkspc)
     }
 
     <span class="doccomment">/// Import the internal plasma state from a slice of 32bit floats.
@@ -436,12 +444,12 @@
 /// # Panics
 ///
 /// __Panics__ if [PhaseAmpsSelect::select] panics.
-</span><span class="kw">pub fn </span>render_part&lt;<span class="lifetime">&#39;a</span>, B, L, M, P&gt;(mixer: <span class="kw-2">&amp;</span>M, buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, pw: usize, ph: usize, phase_amps: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>P,
+</span><span class="kw">pub fn </span>render_part&lt;<span class="lifetime">'a</span>, B, L, M, P&gt;(buffer: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, pw: usize, ph: usize, phase_amps: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>P,
                                    x: usize, y: usize, w: usize, h: usize, wrkspc: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;&gt;)
     <span class="kw">where </span>B: PixelBuffer,
-          L: IntermediateCalculatorProducer&lt;<span class="lifetime">&#39;a</span>, P, Flt&gt;,
+          L: IntermediateCalculatorProducer&lt;<span class="lifetime">'a</span>, P, Flt&gt;,
           M: Mixer&lt;Flt&gt;,
-          P: PhaseAmpsSelect&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="question-mark">?</span>Sized
+          P: PhaseAmpsSelect&lt;<span class="lifetime">'a</span>&gt; + <span class="question-mark">?</span>Sized
 {
     <span class="kw">if </span>x &gt;= pw {
         <span class="kw">return</span>;
@@ -449,7 +457,7 @@
     <span class="kw">else if </span>y &gt;= ph {
         <span class="kw">return</span>;
     }
-    <span class="comment">/* let&#39;s ensure we have some workspace */
+    <span class="comment">/* let's ensure we have some workspace */
     </span><span class="kw">let </span><span class="kw-2">mut </span>tmpwrkspc: Vec&lt;u8&gt;;
     <span class="kw">let </span>wrkspc = <span class="kw">match </span>wrkspc {
         <span class="prelude-val">Some</span>(w) =&gt; w, <span class="comment">/* the provided one */
@@ -485,21 +493,21 @@
         }
     }
     <span class="comment">/* render lines */
-    </span><span class="kw">for </span>(lines, vyp) <span class="kw">in </span>buffer.chunks_mut(LANES * pitch).zip(vyps.iter()) {
-        gen_lines::&lt;B, <span class="kw">_</span>&gt;(mixer, vyp, vxps, lines, pitch, dx);
+    </span><span class="kw">for </span>(lines, vyp) <span class="kw">in </span>buffer.chunks_mut(Flt::LANES * pitch).zip(vyps.iter()) {
+        gen_lines::&lt;B, M&gt;(vyp, vxps, lines, pitch, dx);
     }
 }
 
-<span class="macro">cfg_if! </span>{<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;use-simd&quot;</span>)] </span>{
-    <span class="kw">use </span>std::borrow::Borrow;
-    <span class="kw">use </span>packed_simd::Cast;
+<span class="macro">cfg_if!</span> {<span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"use-simd"</span>)] </span>{
+    <span class="kw">use </span>core::borrow::Borrow;
+    <span class="kw">use </span>core::simd::prelude::SimdUint;
 
     <span class="kw">fn </span>prepare_composition_line&lt;C, D&gt;(index: usize, x0: usize, wr: f32, calc: <span class="kw-2">&amp;</span>C, out: <span class="kw-2">&amp;mut </span>[D])
     <span class="kw">where </span>C: IntermediateCalculator&lt;f32s&gt;, D: BorrowMut&lt;[f32s]&gt;
     {
-        <span class="kw">let </span>wr = splat(wr);
+        <span class="kw">let </span>wr = Flt::splat(wr);
         <span class="kw">for </span>(i, op) <span class="kw">in </span>out.iter_mut().enumerate() {
-            <span class="kw">let </span>x = (i * LANES + x0) <span class="kw">as </span>u32;
+            <span class="kw">let </span>x = (i * Flt::LANES + x0) <span class="kw">as </span>u32;
             <span class="kw">let </span>xs: f32s = <span class="macro">simd_new_consecutive!</span>(u32s, x).cast();
             op.borrow_mut()[index] = calc.calculate(xs * wr);
         }
@@ -507,7 +515,7 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>vd_size(dv: usize) -&gt; usize {
-        (dv + LANES - <span class="number">1</span>) / LANES
+        (dv + Flt::LANES - <span class="number">1</span>) / Flt::LANES
     }
 
     <span class="kw">fn </span>prepare_workspace&lt;M&gt;(tmp: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, dx: usize, dy: usize) -&gt; (<span class="kw-2">&amp;mut </span>[M::IntermediateH], <span class="kw-2">&amp;mut </span>[M::IntermediateV])
@@ -526,15 +534,15 @@
         (ax, ay)
     }
 
-    <span class="kw">fn </span>gen_lines&lt;B, M&gt;(mixer: <span class="kw-2">&amp;</span>M, vyp: <span class="kw-2">&amp;</span>M::IntermediateV, vxps: <span class="kw-2">&amp;</span>[M::IntermediateH], lines: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, dx: usize)
+    <span class="kw">fn </span>gen_lines&lt;B, M&gt;(vyp: <span class="kw-2">&amp;</span>M::IntermediateV, vxps: <span class="kw-2">&amp;</span>[M::IntermediateH], lines: <span class="kw-2">&amp;mut </span>[u8], pitch: usize, dx: usize)
     <span class="kw">where </span>B: PixelBuffer, M: Mixer&lt;f32s&gt;, M::IntermediateV: Borrow&lt;[f32s]&gt; + BorrowMut&lt;[f32s]&gt;
     {
         <span class="comment">/* splat each y */
-        </span><span class="kw">let </span><span class="kw-2">mut </span>vypl: [M::IntermediateV; LANES] = Default::default();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>vypl: [M::IntermediateV; Flt::LANES] = Default::default();
         <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>ys) <span class="kw">in </span>vyp.borrow().iter().enumerate() {
             <span class="kw">let </span>ys: f32tuple = ys.into();
             <span class="kw">for </span>(<span class="kw-2">&amp;</span>y, vyp) <span class="kw">in </span>ys.iter().zip(vypl.iter_mut()) {
-                vyp.borrow_mut()[i] = splat(y);
+                vyp.borrow_mut()[i] = Flt::splat(y);
             }
         }
         <span class="kw">let </span>line_end = B::PIXEL_BYTES * dx;
@@ -544,7 +552,7 @@
                 B::put_pixel(<span class="kw-2">&amp;mut </span>writer, pixel);
             };
             <span class="kw">for </span>vxp <span class="kw">in </span>vxps.iter() {
-                mixer.mix_pixels(vxp, vyp, <span class="kw-2">&amp;mut </span>next_pixel);
+                M::mix_pixels(vxp, vyp, <span class="kw-2">&amp;mut </span>next_pixel);
             }
         }
     }
@@ -573,7 +581,7 @@
         (ax, ay)
     }
 
-    <span class="kw">fn </span>gen_lines&lt;B, M&gt;(mixer: <span class="kw-2">&amp;</span>M, vyp: <span class="kw-2">&amp;</span>M::IntermediateV, vxps: <span class="kw-2">&amp;</span>[M::IntermediateH], line: <span class="kw-2">&amp;mut </span>[u8], _pitch: usize, _dx: usize)
+    <span class="kw">fn </span>gen_lines&lt;B, M&gt;(vyp: <span class="kw-2">&amp;</span>M::IntermediateV, vxps: <span class="kw-2">&amp;</span>[M::IntermediateH], line: <span class="kw-2">&amp;mut </span>[u8], _pitch: usize, _dx: usize)
     <span class="kw">where </span>B: PixelBuffer, M: Mixer&lt;f32&gt;
     {
         <span class="kw">let </span><span class="kw-2">mut </span>writer = line.iter_mut();
@@ -582,7 +590,7 @@
         };
 
         <span class="kw">for </span>vxp <span class="kw">in </span>vxps.iter() {
-            mixer.mix_pixels(vxp, vyp, <span class="kw-2">&amp;mut </span>next_pixel);
+            M::mix_pixels(vxp, vyp, <span class="kw-2">&amp;mut </span>next_pixel);
         }
     }
 }}
@@ -592,9 +600,9 @@
 // 3. returned slice is aligned to type T.
 // 4. T must not implement drop (e.g. primitives)
 // 5. values in slice may be uninitialized
-</span><span class="kw">unsafe fn </span>make_temporary_slice_mut&lt;<span class="lifetime">&#39;a</span>, T: Copy&gt;(vec: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;, len: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T] {
-    <span class="kw">use </span>std::{mem, slice};
-    <span class="macro">assert!</span>(!mem::needs_drop::&lt;T&gt;(), <span class="string">&quot;only non droppable types please&quot;</span>);
+</span><span class="kw">unsafe fn </span>make_temporary_slice_mut&lt;<span class="lifetime">'a</span>, T: Copy&gt;(vec: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;, len: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>[T] {
+    <span class="kw">use </span>core::{mem, slice};
+    <span class="macro">assert!</span>(!mem::needs_drop::&lt;T&gt;(), <span class="string">"only non droppable types please"</span>);
     vec.clear();
     <span class="kw">let </span>bytelen = len * mem::size_of::&lt;T&gt;() + mem::align_of::&lt;T&gt;() - <span class="number">1</span>;
     <span class="kw">let </span>cap = vec.capacity();
@@ -606,5 +614,4 @@
     <span class="kw">let </span>(<span class="kw">_</span>, res, <span class="kw">_</span>) = raw_bytes.align_to_mut::&lt;T&gt;();
     res
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plasma" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (01fbc5ae7 2022-12-07)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

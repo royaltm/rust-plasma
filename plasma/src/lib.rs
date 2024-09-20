@@ -15,13 +15,12 @@
 //!     let plasma_height = 200u32;
 //!     let mut rng = rand::thread_rng();
 //!     let cfg = PhaseAmpCfg::new(min_steps, max_steps);
-//!     let mixer = PlasmaMixer::new();
 //!
 //!     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &mut rng);
 //!
 //!     let pitch = plasma_width as usize * PixelBufRGB24::PIXEL_BYTES;
 //!     let mut buffer_rgb24 = vec![0u8; pitch * plasma_height as usize];
-//!     plasma.render::<PixelBufRGB24, PlasmaICP, _>(&mixer, &mut buffer_rgb24, pitch, None);
+//!     plasma.render::<PixelBufRGB24, PlasmaICP, PlasmaMixer>(&mut buffer_rgb24, pitch, None);
 //!     plasma.update(&mut rng);
 //! }
 //! ```

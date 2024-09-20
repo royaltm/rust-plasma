@@ -21,7 +21,9 @@ To run `plasma-demo` make sure `SDL2.dll` file from `desktop` directory may be f
 
 If you don't want to depend on `SDL2.dll` you need to statically compile `plasma-demo` with `SDL2`.
 
-This is a little bit tricky and can be achieved on Windows with `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
+Using MSVC it's only possible when also compiled with a `bundled` feature.
+
+Otherwise it can be achieved on Windows using `gnu-mingw` Rust toolchain and `MSYS2` with `mingw-w64` toolchain.
 
 ### Prerequisites
 
@@ -30,7 +32,7 @@ This is a little bit tricky and can be achieved on Windows with `gnu-mingw` Rust
 3. From MinGW console install `pacman -S mingw-w64-x86_64-toolchain` or `pacman -S mingw-w64-i686-toolchain` depending upon which architecture (`x86_x64` or `i686`) you want to compile to.
 4. Install the base set of developer tools using `pacman -S base-devel`.
 5. Install rust toolchain `rustup install nightly-x86_64-pc-windows-gnu` or `rustup install nightly-i686-pc-windows-gnu` depending on which architecture (`x86_x64` or `i686`) you want to compile to.
-6. Edit file in `%USERPROFILE%/.cargo/config` (create this file eventually) and add the following to override rust-embedded gnu linker:
+6. Edit file in `%USERPROFILE%/.cargo/config.toml` (create this file eventually) and add the following to override rust-embedded gnu linker:
 
 ```
 [target.x86_64-pc-windows-gnu]
@@ -51,14 +53,14 @@ From MSYS2 console, for a `x86_64` toolchain type:
 
 ```sh
 cd plasma/desktop
-RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.12-windows/x86_64/gnu-mingw" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.30.7-windows/x86_64/gnu-mingw" cargo +nightly-x86_64-pc-windows-gnu build --features=static-link --release
 ```
 
 and for a `i686` toolchain type:
 
 ```sh
 cd plasma/desktop
-RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.0.12-windows/i686/gnu-mingw" cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
+RUSTFLAGS="-C link-args=-s -L native=`pwd -W`/sdl-2.30.7-windows/i686/gnu-mingw" cargo +nightly-i686-pc-windows-gnu build --features=static-link --release
 ```
 
 
@@ -75,7 +77,7 @@ Right click on `Plasma.scr` and select `Install`. Enjoy.
 Linux
 -----
 
-Get the SDL-2.0.14 or later development package.
+Get the SDL-2.0.26 or later development package.
 
 Ubuntu example:
 
@@ -132,13 +134,19 @@ cargo build --release
 Features
 --------
 
-* `use-simd` - selects specialized implementation with SIMD instructions. Available only for `x86`, `x86_64` or `aarch64` architectures.
-* `bundled` - compile a bundled SDL2 library.
-* `static-link` - compile with a static SDL2 library. Not available with "msvc" toolchain.
+* `use-simd` - specialized implementation with SIMD instructions. Available only for `x86`, `x86_64` or `aarch64` architectures, requires nightly rustc features. A significant CPU optimization boost can be achieved if compiled with advanced `target-cpu` feature flags.
+* `bundled` - compile SDL2 library from source.
+* `static-link` - compile with a static SDL2 library. Available for "msvc" toolchain only when used with `bundled`.
 * `use-pkgconfig` - search for SDL2 library in the system using pkgconfig.
 
-Example:
+Enable full potential of `use-simd` on `x86_64`:
 
 ```
-RUSTFLAGS='-C target-cpu=native' cargo +nightly run --release --features=use-simd
+RUSTFLAGS='-C target-cpu=+avx2' cargo +nightly run --release --features=use-simd
+```
+
+Tailor `plasma-demo` to your CPU, build statically linked binary:
+
+```
+RUSTFLAGS='-C target-cpu=native' cargo +nightly run --release --features=use-simd,static-link,bundled
 ```

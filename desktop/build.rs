@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-const SDL2_WINDOWS_DIR: &'static str = "sdl-2.26.1-windows";
+const SDL2_WINDOWS_DIR: &'static str = "sdl-2.30.7-windows";
 
 fn main() {
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows" {

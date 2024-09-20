@@ -94,12 +94,11 @@ fn bench_render_buf<PBuf: PixelBuffer>(ben: &mut Bencher) {
     let mut plasma = Plasma::new(plasma_width, plasma_height, cfg, &mut rng);
     let pitch: usize = PBuf::PIXEL_BYTES * plasma_width as usize;
     let mut buffer_rgb24: Vec<u8> = vec![0; pitch * plasma_height as usize];
-    let mixer = PlasmaMixer::new();
     let mut workspc = Vec::new();
     ben.iter(|| {
            for _ in 0..10 {
                let buffer: &mut [u8] = &mut buffer_rgb24;
-               plasma.render::<PBuf, PlasmaICP, _>(&mixer, buffer, pitch, Some(&mut workspc));
+               plasma.render::<PBuf, PlasmaICP, PlasmaMixer>(buffer, pitch, Some(&mut workspc));
                plasma.update(&mut rng);
                black_box(buffer);
            }

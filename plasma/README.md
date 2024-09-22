@@ -79,9 +79,6 @@ In `no_std` mode `plasma` library still depends on the `alloc` crate and in addi
 `Cargo.toml`:
 
 ```toml
-[dependencies]
-rand = "0.7"
-
 [dependencies.plasma]
 version = "0.2"
 git = "https://github.com/royaltm/rust-plasma.git"

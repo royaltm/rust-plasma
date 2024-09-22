@@ -88,3 +88,8 @@ git = "https://github.com/royaltm/rust-plasma.git"
 default-features = false
 features = ["libm"] # or "micromath"
 ```
+
+
+#### Plasma on Arm Cortex-M7 with SPI 160x80 displays.
+
+![cortex-m7](cortex-m7_sm.jpg "Plasma on Arm Cortex-M7")
